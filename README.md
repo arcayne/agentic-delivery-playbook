@@ -1,6 +1,6 @@
 # Agentic Delivery Playbook
 
-A spec-first coding-agent workflow that front-loads strong-model reasoning, splits work into smaller implementation tickets, and reduces drift, retries, and model spend.
+A spec first workflow for coding agents: use strong reasoning early, split work into smaller tickets, reduce drift, retries, and model spend.
 
 <p align="center">
   <img src="assets/agentic-delivery-loop.svg" alt="Agentic Delivery Playbook workflow diagram" width="920">
@@ -33,7 +33,7 @@ Better prompts help. Delivery systems help more.
 
 A prompt can ask an agent to be careful. A delivery workflow makes care inspectable: what was approved, what changed, what evidence exists, where the agent drifted, and when the loop should stop or escalate.
 
-This playbook is for the gap between casual AI-assisted editing and production-like engineering discipline.
+This playbook is for the gap between casual AI assisted editing and production like engineering discipline.
 
 ## When to use it
 
@@ -45,7 +45,7 @@ Skip it for tiny direct edits when all of these are true:
 - it likely touches one or two files
 - validation is obvious
 - there is no security, privacy, auth, data-loss, financial, or external-provider risk
-- the user did not explicitly ask for a spec-first workflow
+- the user did not explicitly ask for a spec first workflow
 
 ## Quick start
 
@@ -132,7 +132,7 @@ Use strong reasoning for shared understanding, edge cases, acceptance criteria, 
 Recommended GitHub description:
 
 ```text
-Spec-first workflow for coding agents: front-load strong reasoning, split smaller tickets, reduce drift, retries, and model spend.
+Spec first workflow for coding agents: use strong reasoning early, split work into smaller tickets, reduce drift, retries, and model spend.
 ```
 
 Recommended topics:

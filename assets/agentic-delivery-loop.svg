@@ -1,6 +1,6 @@
 <svg width="1200" height="520" viewBox="0 0 1200 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">Agentic Delivery Playbook workflow diagram</title>
-  <desc id="desc">A spec-gated coding-agent delivery loop from intake through closeout.</desc>
+  <desc id="desc">A spec first delivery loop for coding agents from intake through closeout.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="520" gradientUnits="userSpaceOnUse">
       <stop stop-color="#090E1A"/>
@@ -56,7 +56,7 @@
   <circle cx="148" cy="448" r="150" fill="#7C3AED" opacity="0.12"/>
 
   <text x="72" y="94" class="title">Agentic Delivery Playbook</text>
-  <text x="74" y="128" class="subtitle">Spec-gated software delivery for coding agents</text>
+  <text x="74" y="128" class="subtitle">Spec first delivery for coding agents</text>
 
   <!-- top row arrows -->
   <path class="arrow" d="M310 218H346"/>
