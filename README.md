@@ -1,12 +1,12 @@
 # Agentic Delivery Playbook
 
-A spec first workflow for coding agents: use strong reasoning early, split work into smaller tickets, reduce drift, retries, and model spend.
+A spec first workflow for coding agents: choose the right model per task, use strong reasoning early, split work into smaller tickets, reduce drift, retries, and spend.
 
 <p align="center">
   <img src="assets/agentic-delivery-loop.svg" alt="Agentic Delivery Playbook workflow diagram" width="920">
 </p>
 
-The idea is simple: spend stronger reasoning early on the spec, critique, edge cases, and acceptance criteria; then give implementation agents smaller, clearer tasks that are cheaper to run, easier to review, and less likely to drift.
+The idea is simple: decide which model or agent should handle each phase. Spend stronger reasoning early on the spec, critique, edge cases, and acceptance criteria; then give implementation agents smaller, clearer tasks that are cheaper to run, easier to review, and less likely to drift.
 
 Coding agents are powerful, but they are easiest to trust when intent, constraints, and verification are explicit before they edit code. This playbook turns agentic coding into an auditable delivery loop:
 
@@ -24,6 +24,7 @@ This repository is a portable engineering pattern for operating coding agents on
 - approval gates before implementation
 - implementation against an accepted contract
 - QA against evidence, not summaries
+- explicit model or agent choice per task: spec, critique, implementation, QA, escalation
 - run artifacts that record decisions, validation, model routing, and known gaps
 - escalation rules when an agent drifts or repeated fix cycles appear
 
@@ -47,6 +48,16 @@ Skip it for tiny direct edits when all of these are true:
 - there is no security, privacy, auth, data-loss, financial, or external-provider risk
 - the user did not explicitly ask for a spec first workflow
 
+## Model choice per task
+
+This playbook does not assume one model should do everything.
+
+Use stronger reasoning for high ambiguity work: intake, spec writing, critique, architecture tradeoffs, safety review, and escalation. Use faster or cheaper implementation agents after the spec is clear and the task has been split small enough. Use skeptical reviewers for QA.
+
+Every run should record the intended and actual model or agent for each role. That makes cost, quality, and drift visible instead of hidden inside a chat transcript.
+
+See [`docs/model-routing.md`](docs/model-routing.md) for the routing ledger and role guidance.
+
 ## Quick start
 
 1. Create a run directory:
@@ -66,9 +77,10 @@ Skip it for tiny direct edits when all of these are true:
 3. Fill the spec before implementation.
 4. Critique and revise the spec.
 5. Get human approval.
-6. Give the implementer the approved spec and nothing vague.
-7. QA the diff against the spec.
-8. Close out with evidence and known gaps.
+6. Choose the implementation model or agent for the focused task.
+7. Give the implementer the approved spec and nothing vague.
+8. QA the diff against the spec.
+9. Close out with evidence, model routing, and known gaps.
 
 See [`playbook.md`](playbook.md) for the full workflow.
 
@@ -132,7 +144,7 @@ Use strong reasoning for shared understanding, edge cases, acceptance criteria, 
 Recommended GitHub description:
 
 ```text
-Spec first workflow for coding agents: use strong reasoning early, split work into smaller tickets, reduce drift, retries, and model spend.
+Spec first workflow for coding agents: choose the right model per task, use strong reasoning early, split work into smaller tickets, reduce drift, retries, and spend.
 ```
 
 Recommended topics:

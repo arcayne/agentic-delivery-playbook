@@ -1,6 +1,6 @@
 <svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">Agentic Delivery Playbook social preview</title>
-  <desc id="desc">Spec first workflow for coding agents that uses reasoning early, splits work into smaller tickets, and reduces drift.</desc>
+  <desc id="desc">Spec first workflow for coding agents that chooses models per task, uses reasoning early, splits work into smaller tickets, and reduces drift.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="640" gradientUnits="userSpaceOnUse">
       <stop stop-color="#070B16"/>
@@ -42,8 +42,8 @@
   <text x="96" y="120" class="eyebrow">SPEC FIRST · AGENTIC DELIVERY</text>
   <text x="94" y="205" class="title">Agentic Delivery</text>
   <text x="94" y="287" class="title">Playbook</text>
-  <text x="100" y="348" class="subtitle">Use reasoning early. Split work smaller.</text>
-  <text x="100" y="388" class="subtitle">Reduce drift, retries, and model spend.</text>
+  <text x="100" y="348" class="subtitle">Choose models per task. Use reasoning early.</text>
+  <text x="100" y="388" class="subtitle">Split smaller tickets. Reduce drift and spend.</text>
 
   <g filter="url(#shadow)">
     <rect x="98" y="454" width="202" height="76" rx="20" fill="url(#card)" stroke="#334155"/>

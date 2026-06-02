@@ -137,5 +137,5 @@
     <text x="942" y="389" class="hint">record run evidence</text>
   </g>
 
-  <text x="600" y="468" text-anchor="middle" class="footer">Artifacts: spec.md · run.json · notes.md · validation evidence</text>
+  <text x="600" y="468" text-anchor="middle" class="footer">Artifacts: spec.md · run.json · notes.md · model ledger · validation evidence</text>
 </svg>

@@ -9,7 +9,7 @@ agentic-delivery-playbook
 Recommended description:
 
 ```text
-Spec first workflow for coding agents: use strong reasoning early, split work into smaller tickets, reduce drift, retries, and model spend.
+Spec first workflow for coding agents: choose the right model per task, use strong reasoning early, split work into smaller tickets, reduce drift, retries, and spend.
 ```
 
 Recommended topics:
@@ -39,7 +39,7 @@ Then set the repository metadata:
 
 ```bash
 gh repo edit agentic-delivery-playbook \
-  --description "Spec first workflow for coding agents: use strong reasoning early, split work into smaller tickets, reduce drift, retries, and model spend." \
+  --description "Spec first workflow for coding agents: choose the right model per task, use strong reasoning early, split work into smaller tickets, reduce drift, retries, and spend." \
   --add-topic ai-agents \
   --add-topic coding-agents \
   --add-topic agentic-workflow \
