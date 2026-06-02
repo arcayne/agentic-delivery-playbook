@@ -1,0 +1,75 @@
+{
+  "workflow": {
+    "name": "agentic-delivery-playbook",
+    "version": "0.1.0"
+  },
+  "phase": "intake",
+  "status": "draft",
+  "taskFit": "small-direct | lightweight-ticket | broad-ticket",
+  "paths": {
+    "spec": "specs/YYYYMMDD-HHMM-feature-slug/spec.md",
+    "notes": "specs/YYYYMMDD-HHMM-feature-slug/notes.md"
+  },
+  "approval": {
+    "required": true,
+    "status": "pending",
+    "approvedBy": null,
+    "approvedAt": null,
+    "evidence": null
+  },
+  "roles": {
+    "specAuthor": {
+      "agent": null,
+      "model": null,
+      "source": "explicit | agent-default | runtime-default | manual"
+    },
+    "critic": {
+      "agent": null,
+      "model": null,
+      "source": "explicit | agent-default | runtime-default | manual"
+    },
+    "implementer": {
+      "agent": null,
+      "model": null,
+      "source": "explicit | agent-default | runtime-default | manual"
+    },
+    "qaReviewer": {
+      "agent": null,
+      "model": null,
+      "source": "explicit | agent-default | runtime-default | manual"
+    }
+  },
+  "modelLedger": [],
+  "reviewGates": {
+    "specCritique": "pending",
+    "humanApproval": "pending",
+    "implementationQa": "pending",
+    "closeout": "pending"
+  },
+  "acceptance": {
+    "total": 0,
+    "met": 0,
+    "unmet": []
+  },
+  "validation": {
+    "commands": [],
+    "manualChecks": [],
+    "evidence": []
+  },
+  "implementation": {
+    "changedFiles": [],
+    "fixCycles": 0,
+    "drift": "none | minor | major | unknown",
+    "unapprovedDecisions": []
+  },
+  "findings": {
+    "blocker": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "specAmbiguity": 0,
+    "missingValidation": 0
+  },
+  "knownGaps": [],
+  "nextAction": "draft spec"
+}

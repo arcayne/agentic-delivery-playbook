@@ -1,0 +1,94 @@
+{
+  "workflow": {
+    "name": "agentic-delivery-playbook",
+    "version": "0.1.0"
+  },
+  "phase": "closeout",
+  "status": "example-complete",
+  "taskFit": "lightweight-ticket",
+  "paths": {
+    "spec": "examples/lightweight-ticket/spec.md",
+    "notes": "examples/lightweight-ticket/notes.md"
+  },
+  "approval": {
+    "required": true,
+    "status": "approved",
+    "approvedBy": "human",
+    "approvedAt": "2026-06-02T00:00:00Z",
+    "evidence": "Example approval: implement this spec."
+  },
+  "roles": {
+    "specAuthor": {
+      "agent": "parent-agent",
+      "model": "configured-spec-model",
+      "source": "runtime-default"
+    },
+    "critic": {
+      "agent": "parent-agent",
+      "model": "configured-spec-model",
+      "source": "runtime-default"
+    },
+    "implementer": {
+      "agent": "code-writer",
+      "model": "configured-implementation-model",
+      "source": "explicit"
+    },
+    "qaReviewer": {
+      "agent": "reviewer",
+      "model": "configured-review-model",
+      "source": "explicit"
+    }
+  },
+  "modelLedger": [
+    {
+      "role": "implementer",
+      "agent": "code-writer",
+      "model": "configured-implementation-model",
+      "source": "explicit",
+      "notes": "Example ledger entry; replace with actual harness routing."
+    }
+  ],
+  "reviewGates": {
+    "specCritique": "passed",
+    "humanApproval": "passed",
+    "implementationQa": "passed",
+    "closeout": "passed"
+  },
+  "acceptance": {
+    "total": 6,
+    "met": 6,
+    "unmet": []
+  },
+  "validation": {
+    "commands": [
+      "npm test -- webhook-consumer",
+      "npm run typecheck"
+    ],
+    "manualChecks": [
+      "Reviewed logs for raw payload/header leakage."
+    ],
+    "evidence": [
+      "Example evidence only; replace with actual command output summary."
+    ]
+  },
+  "implementation": {
+    "changedFiles": [
+      "src/webhooks/retry-classification.ts",
+      "src/webhooks/webhook-consumer.ts",
+      "test/webhook-consumer.test.ts"
+    ],
+    "fixCycles": 1,
+    "drift": "none",
+    "unapprovedDecisions": []
+  },
+  "findings": {
+    "blocker": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 1,
+    "specAmbiguity": 0,
+    "missingValidation": 0
+  },
+  "knownGaps": [],
+  "nextAction": "ship"
+}
