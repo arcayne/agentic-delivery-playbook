@@ -88,7 +88,11 @@ A good spec is:
 - explicit about non-goals
 - explicit about validation evidence
 
-Use [`templates/spec.template.md`](templates/spec.template.md).
+Use [`templates/spec.template.md`](templates/spec.template.md) for simple runs.
+
+Use [`templates/spec.template.html`](templates/spec.template.html) when visual hierarchy, diagrams, screenshots, state machines, or tables make the spec easier for the human approver to understand. Visual specs are not decoration; they are a way to prevent blindly accepting an agent plan.
+
+See [`docs/visual-specs.md`](docs/visual-specs.md).
 
 ## 3. Spec critique
 
@@ -159,6 +163,8 @@ A reviewer should be able to answer:
 
 Use [`templates/qa-checklist.template.md`](templates/qa-checklist.template.md).
 
+For broad tickets or sensitive changes, also use [`docs/high-risk-qa.md`](docs/high-risk-qa.md).
+
 ## 7. Fix or escalate
 
 A normal fix loop is fine. Repeated correction is a signal.
@@ -171,6 +177,7 @@ Escalate when:
 - validation failures reveal spec ambiguity
 - the change is safety/security/architecture critical
 - the reviewer finds unapproved decisions
+- the parent has to revert implementer edits before continuing
 
 Escalation options:
 
@@ -198,13 +205,42 @@ Record:
 
 Use [`templates/notes.template.md`](templates/notes.template.md) and update `run.json`.
 
+Before closing a serious run, use [`templates/closeout-governance.template.md`](templates/closeout-governance.template.md) to record project-specific checks, warnings, skipped validation, and approved exceptions.
+
+## Evidence integrity and legacy runs
+
+Do not invent evidence after the fact.
+
+If a run predates the current workflow, used runtime default routing, skipped a gate, or cannot prove which model or agent did the work, mark it explicitly as a legacy gap or approved exception. Warnings are better than fake precision.
+
+Record:
+
+- what evidence is missing
+- why it is missing
+- whether the human accepted the gap
+- what future runs should do differently
+
+## Implementation model evaluation
+
+When the implementation used an explicitly chosen model or agent, evaluate it after QA.
+
+This is not a benchmark. It is an operational check:
+
+- Did the implementer satisfy the approved spec?
+- Did it keep scope tight?
+- Did it avoid unapproved decisions?
+- How many fix cycles were needed?
+- Did the chosen model or agent seem appropriate for this task size?
+
+Record the result in `run.json` and `notes.md` so future model routing decisions are based on evidence, not vibes.
+
 ## Artifact contract
 
 Every non-direct run should produce:
 
 ```text
 specs/YYYYMMDD-HHMM-feature-slug/
-  spec.md
+  spec.md or spec.html
   run.json
   notes.md
 ```
@@ -213,6 +249,7 @@ Optional artifacts:
 
 ```text
   qa.md
+  closeout-governance.md
   validation.log
   screenshots/
   diffs/

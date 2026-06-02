@@ -19,6 +19,17 @@ QA target: `<spec path>`
 - [ ] Sensitive data handling was preserved or improved.
 - [ ] External-provider, auth, destructive, or irreversible actions require explicit approval where relevant.
 
+## High risk checks
+
+Use for broad tickets or sensitive changes.
+
+- [ ] Privacy/redaction risks reviewed.
+- [ ] Authority, destructive action, or irreversible action boundaries reviewed.
+- [ ] Routing/state precedence reviewed.
+- [ ] Off, shadow, dry run, reply only, or safe mode behavior reviewed where relevant.
+- [ ] Numeric/display edge cases reviewed.
+- [ ] Provider/config failure behavior reviewed.
+
 ## Validation
 
 - [ ] Relevant tests were run.
@@ -34,5 +45,7 @@ QA target: `<spec path>`
 ## Closeout
 
 - [ ] Changed files are listed.
+- [ ] Model or agent routing is recorded honestly.
+- [ ] Implementation model evaluation is recorded when applicable.
 - [ ] Known gaps are listed.
 - [ ] Follow-up work is recommended when needed.

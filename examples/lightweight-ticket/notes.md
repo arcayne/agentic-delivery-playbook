@@ -40,6 +40,14 @@ npm test -- webhook-consumer  # passed
 npm run typecheck             # passed
 ```
 
+## Closeout governance
+
+- Required checks:
+  - `npm test -- webhook-consumer` — passed
+  - `npm run typecheck` — passed
+- Warnings: none
+- Approved exceptions: none
+
 ## QA findings
 
 | Severity | Finding | Resolution |
@@ -50,6 +58,21 @@ npm run typecheck             # passed
 
 - Count: 1
 - Notes: One small naming fix after QA.
+
+## Implementation model evaluation
+
+- Target agent/model: code-writer / configured-implementation-model
+- Actual agent/model: code-writer / configured-implementation-model
+- Drift: none
+- Back and forth signal: none
+- Verdict: validated
+- Notes: The chosen implementer handled a lightweight, well-scoped task with one small QA naming fix.
+
+## Legacy / exception evidence
+
+- Legacy run: no
+- Missing evidence: none
+- Approved exceptions: none
 
 ## Model / agent ledger
 

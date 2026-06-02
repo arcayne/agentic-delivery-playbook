@@ -22,7 +22,7 @@ Do this when all are true:
 - no security, privacy, auth, payment, financial, destructive, external-provider, or irreversible-action risk
 - no cross-package or public contract change
 - validation is obvious and narrow
-- the user did not explicitly ask for a spec-first run
+- the user did not explicitly ask for a spec first run
 
 ### Use lightweight playbook
 
@@ -57,10 +57,12 @@ specs/YYYYMMDD-HHMM-<feature-slug>/
 Minimum files:
 
 ```text
-spec.md
+spec.md or spec.html
 run.json
 notes.md
 ```
+
+Use `spec.html` when diagrams, screenshots, state machines, tables, or stronger visual hierarchy help the human reviewer understand the contract before approval.
 
 `run.json` should include:
 
@@ -72,6 +74,9 @@ notes.md
 - active role/agent/model
 - review gates
 - model ledger with source: `explicit`, `agent-default`, `runtime-default`, or `manual`
+- implementation model exception, when routing differs from policy and the user approved it
+- legacy policy, when older/incomplete runs cannot prove routing or gate evidence
+- implementation model evaluation after QA, when a model or agent was explicitly chosen
 - changed files
 - validation evidence
 - findings
@@ -98,7 +103,11 @@ For lightweight runs, ask at most one focused clarification question before draf
 
 ### 2. Spec author
 
-Write `spec.md` as an implementation-ready contract. Include:
+Write `spec.md` or `spec.html` as an implementation-ready contract.
+
+Use `spec.html` for complex specs when visual grouping, diagrams, screenshots, or state machines make approval safer. Visuals are not decoration; they help the human avoid blindly accepting an agent plan.
+
+Include:
 
 - objective
 - non-goals
@@ -128,7 +137,7 @@ Review the spec before coding. Attack:
 - security/privacy gaps
 - under-specified verification
 
-Revise `spec.md` or ask the user to decide unresolved questions.
+Revise `spec.md` or `spec.html`, or ask the user to decide unresolved questions.
 
 For lightweight runs, a parent self-review is acceptable if there is no serious risk. For full runs, use an independent critic when available.
 
@@ -166,9 +175,18 @@ For broad tickets:
 
 Do not add this gate for small direct or ordinary lightweight work unless a risk signal appears.
 
+### Evidence integrity and legacy runs
+
+For older, interrupted, or incomplete runs, preserve truth and keep evidence explicit:
+
+- mark missing routing, missing gate, or skipped validation evidence as a warning or approved exception
+- do not fabricate model routing claims after the fact
+- do not claim a model-specific result unless that model or agent was actually routed and recorded
+- record what future runs should do differently
+
 ### 6. Implementation QA
 
-QA against the approved `spec.md`, not against the implementer's summary.
+QA against the approved `spec.md` or `spec.html`, not against the implementer's summary.
 
 Categorize findings:
 
@@ -179,6 +197,8 @@ Categorize findings:
 - spec ambiguity
 - implementation drift
 - missing validation/test
+
+For broad tickets or sensitive changes, include high-risk QA checks for privacy/redaction, authority or irreversible actions, routing/state precedence, mode behavior, numeric/display edge cases, provider/config validation, and external-service failures.
 
 ### 7. Fix/escalation loop
 
@@ -201,9 +221,13 @@ Update `run.json` and `notes.md` with:
 - verification commands/evidence
 - known gaps
 - model ledger
+- implementation model evaluation, when a model or agent was explicitly chosen
+- legacy/exception evidence, when applicable
 - fix cycles
 - escalations
 - recommendation for next run
+
+Before closing serious runs, record project-specific governance checks such as typecheck, lint, tests, workflow audits, warnings, and skipped validation. Missing checks should be known gaps or approved exceptions, not hidden.
 
 ## Visibility banner
 
@@ -212,11 +236,14 @@ At major phase transitions, report compactly:
 ```text
 Workflow: agentic-delivery-playbook v0.1
 Phase: <n>/<total> — <name>
-Spec: specs/YYYYMMDD-HHMM-<slug>/spec.md
+Spec: specs/YYYYMMDD-HHMM-<slug>/spec.md or spec.html
+Open HTML: <local preview URL, if using spec.html>
 Run: specs/YYYYMMDD-HHMM-<slug>/run.json
 Active role/model: <role/model or runtime-default>
 Next gate: <gate>
 ```
+
+If using `spec.html`, prefer a local `127.0.0.1` preview URL when the harness supports it so the human approves the rendered spec instead of raw source.
 
 ## Delegation
 

@@ -41,6 +41,10 @@ The implementation is acceptable only if all required criteria are met.
 - [ ] <criterion with observable evidence>
 - [ ] <criterion with observable evidence>
 
+## Visuals or diagrams
+
+Optional. Add only when a diagram, screenshot, state machine, or flow image helps the human reviewer understand the contract before approval.
+
 ## Verification plan
 
 Commands, tests, manual checks, screenshots, logs, or other evidence required before closeout.

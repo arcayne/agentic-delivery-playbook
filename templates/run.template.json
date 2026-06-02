@@ -7,9 +7,11 @@
   "status": "draft",
   "taskFit": "small-direct | lightweight-ticket | broad-ticket",
   "paths": {
-    "spec": "specs/YYYYMMDD-HHMM-feature-slug/spec.md",
+    "spec": "specs/YYYYMMDD-HHMM-feature-slug/spec.md | specs/YYYYMMDD-HHMM-feature-slug/spec.html",
+    "specPreviewUrl": null,
     "notes": "specs/YYYYMMDD-HHMM-feature-slug/notes.md"
   },
+  "artifactFormat": "markdown | html",
   "approval": {
     "required": true,
     "status": "pending",
@@ -43,8 +45,17 @@
   "reviewGates": {
     "specCritique": "pending",
     "humanApproval": "pending",
+    "broadTicketPlanning": "not-applicable | pending | passed | warning",
     "implementationQa": "pending",
     "closeout": "pending"
+  },
+  "broadTicketGate": {
+    "required": false,
+    "status": "not-applicable | pending | passed | warning",
+    "plannerAgent": null,
+    "plannerModel": null,
+    "tickets": [],
+    "highRiskQaChecks": []
   },
   "acceptance": {
     "total": 0,
@@ -62,6 +73,34 @@
     "drift": "none | minor | major | unknown",
     "unapprovedDecisions": []
   },
+  "implementationModelException": {
+    "approved": false,
+    "reason": null,
+    "approvedBy": null,
+    "evidence": null
+  },
+  "implementationEvaluation": {
+    "targetAgent": null,
+    "targetModel": null,
+    "actualAgent": null,
+    "actualModel": null,
+    "taskFit": "small-direct | lightweight-ticket | broad-ticket",
+    "acceptanceMet": 0,
+    "acceptanceTotal": 0,
+    "implementationDrift": "none | minor | major | unknown",
+    "unapprovedDecisions": 0,
+    "fixCycles": 0,
+    "backAndForthSignal": "none | mild | concerning",
+    "testsRun": [],
+    "reviewFindings": {
+      "blocker": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "verdict": "validated | mixed | failed | inconclusive",
+    "notes": null
+  },
   "findings": {
     "blocker": 0,
     "high": 0,
@@ -71,5 +110,17 @@
     "missingValidation": 0
   },
   "knownGaps": [],
+  "legacyPolicy": {
+    "isLegacyRun": false,
+    "warnings": [],
+    "missingEvidence": [],
+    "rationale": null
+  },
+  "closeoutGovernance": {
+    "requiredChecks": [],
+    "warnings": [],
+    "skippedChecks": [],
+    "approvedExceptions": []
+  },
   "nextAction": "draft spec"
 }

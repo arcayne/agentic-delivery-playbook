@@ -57,6 +57,24 @@ Do not claim that a model performed well unless the run actually used that model
 
 If routing failed or the harness used a default, record that honestly. The operational question is not "which model is best?" but "did this run satisfy the approved spec with evidence?"
 
+## Implementation evaluation
+
+When implementation used an explicitly chosen model or agent, record a short post-QA evaluation:
+
+- target model or agent
+- actual model or agent
+- task fit
+- acceptance criteria met
+- implementation drift
+- unapproved decisions
+- fix cycles
+- back and forth signal
+- tests run
+- review findings
+- verdict
+
+This is not a benchmark score. It is a local operating signal: which models and agents are reliable for which task shapes in your own workflow.
+
 ## Broad-ticket planning
 
 For broad tickets, add a planning/review layer before implementation:

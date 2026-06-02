@@ -8,8 +8,10 @@
   "taskFit": "lightweight-ticket",
   "paths": {
     "spec": "examples/lightweight-ticket/spec.md",
+    "specPreviewUrl": null,
     "notes": "examples/lightweight-ticket/notes.md"
   },
+  "artifactFormat": "markdown",
   "approval": {
     "required": true,
     "status": "approved",
@@ -51,8 +53,17 @@
   "reviewGates": {
     "specCritique": "passed",
     "humanApproval": "passed",
+    "broadTicketPlanning": "not-applicable",
     "implementationQa": "passed",
     "closeout": "passed"
+  },
+  "broadTicketGate": {
+    "required": false,
+    "status": "not-applicable",
+    "plannerAgent": null,
+    "plannerModel": null,
+    "tickets": [],
+    "highRiskQaChecks": []
   },
   "acceptance": {
     "total": 6,
@@ -81,6 +92,37 @@
     "drift": "none",
     "unapprovedDecisions": []
   },
+  "implementationModelException": {
+    "approved": false,
+    "reason": null,
+    "approvedBy": null,
+    "evidence": null
+  },
+  "implementationEvaluation": {
+    "targetAgent": "code-writer",
+    "targetModel": "configured-implementation-model",
+    "actualAgent": "code-writer",
+    "actualModel": "configured-implementation-model",
+    "taskFit": "lightweight-ticket",
+    "acceptanceMet": 6,
+    "acceptanceTotal": 6,
+    "implementationDrift": "none",
+    "unapprovedDecisions": 0,
+    "fixCycles": 1,
+    "backAndForthSignal": "none",
+    "testsRun": [
+      "npm test -- webhook-consumer",
+      "npm run typecheck"
+    ],
+    "reviewFindings": {
+      "blocker": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 1
+    },
+    "verdict": "validated",
+    "notes": "Example evaluation only; replace with evidence from a real run."
+  },
   "findings": {
     "blocker": 0,
     "high": 0,
@@ -90,5 +132,20 @@
     "missingValidation": 0
   },
   "knownGaps": [],
+  "legacyPolicy": {
+    "isLegacyRun": false,
+    "warnings": [],
+    "missingEvidence": [],
+    "rationale": null
+  },
+  "closeoutGovernance": {
+    "requiredChecks": [
+      "npm test -- webhook-consumer",
+      "npm run typecheck"
+    ],
+    "warnings": [],
+    "skippedChecks": [],
+    "approvedExceptions": []
+  },
   "nextAction": "ship"
 }

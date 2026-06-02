@@ -69,12 +69,13 @@ See [`docs/model-routing.md`](docs/model-routing.md) for the routing ledger and 
 2. Copy the templates:
 
    ```text
-   templates/spec.template.md  -> specs/.../spec.md
-   templates/run.template.json -> specs/.../run.json
-   templates/notes.template.md -> specs/.../notes.md
+   templates/spec.template.md   -> specs/.../spec.md
+   templates/spec.template.html -> specs/.../spec.html  # optional visual spec
+   templates/run.template.json  -> specs/.../run.json
+   templates/notes.template.md  -> specs/.../notes.md
    ```
 
-3. Fill the spec before implementation.
+3. Fill the spec before implementation. Use HTML, diagrams, or images when they help the human reviewer actually understand the contract before approving it.
 4. Critique and revise the spec.
 5. Get human approval.
 6. Choose the implementation model or agent for the focused task.
@@ -97,13 +98,17 @@ docs/
   gates.md
   model-routing.md
   failure-modes.md
+  high-risk-qa.md
+  visual-specs.md
   adapters.md
   publishing.md
 templates/
   spec.template.md
+  spec.template.html
   run.template.json
   notes.template.md
   qa-checklist.template.md
+  closeout-governance.template.md
 adapters/
   pi/
     SKILL.md
@@ -138,6 +143,8 @@ The adapter is intentionally generic. Configure your preferred models or agents 
 ## Core principle
 
 Use strong reasoning for shared understanding, edge cases, acceptance criteria, and QA contracts. Use implementation agents only after the contract is clear. Evaluate the result against evidence.
+
+If the spec is complex, make it readable. A rendered HTML spec, diagram, or screenshot is useful when it helps the human reviewer catch mistakes instead of blindly approving an agent plan.
 
 ## Publishing checklist
 
