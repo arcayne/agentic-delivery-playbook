@@ -132,7 +132,7 @@ Use strong reasoning for shared understanding, edge cases, acceptance criteria, 
 Recommended GitHub description:
 
 ```text
-A spec-first coding-agent workflow that front-loads strong-model reasoning, splits work into smaller implementation tickets, and reduces drift, retries, and model spend.
+Spec-first workflow for coding agents: front-load strong reasoning, split smaller tickets, reduce drift, retries, and model spend.
 ```
 
 Recommended topics:

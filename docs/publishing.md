@@ -9,7 +9,7 @@ agentic-delivery-playbook
 Recommended description:
 
 ```text
-A spec-first coding-agent workflow that front-loads strong-model reasoning, splits work into smaller implementation tickets, and reduces drift, retries, and model spend.
+Spec-first workflow for coding agents: front-load strong reasoning, split smaller tickets, reduce drift, retries, and model spend.
 ```
 
 Recommended topics:
@@ -39,7 +39,7 @@ Then set the repository metadata:
 
 ```bash
 gh repo edit agentic-delivery-playbook \
-  --description "A spec-first coding-agent workflow that front-loads strong-model reasoning, splits work into smaller implementation tickets, and reduces drift, retries, and model spend." \
+  --description "Spec-first workflow for coding agents: front-load strong reasoning, split smaller tickets, reduce drift, retries, and model spend." \
   --add-topic ai-agents \
   --add-topic coding-agents \
   --add-topic agentic-workflow \
@@ -48,6 +48,24 @@ gh repo edit agentic-delivery-playbook \
   --add-topic ai-assisted-development \
   --add-topic human-in-the-loop
 ```
+
+## Social preview
+
+GitHub social preview images are configured in the repository web UI, not by `gh repo edit`.
+
+Use:
+
+```text
+assets/social-preview.png
+```
+
+Upload it at:
+
+```text
+Repository Settings -> Social preview -> Upload an image
+```
+
+Recommended image size is 1280x640.
 
 ## First release
 
