@@ -1,7 +1,7 @@
 {
   "workflow": {
     "name": "agentic-delivery-playbook",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "phase": "intake",
   "status": "draft",
@@ -79,6 +79,17 @@
     "approvedBy": null,
     "evidence": null
   },
+  "observabilitySummary": {
+    "available": false,
+    "source": "PI_OBS_DB | harness telemetry | manual estimate | unavailable",
+    "sessions": null,
+    "turns": null,
+    "outputTokens": null,
+    "costApprox": null,
+    "modelMix": {},
+    "processWeight": "lightweight | justified-broad | overused | unknown",
+    "notes": null
+  },
   "implementationEvaluation": {
     "targetAgent": null,
     "targetModel": null,
@@ -118,6 +129,7 @@
   },
   "closeoutGovernance": {
     "requiredChecks": [],
+    "observabilityChecks": [],
     "warnings": [],
     "skippedChecks": [],
     "approvedExceptions": []

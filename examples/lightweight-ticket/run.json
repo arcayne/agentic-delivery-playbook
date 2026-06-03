@@ -1,7 +1,7 @@
 {
   "workflow": {
     "name": "agentic-delivery-playbook",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "phase": "closeout",
   "status": "example-complete",
@@ -98,6 +98,17 @@
     "approvedBy": null,
     "evidence": null
   },
+  "observabilitySummary": {
+    "available": false,
+    "source": "unavailable",
+    "sessions": null,
+    "turns": null,
+    "outputTokens": null,
+    "costApprox": null,
+    "modelMix": {},
+    "processWeight": "lightweight",
+    "notes": "Example run has no telemetry attached."
+  },
   "implementationEvaluation": {
     "targetAgent": "code-writer",
     "targetModel": "configured-implementation-model",
@@ -142,6 +153,9 @@
     "requiredChecks": [
       "npm test -- webhook-consumer",
       "npm run typecheck"
+    ],
+    "observabilityChecks": [
+      "telemetry unavailable for example run"
     ],
     "warnings": [],
     "skippedChecks": [],

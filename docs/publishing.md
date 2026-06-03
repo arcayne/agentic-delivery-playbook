@@ -67,15 +67,20 @@ Repository Settings -> Social preview -> Upload an image
 
 Recommended image size is 1280x640.
 
-## First release
+## Release
+
+Set the release version explicitly, then tag and publish:
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
-gh release create v0.1.0 \
-  --title "v0.1.0" \
-  --notes "Initial public draft of the Agentic Delivery Playbook."
+VERSION=v0.2.0
+git tag "$VERSION"
+git push origin "$VERSION"
+gh release create "$VERSION" \
+  --title "$VERSION" \
+  --notes "Agentic Delivery Playbook release $VERSION."
 ```
+
+For the initial public release, use notes that describe the first draft. For later releases, summarize the workflow/template changes from `CHANGELOG.md`.
 
 ## Launch blurb
 

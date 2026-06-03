@@ -205,7 +205,9 @@ Record:
 
 Use [`templates/notes.template.md`](templates/notes.template.md) and update `run.json`.
 
-Before closing a serious run, use [`templates/closeout-governance.template.md`](templates/closeout-governance.template.md) to record project-specific checks, warnings, skipped validation, and approved exceptions.
+Before closing a serious run, use [`templates/closeout-governance.template.md`](templates/closeout-governance.template.md) to record project-specific checks, warnings, skipped validation, approved exceptions, and observability/ROI data when available.
+
+Telemetry and ROI checks must be portable. Prefer environment/config inputs such as `PI_OBS_DB`; do not commit personal absolute paths into reusable scripts or templates.
 
 ## Evidence integrity and legacy runs
 
@@ -231,6 +233,7 @@ This is not a benchmark. It is an operational check:
 - Did it avoid unapproved decisions?
 - How many fix cycles were needed?
 - Did the chosen model or agent seem appropriate for this task size?
+- Was the process weight appropriate for the task, based on cost/tokens/turns when available?
 
 Record the result in `run.json` and `notes.md` so future model routing decisions are based on evidence, not vibes.
 

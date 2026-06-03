@@ -165,7 +165,7 @@ See [`docs/publishing.md`](docs/publishing.md) for first-publish and release com
 
 ## Status
 
-`v0.1.0` draft. The pattern is intentionally small and practical.
+`v0.2.0` draft. Adds evidence integrity, lightweight/broad budget awareness, and portable observability/ROI closeout guidance while keeping the pattern intentionally practical.
 
 ## License
 

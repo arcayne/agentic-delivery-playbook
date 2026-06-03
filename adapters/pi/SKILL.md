@@ -33,6 +33,8 @@ Use for bounded work when:
 - risk is low or medium
 - a compact spec/checklist is enough
 
+Keep lightweight runs intentionally small. If observability/cost data is available, a lightweight run should usually stay under the team's lightweight budget target.
+
 ### Use full playbook
 
 Use when any are true:
@@ -76,6 +78,7 @@ Use `spec.html` when diagrams, screenshots, state machines, tables, or stronger 
 - model ledger with source: `explicit`, `agent-default`, `runtime-default`, or `manual`
 - implementation model exception, when routing differs from policy and the user approved it
 - legacy policy, when older/incomplete runs cannot prove routing or gate evidence
+- observability or ROI summary when telemetry data is available
 - implementation model evaluation after QA, when a model or agent was explicitly chosen
 - changed files
 - validation evidence
@@ -173,7 +176,7 @@ For broad tickets:
 3. review after the first implementation pass
 4. record the gate in `run.json` and the model ledger
 
-Do not add this gate for small direct or ordinary lightweight work unless a risk signal appears.
+Do not add this gate for small direct or ordinary lightweight work unless a risk signal appears. If observability/cost data is available, broad-ticket runs should have an explicit budget expectation; runs that exceed the team's hard budget should explain why the added process/model spend was justified.
 
 ### Evidence integrity and legacy runs
 
@@ -229,12 +232,14 @@ Update `run.json` and `notes.md` with:
 
 Before closing serious runs, record project-specific governance checks such as typecheck, lint, tests, workflow audits, warnings, and skipped validation. Missing checks should be known gaps or approved exceptions, not hidden.
 
+When telemetry is available, add a small observability/ROI summary: sessions, turns, output tokens, approximate cost, model mix, and whether the process weight was lightweight, justified broad, or overused. Keep this portable: use an environment variable or documented config such as `PI_OBS_DB` for local telemetry databases. Never hard-code personal absolute paths into reusable scripts, templates, or published adapters.
+
 ## Visibility banner
 
 At major phase transitions, report compactly:
 
 ```text
-Workflow: agentic-delivery-playbook v0.1
+Workflow: agentic-delivery-playbook v0.2
 Phase: <n>/<total> — <name>
 Spec: specs/YYYYMMDD-HHMM-<slug>/spec.md or spec.html
 Open HTML: <local preview URL, if using spec.html>
