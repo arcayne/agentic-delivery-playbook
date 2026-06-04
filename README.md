@@ -1,78 +1,155 @@
 # Agentic Delivery Playbook
 
-A spec first workflow for coding agents: choose the right model per task, use strong reasoning early, split work into smaller tickets, reduce drift, retries, and spend.
+**A no-hype workflow for keeping coding agents scoped, testable, and honest.**
+
+This is the thing you paste before you let an agent touch your repo.
+
+Use it to classify the task, define what the agent may change, choose the right model or agent when your harness allows it, and require evidence before trusting the result.
+
+Start with one prompt. Add templates and run artifacts only when the task is risky enough to deserve them.
 
 <p align="center">
-  <img src="assets/agentic-delivery-loop.svg" alt="Agentic Delivery Playbook workflow diagram" width="920">
+  <img src="assets/scoped-vs-freestyle.svg" alt="Freestyle agent run creates a surprise diff; classified tasks create scoped changes with evidence" width="920">
 </p>
 
-The idea is simple: decide which model or agent should handle each phase. Spend stronger reasoning early on the spec, critique, edge cases, and acceptance criteria; then give implementation agents smaller, clearer tasks that are cheaper to run, easier to review, and less likely to drift.
+## Try it in 60 seconds
 
-Coding agents are powerful, but they are easiest to trust when intent, constraints, and verification are explicit before they edit code. This playbook turns agentic coding into an auditable delivery loop:
+Paste this into Claude Code, Codex, ChatGPT, Claude, Cursor, or another coding assistant:
+
+```text
+Use the Agentic Delivery Playbook.
+
+First classify this task:
+- direct: clear, low-risk, narrow edit; no spec or run directory
+- lightweight: bounded work that needs a compact checklist/spec
+- full: broad, ambiguous, security/privacy/provider/state/API, or drift-prone work
+
+Use the smallest safe process.
+
+If direct:
+- make the smallest correct change
+- run the obvious validation
+- report changed files and evidence
+
+If lightweight or full:
+- draft a compact spec before coding
+- include objective, non-goals, acceptance criteria, risks, and verification
+- stop for my approval before implementation unless I say continue end-to-end
+- after implementation, QA the diff against the spec, not your own summary
+- do not claim tests passed unless you have actual output
+
+Task:
+<describe the task>
+```
+
+That is the whole starting point. Everything else in this repo is for teams that want the repeatable version.
+
+## What problem does this solve?
+
+| Agent pain | Playbook move |
+| --- | --- |
+| “The agent changed too much.” | Direct/lightweight/full triage before editing |
+| “It solved a different problem.” | Approved spec with non-goals |
+| “I do not trust the test summary.” | Evidence-based closeout |
+| “The PR is hard to review.” | QA against acceptance criteria, not summaries |
+| “The model was too weak or too expensive for the job.” | Model/agent routing ledger when available |
+| “The task keeps going sideways.” | Fix-cycle escalation rules |
+
+## The three modes
+
+Choose process weight before creating artifacts.
+
+| Mode | Use when | What happens |
+| --- | --- | --- |
+| **Direct** | Small, obvious, low-risk change | Edit, validate, report evidence |
+| **Lightweight** | Bounded feature/fix needing a checklist | Compact spec, approval, implementation, QA |
+| **Full** | Risky, ambiguous, cross-system, security/privacy/API/state/provider work | Critic, approval gate, QA evidence, escalation rules |
+| **Full + bounded workflow** | Broad audit, migration, or adversarial review | Parallel or dynamic work only with scope, cap, stop rule, and synthesis plan |
+
+Do not use full mode for tiny direct edits. Do not create artifacts for obvious one-file changes.
+
+## Adopt it in five minutes
+
+1. Paste the 60-second prompt into your next agent task.
+2. Ask the agent to classify the task before editing.
+3. For direct tasks, let it edit and require evidence.
+4. For non-direct tasks, approve the spec before implementation.
+5. Use a QA prompt on the final diff: “Verify this diff against the approved spec, not the implementer summary.”
+
+No framework required. No new service required. No agent platform required.
+
+## The loop
+
+```text
+classify -> spec only if needed -> approve -> implement -> QA against evidence
+```
+
+For full-mode work, the complete loop is:
 
 ```text
 intake -> spec -> critique -> approval -> implementation -> QA -> fix/escalate -> closeout
 ```
 
-The goal is not to add ceremony to every change. The goal is to use the right amount of structure when agent drift, ambiguous requirements, security/privacy risk, or cross-system changes would be expensive.
+<p align="center">
+  <img src="assets/agentic-delivery-loop.svg" alt="Agentic Delivery Playbook workflow diagram" width="920">
+</p>
 
-## Start here
+## What this is not
 
-If you want to use the playbook with an AI tool, start with [`docs/getting-started.md`](docs/getting-started.md). It includes:
+This is not another agent framework.
 
-- a universal prompt for any assistant
+It does not require a new runtime, queue, orchestrator, vector database, dashboard, or multi-agent platform.
+
+You can use it as:
+
+- one pasted prompt
+- a Claude Code command or project memory
+- a Codex `AGENTS.md`
+- a ChatGPT/Claude review checklist
+- a repo-local delivery convention
+
+Start with the prompt. Add artifacts only when the task deserves them.
+
+## Designed to control token waste
+
+The playbook does not assume one model should do everything.
+
+Use stronger reasoning where mistakes are expensive: goal definition, spec writing, critique, edge cases, safety review, QA, and escalation. Use faster or cheaper implementation agents after the task is explicit and small enough. Record intended and actual model/agent choices when your harness exposes them.
+
+This is a design goal, not a magic savings claim. To make cost and quality inspectable, runs can record:
+
+- task mode and approved scope
+- intended vs actual model/agent routing
+- validation commands and outputs
+- QA findings and fix cycles
+- known gaps and next action
+
+See [`docs/model-routing.md`](docs/model-routing.md) for the routing ledger and role guidance.
+
+## Why not just prompt better?
+
+Better prompts ask the agent to be careful.
+
+This playbook makes care inspectable:
+
+- What was approved?
+- What changed?
+- What evidence exists?
+- Did the agent drift?
+- Should we retry, split, escalate, or stop?
+
+That matters when the code is production-facing, security-sensitive, expensive to review, or easy to get subtly wrong.
+
+## Use with your tool
+
+Start with [`docs/getting-started.md`](docs/getting-started.md). It includes:
+
+- the universal prompt for any assistant
 - Claude and ChatGPT prompts for spec review and QA
 - Claude Code `CLAUDE.md` and slash-command setup
 - Codex `AGENTS.md` setup
 
-For your first task, ask the assistant to classify the work as **direct**, **lightweight**, or **full** before it edits code.
-
-## What this is
-
-This repository is a portable engineering pattern for operating coding agents on real software work. It defines:
-
-- role separation: spec author, critic, implementer, QA reviewer, human approver
-- approval gates before implementation
-- implementation against an accepted contract
-- QA against evidence, not summaries
-- explicit model or agent choice per task: spec, critique, implementation, QA, escalation
-- bounded orchestration choices, including dynamic workflows only when width is genuinely useful
-- run artifacts that record decisions, validation, model routing, and known gaps
-- escalation rules when an agent drifts or repeated fix cycles appear
-
-## Why not just prompt better?
-
-Better prompts help. Delivery systems help more.
-
-A prompt can ask an agent to be careful. A delivery workflow makes care inspectable: what was approved, what changed, what evidence exists, where the agent drifted, and when the loop should stop or escalate.
-
-This playbook is for the gap between casual AI assisted editing and production like engineering discipline.
-
-## When to use it
-
-Choose process weight before creating artifacts.
-
-Use **direct mode** for clear, low-risk one- or two-file edits: no run directory, just edit, validate, and report evidence.
-
-Use **lightweight mode** for bounded low/medium-risk work that benefits from a compact spec or checklist. Notes-only evidence and parent self-review are acceptable when risk stays low.
-
-Use **full mode** for ambiguous, risky, cross-package, customer-facing, provider/config/state-machine, security/privacy, or drift-prone work. Full mode uses broad-ticket planning when needed, explicit routing ledgers, critic/QA gates, high-risk QA, and required closeout fields.
-
-Use **dynamic workflows** only as a full-mode orchestration escalation when broad parallelism is useful. Before launch, write a short plain-English launch note with scope, concrete cap, stop rule, and synthesis/verification plan. Do not turn this into a blank budget form.
-
-Do not use the full workflow for tiny direct edits unless the user explicitly asks for a spec-first run.
-
-## Model choice per task
-
-This playbook does not assume one model should do everything.
-
-Use stronger reasoning for high ambiguity work: intake, spec writing, critique, architecture tradeoffs, safety review, and escalation. Use faster or cheaper implementation agents after the spec is clear and the task has been split small enough. Use skeptical reviewers for QA.
-
-Every run should record the intended and actual model or agent for each role. That makes cost, quality, and drift visible instead of hidden inside a chat transcript.
-
-See [`docs/model-routing.md`](docs/model-routing.md) for the routing ledger and role guidance.
 See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md) for bounded fanout, width-vs-depth guidance, and workflow launch notes.
-See [`docs/getting-started.md`](docs/getting-started.md) for clear setup and copy/paste prompts for Claude, Claude Code, ChatGPT, and Codex.
 If you run Hermes or Pi with OpenAI-backed browser-login models, see [`docs/openai-hermes-pi-routing.md`](docs/openai-hermes-pi-routing.md) for a surface-specific routing companion.
 
 ## Artifact quick start for non-direct runs
@@ -113,6 +190,7 @@ README.md
 playbook.md
 SECURITY.md
 assets/
+  scoped-vs-freestyle.svg
   agentic-delivery-loop.svg
 docs/
   philosophy.md
@@ -240,7 +318,7 @@ If the spec is complex, make it readable. A rendered HTML spec, diagram, or scre
 Recommended GitHub description:
 
 ```text
-Spec first workflow for coding agents: choose the right model per task, use strong reasoning early, split work into smaller tickets, reduce drift, retries, and spend.
+No-hype workflow for keeping coding agents scoped, testable, and honest.
 ```
 
 Recommended topics:

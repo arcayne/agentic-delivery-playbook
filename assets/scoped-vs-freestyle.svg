@@ -1,0 +1,88 @@
+<svg width="1200" height="460" viewBox="0 0 1200 460" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Freestyle agent run versus scoped delivery</title>
+  <desc id="desc">A comparison showing freestyle agent work leading to a surprise diff, while a classified task leads to a scoped change and evidence.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#070B16"/>
+      <stop offset="0.55" stop-color="#101827"/>
+      <stop offset="1" stop-color="#06111F"/>
+    </linearGradient>
+    <linearGradient id="border" x1="70" y1="42" x2="1130" y2="418" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6"/>
+      <stop offset="0.5" stop-color="#06B6D4"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+    <linearGradient id="badCard" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#2A1622"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="goodCard" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#123226"/>
+      <stop offset="1" stop-color="#0B1220"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-25%" width="140%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000" flood-opacity="0.38"/>
+    </filter>
+    <marker id="badArrow" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="strokeWidth">
+      <path d="M2 2L11 7L2 12" stroke="#FB7185" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="goodArrow" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="strokeWidth">
+      <path d="M2 2L11 7L2 12" stroke="#34D399" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      .eyebrow { font: 800 18px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; letter-spacing: 0.12em; }
+      .title { font: 900 38px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #F8FAFC; letter-spacing: -0.035em; }
+      .label { font: 850 28px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #F8FAFC; letter-spacing: -0.035em; }
+      .hint { font: 600 16px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #CBD5E1; }
+      .badHint { fill: #FDA4AF; }
+      .goodHint { fill: #A7F3D0; }
+      .badArrow { stroke: #FB7185; stroke-width: 4; stroke-linecap: round; marker-end: url(#badArrow); }
+      .goodArrow { stroke: #34D399; stroke-width: 4; stroke-linecap: round; marker-end: url(#goodArrow); }
+      .divider { stroke: #334155; stroke-width: 1.5; stroke-dasharray: 6 10; opacity: 0.9; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="460" rx="34" fill="url(#bg)"/>
+  <circle cx="1060" cy="72" r="160" fill="#FB7185" opacity="0.10"/>
+  <circle cx="150" cy="420" r="190" fill="#22C55E" opacity="0.11"/>
+  <circle cx="690" cy="460" r="170" fill="#06B6D4" opacity="0.07"/>
+  <rect x="42" y="34" width="1116" height="392" rx="28" stroke="url(#border)" stroke-width="2" opacity="0.62"/>
+
+  <text x="72" y="84" class="title">Before the agent touches the repo</text>
+  <text x="74" y="116" class="hint">Freestyle work creates review guesswork. Scoped delivery creates evidence.</text>
+
+  <path d="M72 215H1128" class="divider"/>
+
+  <text x="80" y="174" class="eyebrow" fill="#FB7185">FREESTYLE</text>
+  <text x="80" y="334" class="eyebrow" fill="#34D399">PLAYBOOK</text>
+
+  <g filter="url(#shadow)">
+    <rect x="210" y="136" width="300" height="92" rx="20" fill="url(#badCard)" stroke="#7F1D1D"/>
+    <text x="242" y="176" class="label">Freestyle agent run</text>
+    <text x="244" y="204" class="hint badHint">vague handoff, hidden scope</text>
+  </g>
+  <path class="badArrow" d="M538 182H630"/>
+  <g filter="url(#shadow)">
+    <rect x="660" y="136" width="286" height="92" rx="20" fill="url(#badCard)" stroke="#7F1D1D"/>
+    <text x="698" y="176" class="label">Surprise diff</text>
+    <text x="700" y="204" class="hint badHint">plausible, broad, hard to trust</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="185" y="296" width="250" height="92" rx="20" fill="url(#goodCard)" stroke="#065F46"/>
+    <text x="218" y="336" class="label">Classified task</text>
+    <text x="220" y="364" class="hint goodHint">direct, lightweight, or full</text>
+  </g>
+  <path class="goodArrow" d="M462 342H535"/>
+  <g filter="url(#shadow)">
+    <rect x="565" y="296" width="230" height="92" rx="20" fill="url(#goodCard)" stroke="#065F46"/>
+    <text x="602" y="336" class="label">Scoped change</text>
+    <text x="604" y="364" class="hint goodHint">non-goals stay out</text>
+  </g>
+  <path class="goodArrow" d="M822 342H895"/>
+  <g filter="url(#shadow)">
+    <rect x="925" y="296" width="210" height="92" rx="20" fill="url(#goodCard)" stroke="#065F46"/>
+    <text x="972" y="336" class="label">Evidence</text>
+    <text x="974" y="364" class="hint goodHint">verified before trust</text>
+  </g>
+</svg>
