@@ -1,15 +1,15 @@
 <svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">Agentic Delivery Playbook social preview</title>
-  <desc id="desc">Spec first workflow for coding agents that chooses models per task, uses reasoning early, splits work into smaller tickets, and reduces drift.</desc>
+  <title id="title">Coding Agent Playbook social preview</title>
+  <desc id="desc">A practical safety harness for coding agents. Before implementation, define mode, goal, non-goals, risks, approval, and evidence.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="640" gradientUnits="userSpaceOnUse">
       <stop stop-color="#070B16"/>
-      <stop offset="0.45" stop-color="#101827"/>
+      <stop offset="0.5" stop-color="#101827"/>
       <stop offset="1" stop-color="#05111F"/>
     </linearGradient>
-    <linearGradient id="accent" x1="110" y1="96" x2="1170" y2="560" gradientUnits="userSpaceOnUse">
+    <linearGradient id="accent" x1="86" y1="74" x2="1194" y2="566" gradientUnits="userSpaceOnUse">
       <stop stop-color="#8B5CF6"/>
-      <stop offset="0.5" stop-color="#06B6D4"/>
+      <stop offset="0.52" stop-color="#06B6D4"/>
       <stop offset="1" stop-color="#22C55E"/>
     </linearGradient>
     <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
@@ -19,54 +19,60 @@
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
       <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000" flood-opacity="0.42"/>
     </filter>
-    <marker id="arrow" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="strokeWidth">
-      <path d="M2 2L11 7L2 12" stroke="#67E8F9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-    </marker>
     <style>
       .eyebrow { font: 800 22px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #67E8F9; letter-spacing: 0.14em; }
-      .title { font: 900 76px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #F8FAFC; letter-spacing: -0.055em; }
+      .title { font: 900 82px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #F8FAFC; letter-spacing: -0.06em; }
       .subtitle { font: 600 28px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #CBD5E1; }
-      .label { font: 800 25px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #F8FAFC; letter-spacing: -0.025em; }
-      .small { font: 650 17px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #A7F3D0; }
+      .chip { font: 800 18px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #A7F3D0; letter-spacing: 0.08em; }
+      .card-title { font: 800 30px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #F8FAFC; letter-spacing: -0.03em; }
+      .card-copy { font: 600 18px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #CBD5E1; }
       .footer { font: 700 24px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #C4B5FD; }
-      .arrow { stroke: #67E8F9; stroke-width: 4; stroke-linecap: round; marker-end: url(#arrow); }
+      .tiny { font: 700 18px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #94A3B8; }
     </style>
   </defs>
 
   <rect width="1280" height="640" rx="40" fill="url(#bg)"/>
-  <circle cx="1100" cy="116" r="210" fill="#06B6D4" opacity="0.10"/>
-  <circle cx="110" cy="560" r="260" fill="#8B5CF6" opacity="0.13"/>
-  <circle cx="790" cy="600" r="180" fill="#22C55E" opacity="0.08"/>
+  <circle cx="1090" cy="124" r="210" fill="#06B6D4" opacity="0.10"/>
+  <circle cx="120" cy="562" r="250" fill="#8B5CF6" opacity="0.13"/>
+  <circle cx="808" cy="590" r="170" fill="#22C55E" opacity="0.08"/>
   <rect x="46" y="42" width="1188" height="556" rx="34" stroke="url(#accent)" stroke-width="2.2" opacity="0.65"/>
 
-  <text x="96" y="120" class="eyebrow">SPEC FIRST · AGENTIC DELIVERY</text>
-  <text x="94" y="205" class="title">Agentic Delivery</text>
-  <text x="94" y="287" class="title">Playbook</text>
-  <text x="100" y="348" class="subtitle">Choose models per task. Use reasoning early.</text>
-  <text x="100" y="388" class="subtitle">Split smaller tickets. Reduce drift and spend.</text>
+  <text x="92" y="118" class="eyebrow">CODING AGENT PLAYBOOK</text>
+  <text x="92" y="210" class="title">Agent</text>
+  <text x="92" y="296" class="title">Preflight</text>
+  <text x="98" y="358" class="subtitle">Give the agent a small delivery contract</text>
+  <text x="98" y="398" class="subtitle">before it edits your repo.</text>
+
+  <rect x="96" y="452" width="366" height="44" rx="22" fill="#0F172A" stroke="#334155"/>
+  <text x="120" y="481" class="chip">CLASSIFY → SCOPE → APPROVE → VERIFY</text>
+  <text x="98" y="538" class="tiny">Practical safety harness for scoped, testable, honest agent work.</text>
 
   <g filter="url(#shadow)">
-    <rect x="98" y="454" width="202" height="76" rx="20" fill="url(#card)" stroke="#334155"/>
-    <text x="132" y="486" class="label">Spec</text>
-    <text x="132" y="512" class="small">contract first</text>
-  </g>
-  <path class="arrow" d="M315 492H373"/>
-  <g filter="url(#shadow)">
-    <rect x="390" y="454" width="202" height="76" rx="20" fill="url(#card)" stroke="#334155"/>
-    <text x="424" y="486" class="label">Critique</text>
-    <text x="424" y="512" class="small">catch gaps early</text>
-  </g>
-  <path class="arrow" d="M607 492H665"/>
-  <g filter="url(#shadow)">
-    <rect x="682" y="454" width="202" height="76" rx="20" fill="url(#card)" stroke="#334155"/>
-    <text x="716" y="486" class="label">Implement</text>
-    <text x="716" y="512" class="small">focused tickets</text>
-  </g>
-  <path class="arrow" d="M899 492H957"/>
-  <g filter="url(#shadow)">
-    <rect x="974" y="454" width="202" height="76" rx="20" fill="url(#card)" stroke="#334155"/>
-    <text x="1008" y="486" class="label">QA</text>
-    <text x="1008" y="512" class="small">evidence gates</text>
+    <rect x="606" y="88" width="578" height="470" rx="30" fill="url(#card)" stroke="#334155"/>
+
+    <rect x="640" y="126" width="236" height="108" rx="22" fill="#101827" stroke="#334155"/>
+    <text x="668" y="169" class="card-title">Mode</text>
+    <text x="668" y="199" class="card-copy">direct · lightweight · full</text>
+
+    <rect x="912" y="126" width="236" height="108" rx="22" fill="#101827" stroke="#334155"/>
+    <text x="940" y="169" class="card-title">Goal</text>
+    <text x="940" y="199" class="card-copy">what should become true</text>
+
+    <rect x="640" y="268" width="236" height="108" rx="22" fill="#101827" stroke="#334155"/>
+    <text x="668" y="311" class="card-title">Non-goals</text>
+    <text x="668" y="341" class="card-copy">what must not be touched</text>
+
+    <rect x="912" y="268" width="236" height="108" rx="22" fill="#101827" stroke="#334155"/>
+    <text x="940" y="311" class="card-title">Risks</text>
+    <text x="940" y="341" class="card-copy">auth, money, data, coupling</text>
+
+    <rect x="640" y="410" width="236" height="108" rx="22" fill="#101827" stroke="#334155"/>
+    <text x="668" y="453" class="card-title">Approval</text>
+    <text x="668" y="483" class="card-copy">stop before risky coding</text>
+
+    <rect x="912" y="410" width="236" height="108" rx="22" fill="#101827" stroke="#334155"/>
+    <text x="940" y="453" class="card-title">Evidence</text>
+    <text x="940" y="483" class="card-copy">commands, output, known gaps</text>
   </g>
 
   <text x="1178" y="116" text-anchor="end" class="footer">github.com/arcayne</text>

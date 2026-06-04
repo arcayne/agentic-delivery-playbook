@@ -1,7 +1,7 @@
 {
   "name": "agentic-delivery-playbook",
   "version": "0.2.0",
-  "description": "Keep coding agents scoped, testable, and honest with a lightweight delivery playbook.",
+  "description": "Practical safety harness for coding agents: classify, scope, approve, and verify before merge.",
   "license": "MIT",
   "type": "commonjs",
   "bin": {
@@ -21,13 +21,13 @@
   ],
   "keywords": [
     "coding-agents",
-    "ai-code-review",
+    "coding-agent-playbook",
+    "agent-preflight",
     "claude-code",
     "codex",
-    "agent-workflow",
+    "ai-assisted-development",
     "software-engineering",
-    "human-in-the-loop",
-    "developer-tools"
+    "human-in-the-loop"
   ],
   "repository": {
     "type": "git",

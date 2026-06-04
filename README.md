@@ -1,27 +1,29 @@
-# Agentic Delivery Playbook
+# Coding Agent Playbook
 
-**A no-hype workflow for keeping coding agents scoped, testable, and honest.**
+*Repo/package today: `agentic-delivery-playbook`*
 
-Coding agents are useful, but they drift. They over-edit, skip edge cases, invent validation, and turn small requests into surprise refactors.
+[![License: MIT](https://img.shields.io/badge/license-MIT-22c55e.svg)](LICENSE)
+[![Status: v0.2.0 draft](https://img.shields.io/badge/status-v0.2.0_draft-2563eb.svg)](CHANGELOG.md)
+[![Node >=18](https://img.shields.io/badge/node-%3E%3D18-339933.svg)](package.json)
 
-This playbook gives them a simple delivery contract:
+**Keep coding agents scoped, testable, and honest.**
 
-```text
-classify -> spec only if needed -> approve -> implement -> QA against evidence
-```
-
-Use it as one pasted prompt first. Add templates and run artifacts only when the task is risky enough to deserve them.
+> Before a coding agent edits your repo, give it a small delivery contract.
 
 <p align="center">
   <img src="assets/agent-preflight-hero.png" alt="Agent preflight checklist: mode, goal, non-goals, risks, approval, and evidence before the agent touches the repo" width="920">
 </p>
 
+A practical safety harness for agent coding: classify the task, lock the scope, stop risky work before implementation, and close out with evidence.
+
+**Start here:** [Getting started](docs/getting-started.md) · [Templates](templates/) · [Example run](examples/lightweight-ticket/) · [Security](SECURITY.md) · [Contributing](CONTRIBUTING.md)
+
 ## Try it in 60 seconds
 
-Paste this into Claude Code, Codex, ChatGPT, Claude, Cursor, or another coding assistant:
+Paste this into Claude Code, Codex, ChatGPT, Claude, Cursor, Pi, or another coding assistant:
 
 ```text
-Use the Agentic Delivery Playbook.
+Use the Coding Agent Playbook.
 
 First classify this task:
 - direct: clear, low-risk, narrow edit; no spec or run directory
@@ -46,19 +48,79 @@ Task:
 <describe the task>
 ```
 
-That is the whole starting point. Everything else in this repo is for teams that want the repeatable version.
+That is the fastest way to get value from this repo. Everything else here helps you make that behavior repeatable.
 
-## What problem does this solve?
+## Why this exists
 
-| Agent pain | Playbook move |
+Coding agents are useful, but they drift:
+
+- vague prompts turn into broad diffs
+- non-goals get silently included
+- validation gets summarized instead of proven
+- retries pile up because the target keeps moving
+- review gets harder because the agent narrates confidence instead of showing evidence
+
+This playbook gives the agent a small delivery contract before it edits.
+
+## What this gives you
+
+| Agent problem | Playbook guardrail |
 | --- | --- |
-| “The agent changed too much.” | Direct/lightweight/full triage before editing |
-| “It solved a different problem.” | Approved spec with non-goals |
-| “I do not trust the test summary.” | Evidence-based closeout |
-| “It skipped edge cases.” | Critique before implementation |
-| “The PR is hard to review.” | QA against acceptance criteria, not summaries |
-| “The model was too weak or too expensive for the job.” | Model/agent routing ledger when available |
-| “The task keeps going sideways.” | Fix-cycle escalation rules |
+| Agent changes too much | Pick direct/lightweight/full before editing |
+| Agent solves the wrong problem | Write goal and non-goals before implementation |
+| Agent claims tests passed | Require commands, output, and known gaps |
+| Agent keeps retrying blindly | Use fix/escalation rules |
+| PR is hard to review | QA against acceptance criteria, not summaries |
+| Risky task starts coding too early | Add an approval gate |
+| Expensive model is used for everything | Route stronger reasoning to spec/QA work |
+
+## Agent Preflight
+
+Before implementation, define:
+
+- **Mode** — direct, lightweight, or full
+- **Goal** — the thing that should become true
+- **Non-goals** — what must not be touched
+- **Risks** — security, money, auth, data loss, provider behavior, hidden coupling
+- **Approval** — whether the agent must stop before implementation
+- **Evidence** — what proof is required at closeout
+
+That checklist is the core artifact. The playbook exists to make it easy to use consistently.
+
+## Demo: turn a vague request into a delivery contract
+
+Bad:
+
+```text
+Fix the webhook bug.
+```
+
+Better:
+
+```text
+Use the Coding Agent Playbook.
+
+Classify the task first.
+
+Goal:
+Fix duplicate webhook processing.
+
+Non-goals:
+- Do not change billing plans.
+- Do not refactor unrelated handlers.
+- Do not change DB schema unless required and explained.
+
+Risks:
+payment state, provider retries, idempotency
+
+Approval:
+Stop before implementation.
+
+Evidence:
+Show changed files, tests run, output, and known gaps.
+```
+
+That is the move: make the agent operate against a concrete contract, not an abstract intention.
 
 ## The three modes
 
@@ -67,216 +129,62 @@ Choose process weight before creating artifacts.
 | Mode | Use when | What happens |
 | --- | --- | --- |
 | **Direct** | Small, obvious, low-risk change | Edit, validate, report evidence |
-| **Lightweight** | Bounded feature/fix needing a checklist | Compact spec, approval, implementation, QA |
-| **Full** | Risky, ambiguous, cross-system, security/privacy/API/state/provider work | Critic, approval gate, QA evidence, escalation rules |
-| **Full + bounded workflow** | Broad audit, migration, or adversarial review | Parallel or dynamic work only with scope, cap, stop rule, and synthesis plan |
+| **Lightweight** | Bounded feature or fix that needs a checklist | Compact spec, approval, implementation, QA |
+| **Full** | Risky, ambiguous, cross-system, security/privacy/API/state/provider work | Critique, approval gate, QA evidence, escalation rules |
+| **Full + bounded workflow** | Broad audit, migration, or adversarial review | Parallel or dynamic work only with scope, caps, stop rules, and synthesis |
 
-Do not use full mode for tiny direct edits. Do not create artifacts for obvious one-file changes.
+Do not create heavy artifacts for obvious one-file fixes. Do not let risky work skip approval and evidence.
 
-## When not to use this
-
-Do not turn every agent task into a spec-first run.
-
-Use direct mode, with no run directory or templates, when the change is clear, low-risk, narrow, and has obvious validation.
-
-Skip lightweight/full mode unless ambiguity, review cost, cross-system impact, security/privacy/auth/data-loss/financial/provider risk, or previous agent drift makes extra structure worth it.
-
-## Adopt it in five minutes
-
-1. Paste the 60-second prompt into your next agent task.
-2. Ask the agent to classify the task before editing.
-3. For direct tasks, let it edit and require evidence.
-4. For non-direct tasks, approve the spec before implementation.
-5. Use a QA prompt on the final diff: “Verify this diff against the approved spec, not the implementer summary.”
-
-No framework required. No new service required. No agent platform required.
-
-## The loop
-
-```text
-classify -> spec only if needed -> approve -> implement -> QA against evidence
-```
-
-For full-mode work, the complete loop is:
-
-```text
-intake -> spec -> critique -> approval -> implementation -> QA -> fix/escalate -> closeout
-```
-
-<p align="center">
-  <img src="assets/agentic-delivery-loop.svg" alt="Agentic Delivery Playbook workflow diagram" width="920">
-</p>
-
-## What this is not
-
-This is not another agent framework.
-
-It does not require a new runtime, queue, orchestrator, vector database, dashboard, or multi-agent platform.
-
-You can use it as:
-
-- one pasted prompt
-- a Claude Code command or project memory
-- a Codex `AGENTS.md`
-- a ChatGPT/Claude review checklist
-- a repo-local delivery convention
-
-Start with the prompt. Add artifacts only when the task deserves them.
-
-## Designed to control token waste
-
-The playbook does not assume one model should do everything.
-
-Use stronger reasoning where mistakes are expensive: goal definition, spec writing, critique, edge cases, safety review, QA, and escalation. Use faster or cheaper implementation agents after the task is explicit and small enough. Record intended and actual model/agent choices when your harness exposes them.
-
-This is a design goal, not a magic savings claim. To make cost and quality inspectable, runs can record:
-
-- task mode and approved scope
-- intended vs actual model/agent routing
-- validation commands and outputs
-- QA findings and fix cycles
-- known gaps and next action
-
-See [`docs/model-routing.md`](docs/model-routing.md) for the routing ledger and role guidance.
-
-## Why not just prompt better?
-
-Better prompts ask the agent to be careful.
-
-This playbook makes care inspectable:
-
-- What was approved?
-- What changed?
-- What evidence exists?
-- Did the agent drift?
-- Should we retry, split, escalate, or stop?
-
-That matters when the code is production-facing, security-sensitive, expensive to review, or easy to get subtly wrong.
-
-## Use with your tool
+## Use it with your tool
 
 Start with [`docs/getting-started.md`](docs/getting-started.md). It includes:
 
-- the universal prompt for any assistant
+- universal prompt-only usage for any assistant
 - Claude and ChatGPT prompts for spec review and QA
-- Claude Code `CLAUDE.md` and slash-command setup
+- Claude Code project-memory and slash-command setup
 - Codex `AGENTS.md` setup
+- adapter notes for Pi
 
-See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md) for bounded fanout, width-vs-depth guidance, and workflow launch notes.
-If you run Hermes or Pi with OpenAI-backed browser-login models, see [`docs/openai-hermes-pi-routing.md`](docs/openai-hermes-pi-routing.md) for a surface-specific routing companion.
+Repo adapters:
 
-## Artifact quick start for non-direct runs
+- [`adapters/claude/`](adapters/claude/)
+- [`adapters/chatgpt/`](adapters/chatgpt/)
+- [`adapters/codex/`](adapters/codex/)
+- [`adapters/pi/`](adapters/pi/)
 
-If the task is direct mode, skip this section: make the edit, run the obvious validation, and report changed files plus evidence.
+If you want model-routing guidance or bounded fanout patterns, see [`docs/model-routing.md`](docs/model-routing.md) and [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md).
 
-For lightweight or full mode:
+## When to add templates and run artifacts
 
-1. Create a run directory:
+If the task is **direct**, skip this section.
 
-   ```text
-   specs/YYYYMMDD-HHMM-feature-slug/
-   ```
+If the task is **lightweight** or **full**:
 
-2. Copy the templates:
+1. create a run directory like `specs/YYYYMMDD-HHMM-feature-slug/`
+2. copy the needed files from [`templates/`](templates/)
+3. write the spec before coding
+4. get approval when the task is risky enough to require it
+5. implement against the approved spec
+6. QA the diff against the spec
+7. close out with evidence, known gaps, and next action
 
-   ```text
-   templates/spec.template.md   -> specs/.../spec.md
-   templates/spec.template.html -> specs/.../spec.html  # optional visual spec
-   templates/run.template.json  -> specs/.../run.json
-   templates/notes.template.md  -> specs/.../notes.md
-   ```
+See [`playbook.md`](playbook.md) for the full workflow and [`examples/lightweight-ticket/`](examples/lightweight-ticket/) for a completed small-run example.
 
-3. Fill the spec before implementation. Keep lightweight specs compact; use HTML, diagrams, or images only when they help the human reviewer actually understand the contract before approving it.
-4. Critique and revise the spec. Lightweight mode can use parent self-review; full mode should use a critic when available.
-5. Get human approval.
-6. Choose the implementation model or agent for the focused task, recording reasoning controls when available.
-7. Give the implementer the approved spec and nothing vague.
-8. QA the diff against the spec. Use high-risk QA for full-mode sensitive or cross-system work.
-9. Close out with evidence, model routing, known gaps, and the next action.
+## What is in this repo
 
-See [`playbook.md`](playbook.md) for the full workflow.
-
-## Repository layout
-
-```text
-README.md
-playbook.md
-SECURITY.md
-assets/
-  agent-preflight-hero.png
-  agentic-delivery-loop.svg
-docs/
-  philosophy.md
-  gates.md
-  model-routing.md
-  dynamic-workflows.md
-  openai-hermes-pi-routing.md
-  getting-started.md
-  tool-quickstart.md  # compatibility redirect
-  failure-modes.md
-  high-risk-qa.md
-  visual-specs.md
-  adapters.md
-  publishing.md
-templates/
-  spec.template.md
-  spec.template.html
-  run.template.json
-  notes.template.md
-  qa-checklist.template.md
-  closeout-governance.template.md
-adapters/
-  chatgpt/
-    README.md
-    instructions.md
-  claude/
-    SKILL.md
-    workflow.md
-  codex/
-    AGENTS.md
-    README.md
-  pi/
-    SKILL.md
-examples/
-  lightweight-ticket/
-    spec.md
-    run.json
-    notes.md
-.github/
-  ISSUE_TEMPLATE/
-  pull_request_template.md
-```
-
-## Use with Claude, Claude Code, ChatGPT, or Codex
-
-For Claude, install the self-contained skill in `adapters/claude/` when your environment supports skills. For prompt-only or project-instruction setups, use the setup snippets in [`docs/getting-started.md`](docs/getting-started.md). It covers:
-
-- Claude skill installation and prompt-only review usage
-- Claude Code project memory and slash-command setup
-- ChatGPT as spec author, critic, or QA reviewer
-- Codex `AGENTS.md` instructions or copy/paste session prompts
+- [`playbook.md`](playbook.md) — full workflow
+- [`docs/getting-started.md`](docs/getting-started.md) — fastest setup path
+- [`docs/gates.md`](docs/gates.md) — approval and escalation rules
+- [`docs/failure-modes.md`](docs/failure-modes.md) — common agent failure patterns
+- [`docs/high-risk-qa.md`](docs/high-risk-qa.md) — QA for sensitive changes
+- [`docs/visual-specs.md`](docs/visual-specs.md) — when visuals help spec review
+- [`templates/`](templates/) — reusable spec, run, notes, and QA templates
+- [`examples/`](examples/) — copyable examples of finished artifacts
+- [`docs/adapters.md`](docs/adapters.md) — tool-specific integration notes
 
 ## Install adapters
 
-ChatGPT adapter:
-
-```text
-adapters/chatgpt/
-  README.md
-  instructions.md
-```
-
-ChatGPT does not currently use Claude-style skill folders. Use `adapters/chatgpt/instructions.md` as ChatGPT Project instructions, custom GPT instructions, or a pasted session instruction.
-
-Claude skill adapter:
-
-```text
-adapters/claude/
-  SKILL.md
-  workflow.md
-```
-
-Install it with `npx`:
+### Claude skill adapter
 
 ```bash
 # User skill, available across projects
@@ -292,23 +200,15 @@ Until the package is published to npm, install from GitHub:
 npx github:arcayne/agentic-delivery-playbook install claude
 ```
 
-The installer copies the whole `adapters/claude/` directory into the selected Claude skills location. The skill command name comes from the install directory, for example `/agentic-delivery-playbook`. If your Claude environment uses upload/import instead of local skill folders, upload the whole `adapters/claude/` folder, not just `SKILL.md`.
+### ChatGPT adapter
 
-Codex adapter:
+Use [`adapters/chatgpt/instructions.md`](adapters/chatgpt/instructions.md) as project instructions, custom GPT instructions, or a pasted session instruction.
 
-```text
-adapters/codex/
-  AGENTS.md
-  README.md
-```
+### Codex adapter
 
-Install it by copying `adapters/codex/AGENTS.md` into the target repository root, or merge it into an existing `AGENTS.md`.
+Copy [`adapters/codex/AGENTS.md`](adapters/codex/AGENTS.md) into the target repository root, or merge it into an existing `AGENTS.md`.
 
-Pi skill adapter:
-
-```text
-adapters/pi/SKILL.md
-```
+### Pi adapter
 
 Project-local Pi install example:
 
@@ -318,34 +218,21 @@ cp /path/to/agentic-delivery-playbook/adapters/pi/SKILL.md \
   .pi/skills/agentic-delivery-playbook/SKILL.md
 ```
 
-The adapters are intentionally generic. Configure your preferred models or agents in your own harness instead of relying on hard-coded model names.
+## What this is not
 
-## Core principle
+This is not a new agent runtime, orchestrator, queue, dashboard, or multi-agent platform.
 
-Use strong reasoning for shared understanding, edge cases, acceptance criteria, and QA contracts. Use implementation agents only after the contract is clear. Evaluate the result against evidence.
+It is a lightweight delivery convention you can use as:
 
-If the spec is complex, make it readable. A rendered HTML spec, diagram, or screenshot is useful when it helps the human reviewer catch mistakes instead of blindly approving an agent plan.
-
-## Publishing checklist
-
-Recommended GitHub description:
-
-```text
-No-hype workflow for keeping coding agents scoped, testable, and honest.
-```
-
-Recommended topics:
-
-```text
-ai-agents, coding-agents, agentic-workflow, spec-first,
-software-engineering, ai-assisted-development, human-in-the-loop
-```
-
-See [`docs/publishing.md`](docs/publishing.md) for first-publish and release commands.
+- one pasted prompt
+- a repo-level instructions file
+- a Claude skill
+- a Codex `AGENTS.md`
+- a review checklist for ChatGPT, Claude, or Pi
 
 ## Status
 
-`v0.2.0` draft. Adds evidence integrity, lightweight/broad budget awareness, and portable observability/ROI closeout guidance while keeping the pattern intentionally practical.
+`v0.2.0` draft. Current focus: keep the playbook concrete, lightweight, and easy to adopt before adding more process.
 
 ## License
 
