@@ -135,6 +135,8 @@ templates/
   qa-checklist.template.md
   closeout-governance.template.md
 adapters/
+  claude/
+    SKILL.md
   pi/
     SKILL.md
 examples/
@@ -155,15 +157,23 @@ For non-Pi tools, use the setup snippets and reusable prompts in [`docs/getting-
 - Claude Code project memory and slash-command setup
 - Codex `AGENTS.md` instructions or copy/paste session prompts
 
-## Install as a Pi skill
+## Install as a skill
 
-If you use the Pi coding agent, install the adapter from:
+Claude skill adapter:
+
+```text
+adapters/claude/SKILL.md
+```
+
+Use it as a project/user Claude skill by copying or uploading the `adapters/claude/` folder according to your Claude environment's skill installation flow.
+
+Pi skill adapter:
 
 ```text
 adapters/pi/SKILL.md
 ```
 
-Project-local install example:
+Project-local Pi install example:
 
 ```bash
 mkdir -p .pi/skills/agentic-delivery-playbook
@@ -171,7 +181,7 @@ cp /path/to/agentic-delivery-playbook/adapters/pi/SKILL.md \
   .pi/skills/agentic-delivery-playbook/SKILL.md
 ```
 
-The adapter is intentionally generic. Configure your preferred models or agents in your own harness instead of relying on hard-coded model names.
+The adapters are intentionally generic. Configure your preferred models or agents in your own harness instead of relying on hard-coded model names.
 
 ## Core principle
 

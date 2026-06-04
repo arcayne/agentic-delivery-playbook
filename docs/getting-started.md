@@ -12,9 +12,10 @@ The same rule applies in every tool: choose the smallest safe process, write a s
 ## Start here
 
 1. If your agent edits the repo, add persistent instructions:
-   - Claude Code: use `CLAUDE.md` or the slash command below.
+   - Claude: install the self-contained skill in `adapters/claude/` when your Claude environment supports skills.
+   - Claude Code: use the Claude skill, `CLAUDE.md`, or the slash command below.
    - Codex: use `AGENTS.md` or paste the universal prompt.
-2. If your assistant is chat-only, use it as a spec author, critic, or QA reviewer by pasting the reusable role prompts below.
+2. If your assistant is chat-only and skills are unavailable, use it as a spec author, critic, or QA reviewer by pasting the reusable role prompts below.
 3. For every task, ask the assistant to classify the work first: direct, lightweight, or full.
 4. For non-direct work, approve the spec before implementation unless you explicitly want an end-to-end run.
 5. At closeout, require evidence: changed files, commands run, results, known gaps, and next action.
@@ -49,6 +50,18 @@ Task:
 ```
 
 ## Claude
+
+### Option A: Claude skill
+
+Use the self-contained skill adapter when your Claude environment supports skills:
+
+```text
+adapters/claude/SKILL.md
+```
+
+Copy or upload the `adapters/claude/` folder according to your Claude environment's skill installation flow. Then ask Claude to use the Agentic Delivery Playbook for the task.
+
+### Option B: prompt-only Claude chat
 
 Use Claude chat when you want a strong planner, critic, or QA reviewer.
 
