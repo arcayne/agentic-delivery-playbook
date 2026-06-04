@@ -10,6 +10,8 @@ adapters/pi/SKILL.md
 
 The Pi adapter packages the workflow as a Pi skill.
 
+For Claude, Claude Code, ChatGPT, and Codex usage without a formal adapter, see [`tool-quickstart.md`](tool-quickstart.md).
+
 ## Adapter expectations
 
 An adapter should define:
@@ -25,7 +27,7 @@ Provider-specific model names should be examples or configuration, not hard requ
 
 ## Suggested future adapters
 
-- Claude Code command or skill
+- Claude Code command pack
 - Codex CLI prompt pack
 - Cursor rules
 - GitHub Copilot workspace instructions

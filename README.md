@@ -61,6 +61,7 @@ Every run should record the intended and actual model or agent for each role. Th
 
 See [`docs/model-routing.md`](docs/model-routing.md) for the routing ledger and role guidance.
 See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md) for bounded fanout, width-vs-depth guidance, and workflow launch notes.
+See [`docs/tool-quickstart.md`](docs/tool-quickstart.md) for clear setup and copy/paste prompts for Claude, Claude Code, ChatGPT, and Codex.
 If you run Hermes or Pi with OpenAI-backed browser-login models, see [`docs/openai-hermes-pi-routing.md`](docs/openai-hermes-pi-routing.md) for a surface-specific routing companion.
 
 ## Quick start for non-direct runs
@@ -108,6 +109,7 @@ docs/
   model-routing.md
   dynamic-workflows.md
   openai-hermes-pi-routing.md
+  tool-quickstart.md
   failure-modes.md
   high-risk-qa.md
   visual-specs.md
@@ -132,6 +134,14 @@ examples/
   ISSUE_TEMPLATE/
   pull_request_template.md
 ```
+
+## Use with Claude, Claude Code, ChatGPT, or Codex
+
+For non-Pi tools, use the setup snippets and reusable prompts in [`docs/tool-quickstart.md`](docs/tool-quickstart.md). It covers:
+
+- Claude and ChatGPT as spec authors, critics, and QA reviewers
+- Claude Code project memory and slash-command setup
+- Codex `AGENTS.md` instructions or copy/paste session prompts
 
 ## Install as a Pi skill
 
