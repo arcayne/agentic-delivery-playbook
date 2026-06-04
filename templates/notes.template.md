@@ -4,6 +4,12 @@
 
 - <timestamp> — <event>
 
+## Process weight
+
+- Mode: direct | lightweight | full
+- Rationale: <why this process weight is enough>
+- Escalation signal: <none or risk that requires heavier process>
+
 ## Intake decisions
 
 - <decision>
@@ -23,6 +29,8 @@
   - `<path>`
 
 ## Validation evidence
+
+Evidence mode: direct-validation | notes-only | artifact-backed
 
 ```text
 <command output summary or manual check>
@@ -67,12 +75,12 @@
 
 ## Model / agent ledger
 
-| Role | Agent | Model | Source | Notes |
-| --- | --- | --- | --- | --- |
-| spec author | <agent> | <model> | <source> | <notes> |
-| critic | <agent> | <model> | <source> | <notes> |
-| implementer | <agent> | <model> | <source> | <notes> |
-| QA reviewer | <agent> | <model> | <source> | <notes> |
+| Role | Agent | Model | Reasoning | Source | Notes |
+| --- | --- | --- | --- | --- | --- |
+| spec author | <agent> | <model> | <low/medium/high/extra-high/runtime-default> | <source> | <notes> |
+| critic | <agent> | <model> | <low/medium/high/extra-high/runtime-default> | <source> | <notes> |
+| implementer | <agent> | <model> | <low/medium/high/extra-high/runtime-default> | <source> | <notes> |
+| QA reviewer | <agent> | <model> | <low/medium/high/extra-high/runtime-default> | <source> | <notes> |
 
 ## Known gaps
 

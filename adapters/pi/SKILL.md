@@ -9,35 +9,49 @@ Use this skill to turn ambiguous implementation work into an approved, AI-ready 
 
 Core thesis: spend strong-model attention on shared understanding, architecture, edge cases, acceptance criteria, and QA contracts; then implement narrowly against the approved spec with explicit model/agent routing when available.
 
-## Scope triage
+## Scope triage: choose process weight first
 
-Before creating a run directory, classify the request.
+Before creating a run directory, choosing models, or delegating reviewers, classify the request by process weight. Use the least intrusive mode that can safely produce evidence.
 
-### Skip the playbook and implement directly
+### Direct mode: skip the playbook and implement directly
 
-Do this when all are true:
+Use direct mode when all are true:
 
 - the requested change is clear and low ambiguity
 - likely touches one or two files
 - no security, privacy, auth, payment, financial, destructive, external-provider, or irreversible-action risk
 - no cross-package or public contract change
 - validation is obvious and narrow
-- the user did not explicitly ask for a spec first run
+- the user did not explicitly ask for a spec-first run
 
-### Use lightweight playbook
+Direct mode rules:
 
-Use for bounded work when:
+- do not create a run directory
+- do not write spec artifacts unless the user asks
+- edit the code, run the obvious validation, and report changed files plus validation evidence
+
+### Lightweight mode: compact contract, low ceremony
+
+Use lightweight mode for bounded work when:
 
 - likely touches two to five files or one package
-- acceptance criteria are mostly clear after one or two questions
+- acceptance criteria are mostly clear after at most one or two questions
 - risk is low or medium
 - a compact spec/checklist is enough
 
+Lightweight mode rules:
+
+- create only the minimal run artifacts: `spec.md` or `spec.html`, `run.json`, and `notes.md`
+- keep the spec/checklist compact
+- notes-only evidence is acceptable when commands and outcomes are clearly recorded
+- parent self-review is acceptable when no serious risk signal appears
+- do not add an independent critic, broad-ticket planning gate, or high-risk QA checklist unless risk appears
+
 Keep lightweight runs intentionally small. If observability/cost data is available, a lightweight run should usually stay under the team's lightweight budget target.
 
-### Use full playbook
+### Full mode: broad or risky delivery workflow
 
-Use when any are true:
+Use full mode when any are true:
 
 - product or architecture ambiguity is meaningful
 - safety, security, privacy, auth, external-provider, or destructive behavior is involved
@@ -46,11 +60,20 @@ Use when any are true:
 - failure would be costly or hard to detect
 - the user asks for end-to-end spec-gated delivery
 
-When unsure, tell the user the classification and ask whether they want direct implementation, lightweight playbook, or full playbook.
+Full mode rules:
+
+- create the run directory and maintain explicit artifacts
+- use broad-ticket planning before implementation when the spec is too large for one implementer pass
+- record explicit model/agent routing and reasoning intensity when available
+- use a critic/QA gate, preferably independent when available
+- apply high-risk QA checks for sensitive or cross-system work
+- complete required closeout fields: files changed, validation, findings, model ledger, known gaps, fix cycles, and next action
+
+When unsure, tell the user the classification and ask whether they want direct implementation, lightweight mode, or full mode.
 
 ## Required run artifacts
 
-For lightweight or full runs, create one run directory:
+Direct mode creates no run directory. For lightweight or full runs, create one run directory:
 
 ```text
 specs/YYYYMMDD-HHMM-<feature-slug>/
@@ -142,7 +165,7 @@ Review the spec before coding. Attack:
 
 Revise `spec.md` or `spec.html`, or ask the user to decide unresolved questions.
 
-For lightweight runs, a parent self-review is acceptable if there is no serious risk. For full runs, use an independent critic when available.
+For lightweight runs, a parent self-review is acceptable if there is no serious risk; do not add an independent critic unless a risk signal appears. For full runs, use an independent critic when available.
 
 ### 4. Approval gate
 
@@ -191,7 +214,7 @@ For older, interrupted, or incomplete runs, preserve truth and keep evidence exp
 
 ### 6. Implementation QA
 
-QA against the approved `spec.md` or `spec.html`, not against the implementer's summary.
+QA against the approved `spec.md` or `spec.html`, not against the implementer's summary. In lightweight mode, this can be a parent self-review recorded in `notes.md`; in full mode, use an explicit critic/QA gate.
 
 Categorize findings:
 
@@ -219,14 +242,17 @@ Repeated correction is data. Stop blind fix loops when:
 
 ### 8. Closeout
 
-Update `run.json` and `notes.md` with:
+For lightweight mode, close out in `notes.md` and `run.json` with concise evidence. Notes-only evidence is acceptable if it names the changed files, validation commands, outcomes, known gaps, and next action.
+
+For full mode, required closeout fields are:
 
 - final status
 - files changed
 - verification commands/evidence
 - known gaps
-- model ledger
+- model ledger, including reasoning intensity when available
 - implementation model evaluation, when a model or agent was explicitly chosen
+- critic/QA findings
 - legacy/exception evidence, when applicable
 - fix cycles
 - escalations

@@ -18,11 +18,11 @@ It is designed for situations where a direct edit is too risky or too ambiguous,
 8. closeout
 ```
 
-## 0. Triage
+## 0. Triage: process weight first
 
-Classify the task before creating artifacts.
+Classify the task before creating artifacts, choosing models, or delegating reviewers. Use the least intrusive mode that can safely produce evidence.
 
-### Small direct change
+### Direct mode: small direct change
 
 Implement directly when the change is clear, low-risk, narrow, and easy to validate.
 
@@ -34,9 +34,15 @@ Signals:
 - no security, auth, payment, financial, destructive, or irreversible action
 - obvious validation command
 
-### Lightweight ticket
+Direct mode contract:
 
-Use a compact spec when the change is bounded but still benefits from a written contract.
+- no run directory
+- no spec artifact unless the human asks for one
+- edit, run the obvious validation, and report changed files plus evidence
+
+### Lightweight mode: compact ticket
+
+Use a compact spec/checklist when the change is bounded but still benefits from a written contract.
 
 Signals:
 
@@ -45,7 +51,15 @@ Signals:
 - clear acceptance criteria after at most one or two questions
 - low or medium risk
 
-### Broad ticket
+Lightweight mode contract:
+
+- minimal run directory with `spec.md` or `spec.html`, `run.json`, and `notes.md`
+- compact spec/checklist instead of a full PRD
+- notes-only evidence is acceptable when commands and outcomes are explicit
+- parent self-review is acceptable when no serious risk appears
+- no independent critic, broad-ticket planning gate, or high-risk QA checklist unless risk appears
+
+### Full mode: broad or risky ticket
 
 Use the full workflow when implementation drift would be costly.
 
@@ -57,6 +71,14 @@ Signals:
 - subtle negative cases
 - multiple operating modes
 - vague initial implementation prompt
+
+Full mode contract:
+
+- broad-ticket planning before implementation when the spec is too large for one focused implementer pass
+- explicit model/agent and reasoning ledger when routing controls are available
+- critic/QA gate, preferably independent when available
+- high-risk QA for sensitive, authority, provider, state, privacy, or cross-system changes
+- required closeout fields for files changed, validation, findings, model ledger, known gaps, fix cycles, and next action
 
 ## 1. Intake
 
@@ -110,6 +132,8 @@ Review the spec before coding. Attack:
 
 Revise the spec until it is implementable or ask the human to decide.
 
+For lightweight mode, a parent self-review is enough when no serious risk appears. For full mode, use a skeptical critic or independent reviewer when available.
+
 ## 4. Approval gate
 
 Do not implement until the spec is approved, unless the human explicitly asked for an uninterrupted end-to-end run.
@@ -161,7 +185,9 @@ A reviewer should be able to answer:
 - Were tests or validation actually run?
 - Are known gaps explicit?
 
-Use [`templates/qa-checklist.template.md`](templates/qa-checklist.template.md).
+For lightweight mode, QA can be a parent self-review recorded in `notes.md` when acceptance criteria are clear and risk is low or medium.
+
+Use [`templates/qa-checklist.template.md`](templates/qa-checklist.template.md) when a separate QA artifact helps.
 
 For broad tickets or sensitive changes, also use [`docs/high-risk-qa.md`](docs/high-risk-qa.md).
 
@@ -191,7 +217,9 @@ Escalation options:
 
 Close the run with evidence.
 
-Record:
+For lightweight mode, notes-only evidence is acceptable if it clearly records changed files, validation commands, outcomes, known gaps, and next action.
+
+For full mode, record all required closeout fields:
 
 - final status
 - changed files
@@ -199,7 +227,7 @@ Record:
 - acceptance criteria result
 - review findings
 - fix cycles
-- model/agent ledger
+- model/agent ledger, including reasoning intensity when available
 - known gaps
 - next recommended action
 
@@ -238,6 +266,8 @@ This is not a benchmark. It is an operational check:
 Record the result in `run.json` and `notes.md` so future model routing decisions are based on evidence, not vibes.
 
 ## Artifact contract
+
+Direct mode should not create artifacts unless the human asks.
 
 Every non-direct run should produce:
 

@@ -6,6 +6,7 @@
   "phase": "intake",
   "status": "draft",
   "taskFit": "small-direct | lightweight-ticket | broad-ticket",
+  "processWeight": "direct | lightweight | full",
   "paths": {
     "spec": "specs/YYYYMMDD-HHMM-feature-slug/spec.md | specs/YYYYMMDD-HHMM-feature-slug/spec.html",
     "specPreviewUrl": null,
@@ -56,10 +57,10 @@
     }
   ],
   "reviewGates": {
-    "specCritique": "pending",
+    "specCritique": "not-required | parent-self-review | pending | passed | warning",
     "humanApproval": "pending",
     "broadTicketPlanning": "not-applicable | pending | passed | warning",
-    "implementationQa": "pending",
+    "implementationQa": "notes-only | parent-self-review | pending | passed | warning",
     "closeout": "pending"
   },
   "broadTicketGate": {
@@ -92,6 +93,7 @@
     "approvedBy": null,
     "evidence": null
   },
+  "evidenceMode": "direct-validation | notes-only | artifact-backed",
   "observabilitySummary": {
     "available": false,
     "source": "PI_OBS_DB | harness telemetry | manual estimate | unavailable",

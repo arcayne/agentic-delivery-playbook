@@ -6,6 +6,7 @@
   "phase": "closeout",
   "status": "example-complete",
   "taskFit": "lightweight-ticket",
+  "processWeight": "lightweight",
   "paths": {
     "spec": "examples/lightweight-ticket/spec.md",
     "specPreviewUrl": null,
@@ -29,7 +30,7 @@
     "critic": {
       "agent": "parent-agent",
       "model": "configured-spec-model",
-      "reasoningIntensity": "high",
+      "reasoningIntensity": "medium",
       "source": "runtime-default"
     },
     "implementer": {
@@ -39,10 +40,10 @@
       "source": "explicit"
     },
     "qaReviewer": {
-      "agent": "reviewer",
-      "model": "configured-review-model",
+      "agent": "parent-agent",
+      "model": "configured-spec-model",
       "reasoningIntensity": "medium",
-      "source": "explicit"
+      "source": "runtime-default"
     }
   },
   "modelLedger": [
@@ -56,10 +57,10 @@
     }
   ],
   "reviewGates": {
-    "specCritique": "passed",
+    "specCritique": "parent-self-review",
     "humanApproval": "passed",
     "broadTicketPlanning": "not-applicable",
-    "implementationQa": "passed",
+    "implementationQa": "notes-only",
     "closeout": "passed"
   },
   "broadTicketGate": {
@@ -103,6 +104,7 @@
     "approvedBy": null,
     "evidence": null
   },
+  "evidenceMode": "notes-only",
   "observabilitySummary": {
     "available": false,
     "source": "unavailable",

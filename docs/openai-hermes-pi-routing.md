@@ -24,6 +24,16 @@ Treat the model labels below as Hermes/Pi surface labels.
 | `gpt-5.3-codex-spark` | `openai-codex` | mechanical edits, boilerplate, narrow transformations |
 | `gpt-5.2` | `openai-codex` | fallback when newer models are unavailable or a project has known-good history on it |
 
+## Process weight before reasoning weight
+
+First decide whether the work is direct mode, lightweight mode, or full mode.
+
+- Direct mode: no run directory and no routing ceremony; use the current/default editor model unless the human asks otherwise.
+- Lightweight mode: compact spec/checklist, notes-only evidence, parent self-review by default, and medium reasoning unless risk appears.
+- Full mode: broad-ticket planning when needed, explicit model/reasoning ledger, critic/QA gate, high-risk QA for sensitive work, and required closeout fields.
+
+Do not spend premium reasoning or run the full spec-gated workflow for clear one- or two-file edits unless the human explicitly asks.
+
 ## Reasoning intensity policy
 
 Route reasoning intensity by task risk, not by model number alone.

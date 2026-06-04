@@ -4,6 +4,8 @@ This playbook is model-agnostic. It does not require a specific provider or mode
 
 The important idea is role fit: use the right kind of agent or model for each phase, and record what actually happened.
 
+Choose process weight before model weight. Direct-mode edits should not get a model-routing ceremony or full run ledger unless the human asks. Lightweight runs can record compact routing evidence in `run.json`/`notes.md`. Full-mode runs should record explicit model/agent routing and reasoning intensity when available.
+
 ## Provider-specific companion guides
 
 Use provider-specific companions only when they help users route within a real harness surface without changing the core playbook stance.

@@ -38,15 +38,15 @@ This playbook is for the gap between casual AI assisted editing and production l
 
 ## When to use it
 
-Use the playbook for work that is non-trivial, ambiguous, risky, cross-package, customer-facing, or likely to drift during implementation.
+Choose process weight before creating artifacts.
 
-Skip it for tiny direct edits when all of these are true:
+Use **direct mode** for clear, low-risk one- or two-file edits: no run directory, just edit, validate, and report evidence.
 
-- the requested change is clear
-- it likely touches one or two files
-- validation is obvious
-- there is no security, privacy, auth, data-loss, financial, or external-provider risk
-- the user did not explicitly ask for a spec first workflow
+Use **lightweight mode** for bounded low/medium-risk work that benefits from a compact spec or checklist. Notes-only evidence and parent self-review are acceptable when risk stays low.
+
+Use **full mode** for ambiguous, risky, cross-package, customer-facing, provider/config/state-machine, security/privacy, or drift-prone work. Full mode uses broad-ticket planning when needed, explicit routing ledgers, critic/QA gates, high-risk QA, and required closeout fields.
+
+Do not use the full workflow for tiny direct edits unless the user explicitly asks for a spec-first run.
 
 ## Model choice per task
 
@@ -59,7 +59,11 @@ Every run should record the intended and actual model or agent for each role. Th
 See [`docs/model-routing.md`](docs/model-routing.md) for the routing ledger and role guidance.
 If you run Hermes or Pi with OpenAI-backed browser-login models, see [`docs/openai-hermes-pi-routing.md`](docs/openai-hermes-pi-routing.md) for a surface-specific routing companion.
 
-## Quick start
+## Quick start for non-direct runs
+
+If the task is direct mode, skip this section: make the edit, run the obvious validation, and report changed files plus evidence.
+
+For lightweight or full mode:
 
 1. Create a run directory:
 
@@ -76,13 +80,13 @@ If you run Hermes or Pi with OpenAI-backed browser-login models, see [`docs/open
    templates/notes.template.md  -> specs/.../notes.md
    ```
 
-3. Fill the spec before implementation. Use HTML, diagrams, or images when they help the human reviewer actually understand the contract before approving it.
-4. Critique and revise the spec.
+3. Fill the spec before implementation. Keep lightweight specs compact; use HTML, diagrams, or images only when they help the human reviewer actually understand the contract before approving it.
+4. Critique and revise the spec. Lightweight mode can use parent self-review; full mode should use a critic when available.
 5. Get human approval.
-6. Choose the implementation model or agent for the focused task.
+6. Choose the implementation model or agent for the focused task, recording reasoning controls when available.
 7. Give the implementer the approved spec and nothing vague.
-8. QA the diff against the spec.
-9. Close out with evidence, model routing, and known gaps.
+8. QA the diff against the spec. Use high-risk QA for full-mode sensitive or cross-system work.
+9. Close out with evidence, model routing, known gaps, and the next action.
 
 See [`playbook.md`](playbook.md) for the full workflow.
 
