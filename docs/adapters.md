@@ -5,11 +5,13 @@ The core playbook is portable. Adapters translate it into specific coding-agent 
 ## Existing adapters
 
 ```text
-adapters/claude/SKILL.md
+adapters/claude/
+  SKILL.md
+  workflow.md
 adapters/pi/SKILL.md
 ```
 
-The Claude adapter packages the workflow as a self-contained Claude skill. Copy or upload the `adapters/claude/` folder according to your Claude environment's skill installation flow.
+The Claude adapter packages the workflow as a self-contained Claude skill. Its `SKILL.md` is intentionally concise and points to `workflow.md` as supporting material. Install it by copying or uploading the whole `adapters/claude/` folder according to your Claude environment's skill installation flow.
 
 The Pi adapter packages the workflow as a Pi skill.
 

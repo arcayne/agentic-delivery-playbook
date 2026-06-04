@@ -4,6 +4,7 @@ This is the general onboarding guide for using the playbook with common AI tools
 
 The playbook is tool-neutral. Use it as either:
 
+- **a Claude skill** when your Claude environment supports skills
 - **persistent project instructions** for coding agents that can edit a repo, such as Claude Code or Codex
 - **copy/paste review prompts** for chat models, such as Claude or ChatGPT
 
@@ -56,10 +57,28 @@ Task:
 Use the self-contained skill adapter when your Claude environment supports skills:
 
 ```text
-adapters/claude/SKILL.md
+adapters/claude/
+  SKILL.md
+  workflow.md
 ```
 
-Copy or upload the `adapters/claude/` folder according to your Claude environment's skill installation flow. Then ask Claude to use the Agentic Delivery Playbook for the task.
+Install the whole directory so supporting files remain available:
+
+```bash
+# User skill, available across projects
+mkdir -p ~/.claude/skills/agentic-delivery-playbook
+cp -R /path/to/agentic-delivery-playbook/adapters/claude/. \
+  ~/.claude/skills/agentic-delivery-playbook/
+
+# Or project skill, available in one repo
+mkdir -p .claude/skills/agentic-delivery-playbook
+cp -R /path/to/agentic-delivery-playbook/adapters/claude/. \
+  .claude/skills/agentic-delivery-playbook/
+```
+
+The skill command name comes from the install directory, for example `/agentic-delivery-playbook`. If your Claude environment uses upload/import instead of local skill folders, upload the whole `adapters/claude/` folder, not just `SKILL.md`.
+
+Then ask Claude to use the Agentic Delivery Playbook for the task.
 
 ### Option B: prompt-only Claude chat
 

@@ -137,6 +137,7 @@ templates/
 adapters/
   claude/
     SKILL.md
+    workflow.md
   pi/
     SKILL.md
 examples/
@@ -151,10 +152,11 @@ examples/
 
 ## Use with Claude, Claude Code, ChatGPT, or Codex
 
-For non-Pi tools, use the setup snippets and reusable prompts in [`docs/getting-started.md`](docs/getting-started.md). It covers:
+For Claude, install the self-contained skill in `adapters/claude/` when your environment supports skills. For prompt-only or project-instruction setups, use the setup snippets in [`docs/getting-started.md`](docs/getting-started.md). It covers:
 
-- Claude and ChatGPT as spec authors, critics, and QA reviewers
+- Claude skill installation and prompt-only review usage
 - Claude Code project memory and slash-command setup
+- ChatGPT as spec author, critic, or QA reviewer
 - Codex `AGENTS.md` instructions or copy/paste session prompts
 
 ## Install as a skill
@@ -162,10 +164,26 @@ For non-Pi tools, use the setup snippets and reusable prompts in [`docs/getting-
 Claude skill adapter:
 
 ```text
-adapters/claude/SKILL.md
+adapters/claude/
+  SKILL.md
+  workflow.md
 ```
 
-Use it as a project/user Claude skill by copying or uploading the `adapters/claude/` folder according to your Claude environment's skill installation flow.
+Install it as a Claude skill by copying the whole `adapters/claude/` directory into a Claude skills location, preserving the directory name and files:
+
+```bash
+# User skill, available across projects
+mkdir -p ~/.claude/skills/agentic-delivery-playbook
+cp -R /path/to/agentic-delivery-playbook/adapters/claude/. \
+  ~/.claude/skills/agentic-delivery-playbook/
+
+# Or project skill, available in one repo
+mkdir -p .claude/skills/agentic-delivery-playbook
+cp -R /path/to/agentic-delivery-playbook/adapters/claude/. \
+  .claude/skills/agentic-delivery-playbook/
+```
+
+The skill command name comes from the install directory, for example `/agentic-delivery-playbook`. If your Claude environment uses upload/import instead of local skill folders, upload the whole `adapters/claude/` folder, not just `SKILL.md`.
 
 Pi skill adapter:
 
