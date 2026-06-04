@@ -16,6 +16,17 @@ intake -> spec -> critique -> approval -> implementation -> QA -> fix/escalate -
 
 The goal is not to add ceremony to every change. The goal is to use the right amount of structure when agent drift, ambiguous requirements, security/privacy risk, or cross-system changes would be expensive.
 
+## Start here
+
+If you want to use the playbook with an AI tool, start with [`docs/getting-started.md`](docs/getting-started.md). It includes:
+
+- a universal prompt for any assistant
+- Claude and ChatGPT prompts for spec review and QA
+- Claude Code `CLAUDE.md` and slash-command setup
+- Codex `AGENTS.md` setup
+
+For your first task, ask the assistant to classify the work as **direct**, **lightweight**, or **full** before it edits code.
+
 ## What this is
 
 This repository is a portable engineering pattern for operating coding agents on real software work. It defines:
@@ -61,10 +72,10 @@ Every run should record the intended and actual model or agent for each role. Th
 
 See [`docs/model-routing.md`](docs/model-routing.md) for the routing ledger and role guidance.
 See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md) for bounded fanout, width-vs-depth guidance, and workflow launch notes.
-See [`docs/tool-quickstart.md`](docs/tool-quickstart.md) for clear setup and copy/paste prompts for Claude, Claude Code, ChatGPT, and Codex.
+See [`docs/getting-started.md`](docs/getting-started.md) for clear setup and copy/paste prompts for Claude, Claude Code, ChatGPT, and Codex.
 If you run Hermes or Pi with OpenAI-backed browser-login models, see [`docs/openai-hermes-pi-routing.md`](docs/openai-hermes-pi-routing.md) for a surface-specific routing companion.
 
-## Quick start for non-direct runs
+## Artifact quick start for non-direct runs
 
 If the task is direct mode, skip this section: make the edit, run the obvious validation, and report changed files plus evidence.
 
@@ -109,7 +120,8 @@ docs/
   model-routing.md
   dynamic-workflows.md
   openai-hermes-pi-routing.md
-  tool-quickstart.md
+  getting-started.md
+  tool-quickstart.md  # compatibility redirect
   failure-modes.md
   high-risk-qa.md
   visual-specs.md
@@ -137,7 +149,7 @@ examples/
 
 ## Use with Claude, Claude Code, ChatGPT, or Codex
 
-For non-Pi tools, use the setup snippets and reusable prompts in [`docs/tool-quickstart.md`](docs/tool-quickstart.md). It covers:
+For non-Pi tools, use the setup snippets and reusable prompts in [`docs/getting-started.md`](docs/getting-started.md). It covers:
 
 - Claude and ChatGPT as spec authors, critics, and QA reviewers
 - Claude Code project memory and slash-command setup
