@@ -2,7 +2,7 @@
 
 ## 0.2.0
 
-- Added self-contained Claude skill adapter at `adapters/claude/`, with concise `SKILL.md` instructions and supporting `workflow.md`.
+- Added self-contained Claude skill adapter at `adapters/claude/`, with concise `SKILL.md` instructions, supporting `workflow.md`, and an `npx` installer.
 - Added observability/ROI closeout guidance for sessions, turns, output tokens, approximate cost, model mix, and process-weight classification.
 - Added budget-awareness language for lightweight vs broad-ticket runs.
 - Added portability guidance: telemetry scripts and templates should use environment/config such as `PI_OBS_DB`, never personal absolute paths.

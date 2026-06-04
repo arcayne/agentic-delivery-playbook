@@ -62,21 +62,23 @@ adapters/claude/
   workflow.md
 ```
 
-Install the whole directory so supporting files remain available:
+Install it with `npx`:
 
 ```bash
 # User skill, available across projects
-mkdir -p ~/.claude/skills/agentic-delivery-playbook
-cp -R /path/to/agentic-delivery-playbook/adapters/claude/. \
-  ~/.claude/skills/agentic-delivery-playbook/
+npx agentic-delivery-playbook install claude
 
 # Or project skill, available in one repo
-mkdir -p .claude/skills/agentic-delivery-playbook
-cp -R /path/to/agentic-delivery-playbook/adapters/claude/. \
-  .claude/skills/agentic-delivery-playbook/
+npx agentic-delivery-playbook install claude --project
 ```
 
-The skill command name comes from the install directory, for example `/agentic-delivery-playbook`. If your Claude environment uses upload/import instead of local skill folders, upload the whole `adapters/claude/` folder, not just `SKILL.md`.
+Until the package is published to npm, install from GitHub:
+
+```bash
+npx github:arcayne/agentic-delivery-playbook install claude
+```
+
+The installer copies the whole `adapters/claude/` directory into the selected Claude skills location so supporting files remain available. The skill command name comes from the install directory, for example `/agentic-delivery-playbook`. If your Claude environment uses upload/import instead of local skill folders, upload the whole `adapters/claude/` folder, not just `SKILL.md`.
 
 Then ask Claude to use the Agentic Delivery Playbook for the task.
 
