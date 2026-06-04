@@ -8,6 +8,7 @@
     "agentic-delivery-playbook": "bin/agentic-delivery-playbook.js"
   },
   "files": [
+    "adapters/chatgpt",
     "adapters/claude",
     "adapters/pi",
     "bin",

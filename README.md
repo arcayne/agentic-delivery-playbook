@@ -135,6 +135,9 @@ templates/
   qa-checklist.template.md
   closeout-governance.template.md
 adapters/
+  chatgpt/
+    README.md
+    instructions.md
   claude/
     SKILL.md
     workflow.md
@@ -159,7 +162,17 @@ For Claude, install the self-contained skill in `adapters/claude/` when your env
 - ChatGPT as spec author, critic, or QA reviewer
 - Codex `AGENTS.md` instructions or copy/paste session prompts
 
-## Install as a skill
+## Install adapters
+
+ChatGPT adapter:
+
+```text
+adapters/chatgpt/
+  README.md
+  instructions.md
+```
+
+ChatGPT does not currently use Claude-style skill folders. Use `adapters/chatgpt/instructions.md` as ChatGPT Project instructions, custom GPT instructions, or a pasted session instruction.
 
 Claude skill adapter:
 

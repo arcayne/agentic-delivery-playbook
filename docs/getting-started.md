@@ -157,14 +157,29 @@ Then run Claude Code in the repo and invoke:
 
 ## ChatGPT
 
-Use ChatGPT similarly to Claude chat: planning, spec critique, QA review, and human-readable explanations.
+Use ChatGPT for planning, spec critique, QA review, and human-readable explanations.
+
+### Option A: ChatGPT Project or custom GPT instructions
+
+ChatGPT does not currently use Claude-style skill folders. Use the ChatGPT adapter instead:
+
+```text
+adapters/chatgpt/
+  README.md
+  instructions.md
+```
 
 Recommended setup:
 
-1. Create a project or custom instruction named `Agentic Delivery Playbook`.
-2. Add the universal quick prompt or a short summary of the workflow.
-3. Upload or paste only the files, specs, diffs, and logs needed for the current review.
-4. Ask for evidence-based output: changed files, validation commands/results, risks, and open questions.
+1. Create a ChatGPT Project or custom GPT named `Agentic Delivery Playbook`.
+2. Paste `adapters/chatgpt/instructions.md` into the Project/custom GPT instructions.
+3. Optionally upload `playbook.md`, templates, or example specs as knowledge.
+4. Upload or paste only the files, specs, diffs, and logs needed for the current review.
+5. Ask for evidence-based output: changed files, validation commands/results, risks, and open questions.
+
+### Option B: prompt-only ChatGPT
+
+Paste the universal quick prompt or the ChatGPT adapter instructions at the start of a session.
 
 Suggested QA prompt:
 
