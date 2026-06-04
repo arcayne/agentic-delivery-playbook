@@ -13,7 +13,7 @@ classify -> spec only if needed -> approve -> implement -> QA against evidence
 Use it as one pasted prompt first. Add templates and run artifacts only when the task is risky enough to deserve them.
 
 <p align="center">
-  <img src="assets/scoped-vs-freestyle.svg" alt="Freestyle agent run creates a surprise diff; classified tasks create scoped changes with evidence" width="920">
+  <img src="assets/agent-preflight-hero.png" alt="Agent preflight checklist: mode, goal, non-goals, risks, approval, and evidence before the agent touches the repo" width="920">
 </p>
 
 ## Try it in 60 seconds
@@ -203,7 +203,7 @@ README.md
 playbook.md
 SECURITY.md
 assets/
-  scoped-vs-freestyle.svg
+  agent-preflight-hero.png
   agentic-delivery-loop.svg
 docs/
   philosophy.md
