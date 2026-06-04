@@ -10,6 +10,7 @@
   "files": [
     "adapters/chatgpt",
     "adapters/claude",
+    "adapters/codex",
     "adapters/pi",
     "bin",
     "docs",

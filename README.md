@@ -141,6 +141,9 @@ adapters/
   claude/
     SKILL.md
     workflow.md
+  codex/
+    AGENTS.md
+    README.md
   pi/
     SKILL.md
 examples/
@@ -199,6 +202,16 @@ npx github:arcayne/agentic-delivery-playbook install claude
 ```
 
 The installer copies the whole `adapters/claude/` directory into the selected Claude skills location. The skill command name comes from the install directory, for example `/agentic-delivery-playbook`. If your Claude environment uses upload/import instead of local skill folders, upload the whole `adapters/claude/` folder, not just `SKILL.md`.
+
+Codex adapter:
+
+```text
+adapters/codex/
+  AGENTS.md
+  README.md
+```
+
+Install it by copying `adapters/codex/AGENTS.md` into the target repository root, or merge it into an existing `AGENTS.md`.
 
 Pi skill adapter:
 

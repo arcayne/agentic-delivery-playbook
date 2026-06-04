@@ -205,23 +205,21 @@ Use Codex when you want a repo-editing agent to follow the playbook.
 
 ### Project instructions
 
-If your Codex setup reads `AGENTS.md`, add:
+Use the Codex adapter:
 
-```markdown
-# Agent instructions
-
-Use the Agentic Delivery Playbook for non-trivial coding work.
-
-- Classify each task as direct, lightweight, or full before editing.
-- Direct mode: make the smallest correct change, validate, and report evidence; do not create specs/ artifacts.
-- Lightweight/full mode: create specs/YYYYMMDD-HHMM-<slug>/ with spec.md, run.json, and notes.md.
-- Draft and critique the spec before implementation.
-- Stop for approval before coding unless the user explicitly asks for an end-to-end run.
-- Implement only against the approved spec.
-- QA the diff against the spec, not against the implementation summary.
-- Close out with changed files, validation commands/results, known gaps, and next action.
-- Do not invent evidence or claim model-specific routing unless it was actually controlled and recorded.
+```text
+adapters/codex/
+  AGENTS.md
+  README.md
 ```
+
+Install it by copying `adapters/codex/AGENTS.md` into the target repository root:
+
+```bash
+cp adapters/codex/AGENTS.md /path/to/your/repo/AGENTS.md
+```
+
+If the repository already has an `AGENTS.md`, merge the playbook rules into the existing file instead of overwriting project-specific instructions.
 
 Then start Codex in the repository and ask:
 
@@ -229,7 +227,7 @@ Then start Codex in the repository and ask:
 Use the Agentic Delivery Playbook for: <your task>
 ```
 
-If your Codex setup does not read `AGENTS.md`, paste the universal quick prompt at the start of the session.
+If your Codex setup does not read `AGENTS.md`, paste `adapters/codex/AGENTS.md` or the universal quick prompt at the start of the session.
 
 ## Role prompts you can reuse
 
