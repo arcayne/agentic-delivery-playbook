@@ -1,7 +1,7 @@
 {
   "name": "agentic-delivery-playbook",
   "version": "0.2.0",
-  "description": "Spec-first workflow for coding agents with Claude and Pi skill adapters.",
+  "description": "Keep coding agents scoped, testable, and honest with a lightweight delivery playbook.",
   "license": "MIT",
   "type": "commonjs",
   "bin": {
@@ -20,11 +20,14 @@
     "LICENSE"
   ],
   "keywords": [
-    "ai-agents",
     "coding-agents",
-    "claude-skill",
-    "spec-first",
-    "agentic-workflow"
+    "ai-code-review",
+    "claude-code",
+    "codex",
+    "agent-workflow",
+    "software-engineering",
+    "human-in-the-loop",
+    "developer-tools"
   ],
   "repository": {
     "type": "git",

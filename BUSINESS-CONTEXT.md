@@ -72,5 +72,7 @@ Useful provocative language for agent drift, over-editing, surprise refactors, a
 ## Resolved positioning decisions
 
 - README hero: "A no-hype workflow for keeping coding agents scoped, testable, and honest."
-- First-screen wedge: "This is the thing you paste before you let an agent touch your repo."
+- First-screen wedge: lead with a simple delivery contract and 60-second pasted prompt before any artifact/run-directory instructions.
+- Avoid opening with "create a run directory" because that contradicts the anti-ceremony promise for busy developers.
 - Token/cost wording: say "designed to control token waste" unless measured baseline savings are available.
+- Repo-name recommendation under consideration: `coding-agent-playbook` is clearer and less hype-loaded than `agentic-delivery-playbook`, but package/repo rename has not been executed.

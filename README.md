@@ -2,11 +2,15 @@
 
 **A no-hype workflow for keeping coding agents scoped, testable, and honest.**
 
-This is the thing you paste before you let an agent touch your repo.
+Coding agents are useful, but they drift. They over-edit, skip edge cases, invent validation, and turn small requests into surprise refactors.
 
-Use it to classify the task, define what the agent may change, choose the right model or agent when your harness allows it, and require evidence before trusting the result.
+This playbook gives them a simple delivery contract:
 
-Start with one prompt. Add templates and run artifacts only when the task is risky enough to deserve them.
+```text
+classify -> spec only if needed -> approve -> implement -> QA against evidence
+```
+
+Use it as one pasted prompt first. Add templates and run artifacts only when the task is risky enough to deserve them.
 
 <p align="center">
   <img src="assets/scoped-vs-freestyle.svg" alt="Freestyle agent run creates a surprise diff; classified tasks create scoped changes with evidence" width="920">
@@ -51,6 +55,7 @@ That is the whole starting point. Everything else in this repo is for teams that
 | “The agent changed too much.” | Direct/lightweight/full triage before editing |
 | “It solved a different problem.” | Approved spec with non-goals |
 | “I do not trust the test summary.” | Evidence-based closeout |
+| “It skipped edge cases.” | Critique before implementation |
 | “The PR is hard to review.” | QA against acceptance criteria, not summaries |
 | “The model was too weak or too expensive for the job.” | Model/agent routing ledger when available |
 | “The task keeps going sideways.” | Fix-cycle escalation rules |
@@ -67,6 +72,14 @@ Choose process weight before creating artifacts.
 | **Full + bounded workflow** | Broad audit, migration, or adversarial review | Parallel or dynamic work only with scope, cap, stop rule, and synthesis plan |
 
 Do not use full mode for tiny direct edits. Do not create artifacts for obvious one-file changes.
+
+## When not to use this
+
+Do not turn every agent task into a spec-first run.
+
+Use direct mode, with no run directory or templates, when the change is clear, low-risk, narrow, and has obvious validation.
+
+Skip lightweight/full mode unless ambiguity, review cost, cross-system impact, security/privacy/auth/data-loss/financial/provider risk, or previous agent drift makes extra structure worth it.
 
 ## Adopt it in five minutes
 
