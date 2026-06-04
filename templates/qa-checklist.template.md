@@ -30,6 +30,15 @@ Use for broad tickets or sensitive changes.
 - [ ] Numeric/display edge cases reviewed.
 - [ ] Provider/config failure behavior reviewed.
 
+## Dynamic workflow findings
+
+Use only when dynamic workflow or large parallel fanout was used.
+
+- [ ] Launch note and approval evidence are recorded.
+- [ ] Synthesis includes accepted, rejected, speculative, and conflicting findings.
+- [ ] Accepted findings have independent verification or clear evidence.
+- [ ] Speculative findings are labeled and not presented as final.
+
 ## Validation
 
 - [ ] Relevant tests were run.

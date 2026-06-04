@@ -10,6 +10,8 @@ Before writing a spec, creating a run directory, choosing models, or delegating 
 - **Lightweight mode:** bounded low/medium-risk change that benefits from a compact spec/checklist. Notes-only evidence and parent self-review are acceptable.
 - **Full mode:** broad, ambiguous, sensitive, cross-system, provider/config/state-machine, security/privacy, or drift-prone work. Require explicit artifacts, routing ledger, QA gate, high-risk checks when applicable, and full closeout.
 
+Dynamic workflows and large fanout are full-mode escalations, not defaults.
+
 Escalate the process weight only when risk appears. Do not add full-mode gates to direct or ordinary lightweight work by default.
 
 ## Intake gate
@@ -47,6 +49,21 @@ Implementation starts only after approval, unless the human explicitly asked for
 
 Record approval in `run.json` or `notes.md`.
 
+## Dynamic workflow launch gate
+
+Before starting a dynamic workflow or large parallel fanout, present a plain-English launch note and get approval. This should be a readable plan, not a blank budget schema.
+
+The note should state:
+
+- scope: what is included and excluded
+- concrete cap: for example fixed file list, one worker per package, first pass only, no recursive fanout, or one verifier per finding
+- stop rule: what ends the workflow
+- synthesis and verification plan: how results are merged, checked, rejected, or marked speculative
+
+Record the approved launch note in `notes.md`, `run.json`, or a workflow artifact.
+
+Do not launch if the scope, cap, stop rule, or synthesis plan is vague.
+
 ## Implementation gate
 
 Before editing code, the implementer should have:
@@ -66,6 +83,8 @@ QA compares implementation to the approved spec.
 For lightweight mode, QA may be a parent self-review recorded in `notes.md` when no serious risk appears. For full mode, use an explicit critic/QA gate, preferably independent when available.
 
 The reviewer should not accept an implementation merely because tests pass. Tests are evidence, not the whole contract.
+
+For dynamic workflows, QA must inspect the synthesis and verification trail. No finding should be accepted as final unless it survived independent verification or is explicitly labeled speculative.
 
 ## Escalation gate
 

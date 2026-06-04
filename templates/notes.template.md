@@ -10,6 +10,16 @@
 - Rationale: <why this process weight is enough>
 - Escalation signal: <none or risk that requires heavier process>
 
+## Dynamic workflow launch note (delete if unused)
+
+Use only for dynamic workflows or large parallel fanout. Prefer a short plain-English approval note over blank budget fields.
+
+```text
+<scope, concrete cap, stop rule, and synthesis/verification plan>
+```
+
+- Approval evidence: <quote, message, ticket link, or note>
+
 ## Intake decisions
 
 - <decision>

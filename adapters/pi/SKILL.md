@@ -67,9 +67,32 @@ Full mode rules:
 - record explicit model/agent routing and reasoning intensity when available
 - use a critic/QA gate, preferably independent when available
 - apply high-risk QA checks for sensitive or cross-system work
+- use dynamic workflow/fanout only after a plain-English launch note is approved
+- accept workflow findings only after synthesis plus independent verification, or mark them speculative
 - complete required closeout fields: files changed, validation, findings, model ledger, known gaps, fix cycles, and next action
 
 When unsure, tell the user the classification and ask whether they want direct implementation, lightweight mode, or full mode.
+
+## Harness ladder and dynamic workflow guardrail
+
+Use the smallest harness that safely fits the work:
+
+```text
+direct prompt -> skill -> subagent -> chain / agent team -> goal loop -> dynamic workflow
+```
+
+A goal loop is depth: one objective, repeated passes, stop when completion is true. A dynamic workflow is width: many agents run in parallel, then a synthesizer folds the results into one answer.
+
+Dynamic workflows are full-mode escalations for broad audits, migrations, root-cause hypothesis panels, evals, rule-adherence checks, or critical plans that need independent attempts and adversarial review. Do not use them for small edits, vague scope, tightly sequential work, or low-value knowledge work.
+
+Before launching a dynamic workflow or large parallel fanout, stop and present a short launch note for approval. Do not create blank budget fields. The note should include:
+
+- scope: what is included and excluded
+- concrete cap: for example fixed file list, one worker per package, first pass only, no recursive fanout, or one verifier per finding
+- stop rule: what ends the workflow
+- synthesis and verification plan: how results are merged, checked, rejected, or marked speculative
+
+Record the approved note in `notes.md`, `run.json`, or a workflow artifact. Do not accept a workflow finding as final unless it survived independent verification or is explicitly labeled speculative.
 
 ## Required run artifacts
 
@@ -103,6 +126,7 @@ Use `spec.html` when diagrams, screenshots, state machines, tables, or stronger 
 - legacy policy, when older/incomplete runs cannot prove routing or gate evidence
 - observability or ROI summary when telemetry data is available
 - implementation model evaluation after QA, when a model or agent was explicitly chosen
+- dynamic workflow launch note, only when dynamic workflow/fanout was used
 - changed files
 - validation evidence
 - findings
@@ -201,6 +225,8 @@ For broad tickets:
 3. review after the first implementation pass
 4. record the gate in `run.json` and the model ledger
 
+If the broad ticket becomes a dynamic workflow, present the launch note before fanout starts and record the approval evidence.
+
 Do not add this gate for small direct or ordinary lightweight work unless a risk signal appears. If observability/cost data is available, broad-ticket runs should have an explicit budget expectation; runs that exceed the team's hard budget should explain why the added process/model spend was justified.
 
 ### Evidence integrity and legacy runs
@@ -227,6 +253,8 @@ Categorize findings:
 - missing validation/test
 
 For broad tickets or sensitive changes, include high-risk QA checks for privacy/redaction, authority or irreversible actions, routing/state precedence, mode behavior, numeric/display edge cases, provider/config validation, and external-service failures.
+
+For dynamic workflows, QA must review the synthesis, rejected findings, verifier/refuter results, and any speculative findings.
 
 ### 7. Fix/escalation loop
 

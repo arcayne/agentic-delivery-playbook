@@ -25,6 +25,7 @@ This repository is a portable engineering pattern for operating coding agents on
 - implementation against an accepted contract
 - QA against evidence, not summaries
 - explicit model or agent choice per task: spec, critique, implementation, QA, escalation
+- bounded orchestration choices, including dynamic workflows only when width is genuinely useful
 - run artifacts that record decisions, validation, model routing, and known gaps
 - escalation rules when an agent drifts or repeated fix cycles appear
 
@@ -46,6 +47,8 @@ Use **lightweight mode** for bounded low/medium-risk work that benefits from a c
 
 Use **full mode** for ambiguous, risky, cross-package, customer-facing, provider/config/state-machine, security/privacy, or drift-prone work. Full mode uses broad-ticket planning when needed, explicit routing ledgers, critic/QA gates, high-risk QA, and required closeout fields.
 
+Use **dynamic workflows** only as a full-mode orchestration escalation when broad parallelism is useful. Before launch, write a short plain-English launch note with scope, concrete cap, stop rule, and synthesis/verification plan. Do not turn this into a blank budget form.
+
 Do not use the full workflow for tiny direct edits unless the user explicitly asks for a spec-first run.
 
 ## Model choice per task
@@ -57,6 +60,7 @@ Use stronger reasoning for high ambiguity work: intake, spec writing, critique, 
 Every run should record the intended and actual model or agent for each role. That makes cost, quality, and drift visible instead of hidden inside a chat transcript.
 
 See [`docs/model-routing.md`](docs/model-routing.md) for the routing ledger and role guidance.
+See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md) for bounded fanout, width-vs-depth guidance, and workflow launch notes.
 If you run Hermes or Pi with OpenAI-backed browser-login models, see [`docs/openai-hermes-pi-routing.md`](docs/openai-hermes-pi-routing.md) for a surface-specific routing companion.
 
 ## Quick start for non-direct runs
@@ -102,6 +106,7 @@ docs/
   philosophy.md
   gates.md
   model-routing.md
+  dynamic-workflows.md
   openai-hermes-pi-routing.md
   failure-modes.md
   high-risk-qa.md

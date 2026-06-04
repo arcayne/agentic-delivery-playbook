@@ -78,7 +78,25 @@ Full mode contract:
 - explicit model/agent and reasoning ledger when routing controls are available
 - critic/QA gate, preferably independent when available
 - high-risk QA for sensitive, authority, provider, state, privacy, or cross-system changes
+- dynamic workflow/fanout only after a plain-English launch note is approved
+- workflow findings accepted only after synthesis plus independent verification, or clearly marked speculative
 - required closeout fields for files changed, validation, findings, model ledger, known gaps, fix cycles, and next action
+
+### Harness ladder: choose the smallest runtime
+
+Use the smallest harness that safely fits the work:
+
+```text
+direct prompt -> skill -> subagent -> chain / agent team -> goal loop -> dynamic workflow
+```
+
+A goal loop is depth: it iterates against a completion condition. A dynamic workflow is width: many agents explore, verify, compare, or classify in parallel, then a synthesizer folds the work into one answer.
+
+Dynamic workflows are a full-mode escalation for broad audits, migrations, root-cause hypothesis panels, evals, rule-adherence checks, or critical plans that need independent attempts and adversarial review. They are not for small edits, unclear scope, low-value knowledge work, or tightly sequential tasks.
+
+Before launching a dynamic workflow or large parallel fanout, write a short launch note with scope, a concrete cap, a stop rule, and the synthesis/verification plan. Do not create blank budget fields that people will not fill.
+
+See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md).
 
 ## 1. Intake
 
@@ -191,6 +209,8 @@ Use [`templates/qa-checklist.template.md`](templates/qa-checklist.template.md) w
 
 For broad tickets or sensitive changes, also use [`docs/high-risk-qa.md`](docs/high-risk-qa.md).
 
+For dynamic workflows, QA must review the synthesis, rejected findings, verifier/refuter results, and any speculative findings. A workflow finding is not final just because a worker reported it.
+
 ## 7. Fix or escalate
 
 A normal fix loop is fine. Repeated correction is a signal.
@@ -284,6 +304,8 @@ Optional artifacts:
   qa.md
   closeout-governance.md
   validation.log
+  workflow-status.md
+  workflow-results.json
   screenshots/
   diffs/
 ```
