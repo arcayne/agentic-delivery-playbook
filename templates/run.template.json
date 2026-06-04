@@ -23,25 +23,38 @@
     "specAuthor": {
       "agent": null,
       "model": null,
+      "reasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
       "source": "explicit | agent-default | runtime-default | manual"
     },
     "critic": {
       "agent": null,
       "model": null,
+      "reasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
       "source": "explicit | agent-default | runtime-default | manual"
     },
     "implementer": {
       "agent": null,
       "model": null,
+      "reasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
       "source": "explicit | agent-default | runtime-default | manual"
     },
     "qaReviewer": {
       "agent": null,
       "model": null,
+      "reasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
       "source": "explicit | agent-default | runtime-default | manual"
     }
   },
-  "modelLedger": [],
+  "modelLedger": [
+    {
+      "role": "specAuthor | critic | implementer | qaReviewer | escalationReviewer",
+      "agent": null,
+      "model": null,
+      "reasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
+      "source": "explicit | agent-default | runtime-default | manual",
+      "notes": null
+    }
+  ],
   "reviewGates": {
     "specCritique": "pending",
     "humanApproval": "pending",
@@ -93,8 +106,10 @@
   "implementationEvaluation": {
     "targetAgent": null,
     "targetModel": null,
+    "targetReasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
     "actualAgent": null,
     "actualModel": null,
+    "actualReasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
     "taskFit": "small-direct | lightweight-ticket | broad-ticket",
     "acceptanceMet": 0,
     "acceptanceTotal": 0,

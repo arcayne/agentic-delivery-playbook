@@ -23,21 +23,25 @@
     "specAuthor": {
       "agent": "parent-agent",
       "model": "configured-spec-model",
+      "reasoningIntensity": "high",
       "source": "runtime-default"
     },
     "critic": {
       "agent": "parent-agent",
       "model": "configured-spec-model",
+      "reasoningIntensity": "high",
       "source": "runtime-default"
     },
     "implementer": {
       "agent": "code-writer",
       "model": "configured-implementation-model",
+      "reasoningIntensity": "medium",
       "source": "explicit"
     },
     "qaReviewer": {
       "agent": "reviewer",
       "model": "configured-review-model",
+      "reasoningIntensity": "medium",
       "source": "explicit"
     }
   },
@@ -46,6 +50,7 @@
       "role": "implementer",
       "agent": "code-writer",
       "model": "configured-implementation-model",
+      "reasoningIntensity": "medium",
       "source": "explicit",
       "notes": "Example ledger entry; replace with actual harness routing."
     }
@@ -112,8 +117,10 @@
   "implementationEvaluation": {
     "targetAgent": "code-writer",
     "targetModel": "configured-implementation-model",
+    "targetReasoningIntensity": "medium",
     "actualAgent": "code-writer",
     "actualModel": "configured-implementation-model",
+    "actualReasoningIntensity": "medium",
     "taskFit": "lightweight-ticket",
     "acceptanceMet": 6,
     "acceptanceTotal": 6,

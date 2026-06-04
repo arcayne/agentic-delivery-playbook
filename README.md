@@ -57,6 +57,7 @@ Use stronger reasoning for high ambiguity work: intake, spec writing, critique, 
 Every run should record the intended and actual model or agent for each role. That makes cost, quality, and drift visible instead of hidden inside a chat transcript.
 
 See [`docs/model-routing.md`](docs/model-routing.md) for the routing ledger and role guidance.
+If you run Hermes or Pi with OpenAI-backed browser-login models, see [`docs/openai-hermes-pi-routing.md`](docs/openai-hermes-pi-routing.md) for a surface-specific routing companion.
 
 ## Quick start
 
@@ -97,6 +98,7 @@ docs/
   philosophy.md
   gates.md
   model-routing.md
+  openai-hermes-pi-routing.md
   failure-modes.md
   high-risk-qa.md
   visual-specs.md

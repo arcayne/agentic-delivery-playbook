@@ -156,6 +156,8 @@ Implement only against the approved spec. If the spec is ambiguous, stop and ask
 
 If subagents/model routing are available, explicitly route the implementation writer to the configured implementation agent/model. Record both the intended and actual routing. If routing is required by the project and cannot be enforced, stop and ask the user whether to manually switch models or approve a one-off exception.
 
+If the harness exposes reasoning intensity or similar effort controls, record those alongside the selected model. For Hermes/Pi users selecting OpenAI-backed browser-login models, capture both the model label shown in the picker and the actual reasoning intensity used.
+
 Implementation prompt contract:
 
 - implement one approved spec task or tightly grouped task set at a time

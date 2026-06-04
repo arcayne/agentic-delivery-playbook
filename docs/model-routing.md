@@ -4,6 +4,12 @@ This playbook is model-agnostic. It does not require a specific provider or mode
 
 The important idea is role fit: use the right kind of agent or model for each phase, and record what actually happened.
 
+## Provider-specific companion guides
+
+Use provider-specific companions only when they help users route within a real harness surface without changing the core playbook stance.
+
+- OpenAI via Hermes/Pi: [`docs/openai-hermes-pi-routing.md`](openai-hermes-pi-routing.md)
+
 ## Recommended roles
 
 | Role | Work type | Useful traits |
@@ -39,6 +45,7 @@ Minimum fields:
   "role": "implementer",
   "agent": "code-writer",
   "model": "configured-implementation-model",
+  "reasoningIntensity": "high",
   "source": "explicit",
   "notes": "Routed by run configuration."
 }
