@@ -154,6 +154,8 @@ Repo adapters:
 
 If you want model-routing guidance or bounded fanout patterns, see [`docs/model-routing.md`](docs/model-routing.md) and [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md).
 
+For Pi users with task-fit model routing policy (DeepSeek implementation worker, escalation rules, final review contract), see [`docs/pi-task-fit-model-routing.md`](docs/pi-task-fit-model-routing.md).
+
 ## When to add templates and run artifacts
 
 If the task is **direct**, skip this section.

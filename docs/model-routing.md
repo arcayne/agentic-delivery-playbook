@@ -11,6 +11,7 @@ Choose process weight before model weight. Direct-mode edits should not get a mo
 Use provider-specific companions only when they help users route within a real harness surface without changing the core playbook stance.
 
 - OpenAI via Hermes/Pi: [`docs/openai-hermes-pi-routing.md`](openai-hermes-pi-routing.md)
+- Pi task-fit model routing (task-shape-first policy with DeepSeek as implementation worker, escalation rules, and final review contract): [`docs/pi-task-fit-model-routing.md`](pi-task-fit-model-routing.md)
 
 ## Recommended roles
 
