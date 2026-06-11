@@ -1,11 +1,36 @@
-# Model Ledger — GitHub OAuth Integration
+# Model & Reasoning Ledger
 
-| Role | Intended Model | Actual Model | Source | Reason | Task | Result | Notes |
-|------|---------------|-------------|--------|--------|------|--------|-------|
-| specAuthor | `gpt-5.5` | `gpt-5.5` | explicit | Strong planning for auth provider spec | GitHub OAuth spec | completed | Reasoning intensity: high |
-| critic | `gpt-5.4` | `gpt-5.4` | explicit | Architecture-oriented critique | Spec critique | completed | No spec ambiguity found |
-| implementer (ticket 1) | `deepseek-v4-flash` | `deepseek-v4-flash` | explicit | Provider config — narrow file-scoped change | Config schema + provider file | completed | 0 fix cycles |
-| implementer (ticket 2) | `deepseek-v4-flash` | `gpt-5.3-codex-spark` | exception-approved | DeepSeek failed 2 fix cycles on token exchange | Token exchange handler | completed | Escalated: state parameter handling was ambiguous |
-| implementer (ticket 3) | `gpt-5.3-codex-spark` | `gpt-5.3-codex-spark` | explicit | Session integration is sensitive — not safe for DeepSeek | Route handler wiring | completed | Direct assignment per policy |
-| finalCodeReview | `gpt-5.3-codex-spark` | `gpt-5.3-codex-spark` | explicit | Final code correctness review | Full diff review | completed | 0 blockers, 1 low finding (unused import) |
-| finalRiskReview | `gpt-5.4` | `gpt-5.4` | explicit | Architecture review for auth provider | Full spec compliance check | completed | approve |
+| Role | Intended Model | Actual Model | Reasoning | Source | Reason | Task | Result | Notes |
+|---|---|---|---|---|---|---|---|---|
+| specAuthor | `gpt-5.4` | `gpt-5.4` | high | explicit | Strong planning for the parent spec | Classification-first routing spec | completed | Full parent task |
+| childImplementer | `deepseek-v4-flash` | `deepseek-v4-flash` | low | explicit | Narrow, file-scoped child implementation | 01 parser case | completed | No architecture decisions delegated |
+| childImplementer | `deepseek-v4-flash` | `deepseek-v4-flash` | low | explicit | Narrow, test-only child implementation | 02 regression tests | completed | Scoped implementation worker only |
+| childReviewer | `gpt-5.3-codex-spark` | `gpt-5.3-codex-spark` | medium | explicit | Code correctness review for child work | Child diff review | completed | No blockers |
+| finalCodeReview | `gpt-5.3-codex-spark` | `gpt-5.3-codex-spark` | medium | explicit | Final code correctness review | Full diff review | completed | approve-with-notes |
+| finalRiskReview | `gpt-5.4` | `gpt-5.4` | high | explicit | Architecture/risk review | Final risk review | completed | approve-with-notes |
+
+## Source Values
+
+- explicit
+- agent-default
+- runtime-default
+- manual
+- exception-approved
+- unknown-legacy
+
+## Reasoning Values
+
+- off
+- minimal
+- low
+- medium
+- high
+- runtime-default
+- unknown
+
+## Rules
+
+- Do not invent model usage.
+- Use `actualModel: unknown` if the runtime does not expose it.
+- Use `source: manual` if the user manually switched model.
+- Record routing exceptions honestly.

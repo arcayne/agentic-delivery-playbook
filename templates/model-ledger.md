@@ -1,31 +1,39 @@
-# Model Ledger
+# Model & Reasoning Ledger
 
-Record model routing for each role in the run. One row per role or per distinct task.
+Use this ledger for Lightweight and Full mode runs.
 
-| Role | Intended Model | Actual Model | Source | Reason | Task | Result | Notes |
-|------|---------------|-------------|--------|--------|------|--------|-------|
-| specAuthor | `gpt-5.5` | `gpt-5.5` | explicit | Strong planning for broad-ticket spec | Auth refactor spec | completed | Reasoning intensity: high |
-| critic | `gpt-5.4` | `gpt-5.4` | explicit | Architecture-oriented critique | Auth refactor critique | completed | No spec ambiguity found |
-| implementer | `deepseek-v4-flash` | `deepseek-v4-flash` | explicit | Bounded file-scoped implementation after checklist approval | Parser regression tests | completed | No routing exception |
-| implementer | `deepseek-v4-flash` | `gpt-5.3-codex-spark` | exception-approved | DeepSeek failed 2 fix cycles on state-machine subtask | Order state handler | completed | Escalated per policy |
-| qaReviewer | `gpt-5.3-codex-spark` | `gpt-5.3-codex-spark` | explicit | Code correctness review | Final diff review | completed | 0 blockers, 2 low findings |
-| escalationReviewer | `gpt-5.4` | `gpt-5.4` | explicit | Architecture drift diagnosis | Drift analysis | completed | Spec ambiguity identified |
+Direct mode does not require a ledger unless requested.
+
+| Role | Intended Model | Actual Model | Reasoning | Source | Reason | Task | Result | Notes |
+|---|---|---|---|---|---|---|---|---|
+| specAuthor | `gpt-5.4` | `gpt-5.4` | high | explicit | Strong planning for full spec | Routing example spec | completed | Reasoning intensity: high |
+| childImplementer | `deepseek-v4-flash` | `deepseek-v4-flash` | low | explicit | Bounded implementation task | Parser-case child task | completed | No architecture decisions delegated |
+| childReviewer | `gpt-5.3-codex-spark` | `gpt-5.3-codex-spark` | medium | explicit | Code correctness review for child diff | Regression test review | completed | Clean review |
+| finalCodeReview | `gpt-5.3-codex-spark` | `gpt-5.3-codex-spark` | medium | explicit | Final code correctness review | Full diff review | completed | 0 blockers |
+| finalRiskReview | `gpt-5.4` | `gpt-5.4` | high | explicit | Architecture/risk review | Final risk review | completed | approve-with-notes |
 
 ## Source Values
 
-| Source | Meaning |
-|--------|---------|
-| `explicit` | The run requested this model directly |
-| `agent-default` | An agent profile supplied the routing |
-| `runtime-default` | The harness chose it implicitly |
-| `manual` | A human selected it outside the run configuration |
-| `exception-approved` | A routing exception was explicitly approved |
-| `unknown-legacy` | Routing cannot be determined for older/interrupted runs |
+- explicit
+- agent-default
+- runtime-default
+- manual
+- exception-approved
+- unknown-legacy
+
+## Reasoning Values
+
+- off
+- minimal
+- low
+- medium
+- high
+- runtime-default
+- unknown
 
 ## Rules
 
-- Never invent model usage.
-- Record `Actual Model: unknown` if the harness did not expose the model.
-- Record `Source: manual` if the user manually switched models.
+- Do not invent model usage.
+- Use `actualModel: unknown` if the runtime does not expose it.
+- Use `source: manual` if the user manually switched model.
 - Record routing exceptions honestly.
-- Direct mode does not require a ledger unless requested.

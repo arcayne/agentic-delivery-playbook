@@ -1,55 +1,77 @@
-# Spec: Add OAuth Provider (GitHub)
+# Spec: Classification-First Routing for Ambiguous Trading Command
+
+## Mode
+
+Full
 
 ## Objective
 
-Add GitHub as a new OAuth provider to the authentication system.
+Ensure ambiguous or actionable trading commands are classified before pending prompt handlers consume them, so safety-critical trading intent is routed deterministically and not mistaken for a reply to an unrelated pending flow.
 
-## Non-goals
+## Non-Goals
 
-- Do not change existing OAuth providers (Google, Microsoft).
-- Do not modify the session model.
-- Do not add UI components beyond the provider button.
-- Do not change token storage format.
+- Do not place live orders.
+- Do not change broker/provider execution behavior.
+- Do not redesign all routing.
+- Do not introduce autonomous trading.
+- Do not bypass human confirmation.
+- Do not change unrelated Telegram command behavior.
 
-## Current state
+## Risk
 
-The auth module supports OAuth login via Google and Microsoft. Each provider implements `OAuthProvider` interface:
+High, because incorrect routing can cause unsafe, confusing, or money-impacting trading behavior.
 
-```typescript
-interface OAuthProvider {
-  name: string;
-  getAuthUrl(state: string): string;
-  exchangeCode(code: string): Promise<TokenSet>;
-  refreshToken(refreshToken: string): Promise<TokenSet>;
-}
-```
+## Model Plan
 
-## Architecture decision
+Spec/planning: gpt-5.4, high reasoning  
+Implementation subtasks: DeepSeek V4 Flash or gpt-5.4-mini, low reasoning  
+Code review: gpt-5.3-codex-spark, medium/high reasoning  
+Architecture/risk review: gpt-5.4, high reasoning
 
-GitHub OAuth follows the same interface. Separate file per provider: `src/auth/providers/github.ts`.
+## Child Tasks
 
-## Acceptance criteria
+1. Add parser/classifier coverage for ambiguous trading phrases.
+2. Add regression tests for pending-flow interruption and routing precedence.
+3. Add a short docs note explaining the routing invariant.
 
-1. `GET /api/auth/github/url` returns a valid GitHub OAuth authorize URL with client_id, redirect_uri, and state.
-2. `POST /api/auth/github/callback` exchanges the code for a token set.
-3. Token set includes access_token, token_type, and (if available) refresh_token.
-4. Existing Google and Microsoft providers continue working unchanged.
-5. All existing auth tests pass.
+## Acceptance Criteria
 
-## Verification plan
+- Actionable trading commands are classified before pending prompt handlers consume them.
+- Existing pending prompt behavior still works for non-actionable replies.
+- Ambiguous trading phrases are covered by parser/classifier examples.
+- Regression tests cover pending-flow interruption cases.
+- No live execution path is introduced.
+- No autonomous trading behavior is introduced.
+- Human confirmation remains required before any execution action.
+- Final review compares the complete example against this parent spec.
 
-1. Run `npm test` — all existing tests pass.
-2. Run `npm run lint` — no new lint issues.
-3. Verify provider registration in `src/auth/providers/index.ts` lists GitHub.
+## Recursive Decomposition
 
-## Implementation checklist
+Parent task: Full
 
-- [ ] Add `src/auth/providers/github.ts` implementing `OAuthProvider`
-- [ ] Register GitHub provider in `src/auth/providers/index.ts`
-- [ ] Add GitHub client ID and redirect URI to config schema
-- [ ] Add route handlers for `/api/auth/github/url` and `/api/auth/github/callback`
-- [ ] Run validation and fix failures
+Child tasks:
 
-## Open questions
+- 01 parser case — Lightweight
+- 02 regression tests — Lightweight
+- 03 docs note — Direct
 
-- Should GitHub device flow be supported in this pass? (No — deferred.)
+Each child task is independently classified and uses its own model/reasoning lane.
+
+## Validation Plan
+
+- Manual example consistency check.
+- Confirm child tasks match this parent spec.
+- Confirm evidence and final-review files reference this routing narrative.
+- Confirm DeepSeek is scoped only to bounded implementation child tasks.
+- Confirm Direct child task remains low-friction.
+
+## Closeout Requirements
+
+The example closeout should show:
+
+- parent Full task,
+- child task completion,
+- model/reasoning usage,
+- validation evidence,
+- final review verdict,
+- known gaps.

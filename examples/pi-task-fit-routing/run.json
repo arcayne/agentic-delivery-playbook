@@ -1,0 +1,41 @@
+{
+  "workflow": "agentic-delivery-playbook",
+  "mode": "Full",
+  "status": "example",
+  "specPath": "examples/pi-task-fit-routing/spec.md",
+  "modelRoutingPolicy": {
+    "specPlanning": "gpt-5.4",
+    "childImplementation": "deepseek-v4-flash-or-gpt-5.4-mini",
+    "codeReview": "gpt-5.3-codex-spark",
+    "architectureReview": "gpt-5.4"
+  },
+  "reasoningPolicy": {
+    "specPlanning": "high",
+    "childImplementation": "low",
+    "codeReview": "medium-high",
+    "architectureReview": "high"
+  },
+  "childTasks": [
+    {
+      "id": "01",
+      "title": "Update routing order",
+      "mode": "Lightweight",
+      "status": "complete"
+    },
+    {
+      "id": "02",
+      "title": "Add regression tests",
+      "mode": "Lightweight",
+      "status": "complete"
+    },
+    {
+      "id": "03",
+      "title": "Update docs note",
+      "mode": "Direct",
+      "status": "complete"
+    }
+  ],
+  "fixCycles": 0,
+  "escalations": [],
+  "finalVerdict": "approve-with-notes"
+}
