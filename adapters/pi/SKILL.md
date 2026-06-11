@@ -1,77 +1,95 @@
 ---
 name: agentic-delivery-playbook
-description: Spec-gated delivery workflow for non-trivial coding-agent work. Use when a feature, refactor, integration, workflow, or bug fix needs an approved spec before implementation, especially when ambiguity, safety, privacy, security, cross-package changes, or agent drift risk is meaningful. Do not use for clear small direct edits unless the user asks.
+description: Spec-gated delivery workflow for non-trivial coding-agent work, with task-fit model routing and recursive decomposition. Use when a feature, refactor, integration, workflow, or bug fix needs an approved spec before implementation, especially when ambiguity, safety, privacy, security, cross-package changes, or agent drift risk is meaningful.
 ---
 
 # Agentic Delivery Playbook
 
 Use this skill to turn ambiguous implementation work into an approved, AI-ready contract before coding.
 
-Core thesis: spend strong-model attention on shared understanding, architecture, edge cases, acceptance criteria, and QA contracts; then implement narrowly against the approved spec with explicit model/agent routing when available.
+Core stance: classify the task first, route by task mode second, then pick the lowest safe model lane and the lowest safe reasoning level. The goal is not "cheapest model first"; it is "task shape → delivery mode → model lane → reasoning level".
+
+Use this skill when the user asks to use the Agentic Delivery Playbook, route by task fit, decompose a Full task recursively, use DeepSeek only for scoped implementation, or use Codex/Spark for review.
+
+## Delivery loop
+
+```text
+0. triage
+1. intake
+2. spec authoring
+3. spec critique
+4. approval gate
+5. implementation
+6. implementation QA
+7. fix or escalate
+8. closeout
+```
 
 ## Scope triage: choose process weight first
 
-Before creating a run directory, choosing models, or delegating reviewers, classify the request by process weight. Use the least intrusive mode that can safely produce evidence.
+Before choosing models, delegating reviewers, or creating artifacts, classify the request by process weight. Use the least intrusive mode that can safely produce evidence.
 
-### Direct mode: skip the playbook and implement directly
+### Direct mode
 
-Use direct mode when all are true:
+Use Direct mode when all are true:
 
-- the requested change is clear and low ambiguity
-- likely touches one or two files
-- no security, privacy, auth, payment, financial, destructive, external-provider, or irreversible-action risk
-- no cross-package or public contract change
+- the change is clear and low ambiguity
+- it likely touches one or two files
+- it is a typo fix, small docs edit, obvious one-file bug fix, simple test, trivial config edit, or other low-risk mechanical change
+- there is no security, privacy, auth, payment, financial, destructive, external-provider, or irreversible-action risk
+- there is no cross-package or public contract change
 - validation is obvious and narrow
 - the user did not explicitly ask for a spec-first run
 
 Direct mode rules:
 
 - do not create a run directory
-- do not write spec artifacts unless the user asks
-- edit the code, run the obvious validation, and report changed files plus validation evidence
+- do not require specs, model ledgers, or run artifacts unless requested
+- do not over-plan
+- edit, validate, and report changed files plus evidence
+- if hidden complexity appears, upgrade to Lightweight or Full
 
-### Lightweight mode: compact contract, low ceremony
+### Lightweight mode
 
-Use lightweight mode for bounded work when:
+Use Lightweight mode for bounded work that benefits from a compact spec or checklist.
 
-- likely touches two to five files or one package
+Signals:
+
+- roughly two to five files or one package
 - acceptance criteria are mostly clear after at most one or two questions
 - risk is low or medium
 - a compact spec/checklist is enough
 
 Lightweight mode rules:
 
-- create only the minimal run artifacts: `spec.md` or `spec.html`, `run.json`, and `notes.md`
+- create only the minimal run artifacts when the run is explicit
 - keep the spec/checklist compact
-- notes-only evidence is acceptable when commands and outcomes are clearly recorded
 - parent self-review is acceptable when no serious risk signal appears
 - do not add an independent critic, broad-ticket planning gate, or high-risk QA checklist unless risk appears
+- if the task broadens, upgrade to Full mode
 
-Keep lightweight runs intentionally small. If observability/cost data is available, a lightweight run should usually stay under the team's lightweight budget target.
+### Full mode
 
-### Full mode: broad or risky delivery workflow
-
-Use full mode when any are true:
+Use Full mode when any are true:
 
 - product or architecture ambiguity is meaningful
 - safety, security, privacy, auth, external-provider, or destructive behavior is involved
 - the change affects routing, state machines, provider wiring, config, public contracts, or command semantics
-- likely touches more than five files
+- it likely touches more than five files
 - failure would be costly or hard to detect
 - the user asks for end-to-end spec-gated delivery
 
 Full mode rules:
 
-- create the run directory and maintain explicit artifacts
-- use broad-ticket planning before implementation when the spec is too large for one implementer pass
-- record explicit model/agent routing and reasoning intensity when available
+- create explicit artifacts when the run is active
+- use a strong planner/reviewer before implementation when the spec is too large for one implementer pass
 - use a critic/QA gate, preferably independent when available
 - apply high-risk QA checks for sensitive or cross-system work
 - use dynamic workflow/fanout only after a plain-English launch note is approved
 - accept workflow findings only after synthesis plus independent verification, or mark them speculative
-- complete required closeout fields: files changed, validation, findings, model ledger, known gaps, fix cycles, and next action
+- complete required closeout fields with evidence, model ledger, known gaps, fix cycles, and next action
 
-When unsure, tell the user the classification and ask whether they want direct implementation, lightweight mode, or full mode.
+When unsure, tell the user the classification and ask whether they want Direct, Lightweight, or Full mode.
 
 ## Harness ladder and dynamic workflow guardrail
 
@@ -83,119 +101,118 @@ direct prompt -> skill -> subagent -> chain / agent team -> goal loop -> dynamic
 
 A goal loop is depth: one objective, repeated passes, stop when completion is true. A dynamic workflow is width: many agents run in parallel, then a synthesizer folds the results into one answer.
 
-Dynamic workflows are full-mode escalations for broad audits, migrations, root-cause hypothesis panels, evals, rule-adherence checks, or critical plans that need independent attempts and adversarial review. Do not use them for small edits, vague scope, tightly sequential work, or low-value knowledge work.
+Before launching a dynamic workflow or large parallel fanout, stop and present a short launch note for approval. The note should include scope, a concrete cap, a stop rule, and the synthesis/verification plan. Do not create blank budget fields.
 
-Before launching a dynamic workflow or large parallel fanout, stop and present a short launch note for approval. Do not create blank budget fields. The note should include:
+## Task-Fit Model Routing
 
-- scope: what is included and excluded
-- concrete cap: for example fixed file list, one worker per package, first pass only, no recursive fanout, or one verifier per finding
-- stop rule: what ends the workflow
-- synthesis and verification plan: how results are merged, checked, rejected, or marked speculative
-
-Record the approved note in `notes.md`, `run.json`, or a workflow artifact. Do not accept a workflow finding as final unless it survived independent verification or is explicitly labeled speculative.
-
-## Task-fit model routing
-
-Route by task shape first. Then choose the cheapest safe model for that shape.
-
-Do not route by price preference first. The invariant:
+Model choice is determined by task mode, not by price preference.
 
 ```text
-The harder the task, the more strong-model judgment happens before and after implementation.
-The narrower the task, the safer it is to delegate implementation to a cheaper worker.
+Task shape → Delivery mode → Model lane → Reasoning level
 ```
 
-Classification happens before implementation. Model choice depends on task mode, not on a quality-vs-speed-vs-cost tradeoff question.
+The hard invariant:
 
-This policy assumes the following models are available in the Pi/OpenAI environment:
+```text
+Route by task mode first.
+Use the lowest safe process.
+Use the lowest safe reasoning level.
+Escalate when failure or risk appears.
+```
+
+This policy assumes the following example lanes may be available in Pi/OpenAI workflows:
 
 ```text
 gpt-5.3-codex-spark
 gpt-5.4
 gpt-5.4-mini
 gpt-5.5
-DeepSeek V4 Flash (optional fallback / implementation worker)
+deepseek-v4-flash
+deepseek-v4-pro
 ```
 
-See [`docs/pi-task-fit-model-routing.md`](../../docs/pi-task-fit-model-routing.md) for the full supporting guide including DeepSeek implementation contract, escalation review contract, and final review contract.
+These are examples, not hard requirements.
 
-See [`docs/openai-hermes-pi-routing.md`](../../docs/openai-hermes-pi-routing.md) for reasoning intensity policy and per-role model recommendations with the Codex/OpenAI ladder.
+### Direct Mode Model Policy
 
-### Direct mode model policy
+Default: current active Pi model.
 
-Default to the current active Pi model. Do not switch models just to optimize cost.
+Examples when already active:
 
-- Do not require Codex 5.4.
-- Do not require DeepSeek.
-- Do not create run artifacts unless requested.
-- Do not over-plan.
-- Validate the change and close with evidence.
+- gpt-5.4-mini
+- gpt-5.3-codex-spark
 
-**DeepSeek V4 Flash optional overflow** — may be used only when:
+Rules:
 
-- the current active model is unavailable,
-- OpenAI credits are exhausted or intentionally being preserved,
-- the task is purely mechanical,
-- the task has no meaningful architecture, product, state, provider, auth, trading, money, or irreversible-action risk.
+- do not switch models just to optimize cost
+- do not require DeepSeek
+- do not require Codex review
+- do not create run artifacts unless requested
+- do not require a model ledger unless requested
+- validate and close with evidence
 
-**Rules:**
+DeepSeek V4 Flash may be used only as optional overflow when:
 
-- If the task reveals hidden complexity, upgrade to Lightweight mode.
-- If the task touches risky areas (auth, provider wiring, trading, money, state machines, irreversible actions), do not stay in Direct mode.
-- If switching models would take longer than doing the task, do not switch.
-- If DeepSeek is used, still validate and report evidence.
+- the current active model is unavailable
+- OpenAI credits are exhausted or intentionally being preserved
+- the task is purely mechanical
+- there is no architecture, product, state, provider, auth, trading, money, or irreversible-action risk
 
-**Closeout:**
+Reasoning policy:
+
+```text
+minimal / low / runtime-default
+```
+
+Closeout format:
 
 ```text
 Mode: Direct
 Active model/lane:
+Reasoning level:
 Files changed:
 Validation:
 Result:
 Known gaps:
 ```
 
-### Lightweight mode model policy
+### Lightweight Mode Model Policy
 
 Use for bounded changes that need a compact spec or checklist before implementation.
 
-- **Spec/checklist:** current strong Pi model, `gpt-5.4`, or similar Codex/OpenAI lane.
-- **Implementation:** DeepSeek V4 Flash, once the task is narrow and file-scoped.
-- **Review:** parent self-review unless risk or failure appears.
-- **Escalation:** `gpt-5.3-codex-spark` or `gpt-5.4` after two failed DeepSeek fix cycles or any meaningful drift.
+Model policy:
 
-**Rules:**
+- Spec/checklist: current strong Pi model, gpt-5.4, or similar
+- Implementation: DeepSeek V4 Flash or gpt-5.4-mini once the task is narrow and file-scoped
+- Review: parent self-review unless risk or failure appears
+- Escalation: gpt-5.3-codex-spark or gpt-5.4 after two failed DeepSeek fix cycles or any meaningful drift
 
-- The parent agent must first reduce the work into a narrow implementation task.
-- DeepSeek should receive only:
+Rules:
 
-  - approved task,
-  - relevant spec/checklist excerpt,
-  - allowed files,
-  - non-goals,
-  - validation commands.
-- DeepSeek should not make architecture decisions.
-- DeepSeek should not broaden scope.
-- If implementation fails twice, stop blind retries and escalate.
-- If the task becomes broader than expected, upgrade to Full mode.
+- create a compact checklist/spec first
+- the parent agent must first reduce the work into a narrow implementation task
+- DeepSeek should receive only the approved task, relevant spec/checklist excerpt, allowed files, non-goals, and validation commands
+- DeepSeek should not make architecture decisions
+- DeepSeek should not broaden scope
+- if implementation fails twice, stop blind retries and escalate
+- if the task becomes broader than expected, upgrade to Full mode
 
-**Default path:**
+Reasoning policy:
 
 ```text
-1. Parent/current strong model creates compact spec or checklist.
-2. DeepSeek V4 Flash implements the bounded task.
-3. Parent validates against checklist.
-4. If two failed fix cycles or drift: escalate to gpt-5.3-codex-spark or gpt-5.4.
-5. Close with evidence.
+Spec/checklist: medium if ambiguity exists
+Implementation: low / non-thinking
+Review: low or medium
+Escalation: medium/high
 ```
 
-**Closeout:**
+Closeout format:
 
 ```text
 Mode: Lightweight
 Spec/checklist:
 Implementation model:
+Reasoning level:
 Review model:
 Fix cycles:
 Files changed:
@@ -204,40 +221,43 @@ Result:
 Known gaps:
 ```
 
-### Full mode model policy
+### Full Mode Model Policy
 
 Use for broad, ambiguous, cross-package, stateful, provider-level, auth, privacy, security, API, trading, money, irreversible-action, or drift-prone work.
 
-- **Spec author:** `gpt-5.4`, `gpt-5.5`, Codex Pro, or strongest available planning model.
-- **Spec critic:** `gpt-5.4`, `gpt-5.5`, or `gpt-5.3-codex-spark` depending on whether the critique is architectural or code-oriented.
-- **Implementation:** DeepSeek V4 Flash only for narrow subtasks extracted from the approved spec.
-- **Hard implementation fallback:** DeepSeek V4 Pro, `gpt-5.3-codex-spark`, or `gpt-5.4`.
-- **Final reviewer:** `gpt-5.3-codex-spark` for code correctness; `gpt-5.4` or `gpt-5.5` for architectural/product-risk review.
+Model policy:
 
-**Rules:**
+- Spec/planning: gpt-5.4, gpt-5.5, Codex Pro, or the strongest available planner
+- Spec critique: gpt-5.4, gpt-5.5, or gpt-5.3-codex-spark depending on critique type
+- Narrow implementation: DeepSeek V4 Flash or gpt-5.4-mini after decomposition
+- Hard implementation fallback: DeepSeek V4 Pro, gpt-5.3-codex-spark, or gpt-5.4
+- Final code review: gpt-5.3-codex-spark
+- Final architecture/risk review: gpt-5.4 or gpt-5.5
 
-- Do not let DeepSeek implement the whole broad task directly.
-- Break the full task into smaller implementation tickets.
-- Each DeepSeek task must be file-scoped or behavior-scoped.
-- Architecture and acceptance criteria must be settled before implementation.
-- If DeepSeek fails twice on a subtask, escalate.
-- If the escalation reviewer identifies spec ambiguity, revise the spec before more implementation.
-- Final review must compare the final diff against the approved spec, not against the implementer's summary.
+Rules:
 
-**Default path:**
+- do not let DeepSeek implement the whole broad task directly
+- create a Full spec first
+- critique the spec before implementation
+- decompose into child tasks
+- reclassify each child task as Direct, Lightweight, or Full
+- use DeepSeek only for narrow child tasks
+- child routing follows child mode, not parent mode
+- parent Full mode does not force high reasoning on all child tasks
+- final review must compare the diff against the approved spec
+
+Reasoning policy:
 
 ```text
-1. Strong model drafts full spec.
-2. Strong reviewer critiques spec.
-3. Human approves spec.
-4. Parent decomposes into bounded implementation subtasks.
-5. DeepSeek V4 Flash implements narrow subtasks.
-6. Codex/OpenAI model handles failed or hard subtasks.
-7. Codex/OpenAI model performs final diff review.
-8. Parent closes with evidence.
+Spec author: high
+Spec critic: high
+Implementation subtasks: low once scoped
+Hard implementation fallback: medium/high
+Final code review: medium/high
+Final architecture/risk review: high
 ```
 
-**Closeout:**
+Closeout format:
 
 ```text
 Mode: Full
@@ -245,6 +265,7 @@ Spec:
 Spec critic:
 Implementation subtasks:
 Implementation models:
+Reasoning levels:
 Escalations:
 Final reviewer:
 Files changed:
@@ -254,220 +275,334 @@ Final verdict:
 Next action:
 ```
 
-### Model ledger guidance
+## OpenAI / Codex Model Examples
 
-For Lightweight and Full modes, record model routing in the run directory.
+These are examples when available in Pi, not hard requirements.
 
-The ledger may live in `specs/YYYYMMDD-HHMM-task-slug/run.json` (preferred) or as a separate `model-ledger.md` file.
+### gpt-5.4-mini
 
-Use the template at [`templates/model-ledger.md`](../../templates/model-ledger.md) for the markdown format.
+Role: small/default OpenAI implementation model.
 
-Allowed `source` values:
+Use for:
+
+- Direct tasks
+- small implementation
+- simple tests
+- low-risk docs/code changes
+- quick validation fixes
+
+Reasoning:
 
 ```text
-explicit          — the run requested this model directly
-agent-default     — an agent profile supplied it
-runtime-default   — the harness chose it implicitly
-manual            — a human selected it outside the run configuration
-exception-approved — a routing exception was explicitly approved
-unknown-legacy    — routing cannot be determined for an older/interrupted run
+minimal / low
+```
+
+Avoid for:
+
+- major architecture
+- ambiguous product behavior
+- trading/money/security-sensitive decisions
+- high-risk final review
+
+### gpt-5.3-codex-spark
+
+Role: code-specialist lane.
+
+Use for:
+
+- code review
+- test failure diagnosis
+- implementation escalation
+- patch refinement
+- final code correctness review
+- fast coding iteration
+
+Reasoning:
+
+```text
+low for direct coding
+medium/high for review or repeated failure
+```
+
+Avoid as the primary lane for broad product/system architecture.
+
+### gpt-5.4
+
+Role: default strong planning and architecture model.
+
+Use for:
+
+- Lightweight checklist/spec when ambiguity exists
+- Full spec authoring
+- architecture decisions
+- API/provider design
+- state-machine reasoning
+- requirements ambiguity
+- architecture/risk review
+
+Reasoning:
+
+```text
+medium for lightweight spec
+high for full spec and architecture review
+```
+
+### gpt-5.5
+
+Role: highest-judgment lane.
+
+Use for:
+
+- high-risk architecture
+- trading/money/security-sensitive decisions
+- irreversible-action safety
+- complex multi-system refactors
+- final judgment when stakes are high
+
+Reasoning:
+
+```text
+high
+```
+
+Avoid for routine implementation and Direct mode tasks.
+
+## DeepSeek Usage Policy
+
+DeepSeek is not the Direct-mode default.
+
+Use DeepSeek when:
+
+- the task is already scoped
+- the implementation unit is narrow
+- allowed files are known
+- acceptance criteria are explicit
+- validation commands are known
+- no architecture decision remains
+
+### DeepSeek V4 Flash
+
+Role: cheap bounded implementation worker.
+
+Use for:
+
+- Lightweight implementation after checklist approval
+- Full-mode child subtasks after decomposition
+- test additions
+- mechanical implementation
+- overflow when OpenAI credits are constrained
+
+Reasoning:
+
+```text
+low / non-thinking
+```
+
+Avoid for:
+
+- architecture
+- ambiguous requirements
+- final review
+- trading/money/auth/security decisions
+
+### DeepSeek V4 Pro
+
+Role: heavier bounded implementation fallback.
+
+Use only when:
+
+- Flash is insufficient
+- the task is still bounded
+- the issue does not require architecture judgment
+
+Escalate to OpenAI/Codex instead if the failure is architectural, ambiguous, or risk-related.
+
+## Reasoning / Thinking Budget Policy
+
+Default rule:
+
+```text
+Use the lowest reasoning level that is safe for the task mode.
+Increase reasoning only when ambiguity, risk, failed validation, or architectural judgment requires it.
+```
+
+Allowed values:
+
+```text
+off
+minimal
+low
+medium
+high
+runtime-default
+unknown
+```
+
+Core invariant:
+
+```text
+Reasoning is for judgment.
+Execution is for implementing approved judgment.
 ```
 
 Rules:
 
-- Never invent model usage.
-- Record `actualModel: unknown` if Pi did not expose it.
-- Record `source: manual` if the user manually switched models.
-- Record routing exceptions honestly.
-- Direct mode does not require a ledger unless requested.
+- do not keep high thinking enabled by default
+- strong specs should reduce implementation reasoning
+- implementation from a clear spec should usually use low or non-thinking mode
+- escalate reasoning when repeated failures or ambiguity appear
+- recalculate reasoning level per child task
+- record reasoning intensity whenever the harness exposes it
 
-## Required run artifacts
+## Recursive Task Decomposition
 
-Direct mode creates no run directory. For lightweight or full runs, create one run directory:
-
-```text
-specs/YYYYMMDD-HHMM-<feature-slug>/
-```
-
-Minimum files:
+Core rule:
 
 ```text
-spec.md or spec.html
-run.json
-notes.md
+Full mode plans and decomposes.
+Lightweight mode scopes and implements bounded behavior.
+Direct mode performs obvious small edits.
 ```
 
-Use `spec.html` when diagrams, screenshots, state machines, tables, or stronger visual hierarchy help the human reviewer understand the contract before approval.
-
-`run.json` should include:
-
-- workflow name/version
-- phase
-- status
-- task fit: `lightweight-ticket` or `broad-ticket`
-- spec path
-- active role/agent/model
-- review gates
-- model ledger with source: `explicit`, `agent-default`, `runtime-default`, or `manual`
-- implementation model exception, when routing differs from policy and the user approved it
-- legacy policy, when older/incomplete runs cannot prove routing or gate evidence
-- observability or ROI summary when telemetry data is available
-- implementation model evaluation after QA, when a model or agent was explicitly chosen
-- dynamic workflow launch note, only when dynamic workflow/fanout was used
-- changed files
-- validation evidence
-- findings
-- known gaps
-- next action
-
-## Workflow phases
-
-### 0. Triage
-
-Apply the anti-overuse gate before writing artifacts. Record `taskFit` as one of:
+Pattern:
 
 ```text
-small-direct | lightweight-ticket | broad-ticket
+Full problem
+  → child Lightweight tasks
+    → child Direct tasks where appropriate
+  → child evidence
+  → parent final review
 ```
 
-For `small-direct`, do not create artifacts unless the user explicitly asks.
+Rules:
 
-### 1. Intake
+- Full tasks may decompose into child tasks
+- each child task is independently classified
+- child model routing follows child mode, not parent mode
+- a parent Full task does not force high reasoning on all child tasks
+- the parent aggregates child evidence
+- final review compares the total diff against the parent spec
+- escalate back upward when a child contradicts the parent spec, reveals missing requirements, needs files outside the allowed scope, or fails for the same root cause across multiple child tasks
 
-Interview until the objective, non-goals, constraints, acceptance criteria, risks, and required evidence are clear.
-
-For lightweight runs, ask at most one focused clarification question before drafting; if the task is already clear, move directly to a compact spec/checklist.
-
-### 2. Spec author
-
-Write `spec.md` or `spec.html` as an implementation-ready contract.
-
-Use `spec.html` for complex specs when visual grouping, diagrams, screenshots, or state machines make approval safer. Visuals are not decoration; they help the human avoid blindly accepting an agent plan.
-
-Include:
-
-- objective
-- non-goals
-- current-state/repo context
-- architecture and stack decisions that matter
-- data/API/contracts
-- UX or messaging behavior if relevant
-- safety/security/privacy constraints
-- edge cases and failure modes
-- acceptance criteria
-- verification plan
-- implementation checklist
-- QA checklist
-- explicit open questions, if any
-
-For lightweight runs, keep the spec compact.
-
-### 3. Spec critic
-
-Review the spec before coding. Attack:
-
-- vague requirements
-- contradictions
-- missing states
-- hidden assumptions
-- impossible acceptance criteria
-- security/privacy gaps
-- under-specified verification
-
-Revise `spec.md` or `spec.html`, or ask the user to decide unresolved questions.
-
-For lightweight runs, a parent self-review is acceptable if there is no serious risk; do not add an independent critic unless a risk signal appears. For full runs, use an independent critic when available.
-
-### 4. Approval gate
-
-Do not implement until the spec is approved, unless the user explicitly requested an uninterrupted end-to-end run.
-
-Approval can be informal (`go`, `approved`, `implement it`) but record it in `run.json` or `notes.md`.
-
-### 5. Implementation
-
-Implement only against the approved spec. If the spec is ambiguous, stop and ask or reopen the spec phase.
-
-If subagents/model routing are available, explicitly route the implementation writer to the configured implementation agent/model. Record both the intended and actual routing. If routing is required by the project and cannot be enforced, stop and ask the user whether to manually switch models or approve a one-off exception.
-
-If the harness exposes reasoning intensity or similar effort controls, record those alongside the selected model. For Hermes/Pi users selecting OpenAI-backed browser-login models, capture both the model label shown in the picker and the actual reasoning intensity used.
-
-Implementation prompt contract:
-
-- implement one approved spec task or tightly grouped task set at a time
-- make the smallest correct change
-- do not broaden scope or refactor unrelated code
-- do not edit run artifacts unless the task explicitly asks for artifact updates
-- run relevant tests and fix failures
-- report changed files, validation commands, assumptions, and any spec ambiguity
-
-### Broad-ticket planning gate
-
-If `taskFit` is `broad-ticket`, split the approved spec into implementer-sized tickets before implementation.
-
-For broad tickets:
-
-1. use a strong planner/reviewer to split implementation tasks and list high-risk QA checks
-2. give the implementer one ticket or tightly grouped ticket set at a time
-3. review after the first implementation pass
-4. record the gate in `run.json` and the model ledger
-
-If the broad ticket becomes a dynamic workflow, present the launch note before fanout starts and record the approval evidence.
-
-Do not add this gate for small direct or ordinary lightweight work unless a risk signal appears. If observability/cost data is available, broad-ticket runs should have an explicit budget expectation; runs that exceed the team's hard budget should explain why the added process/model spend was justified.
-
-### Evidence integrity and legacy runs
-
-For older, interrupted, or incomplete runs, preserve truth and keep evidence explicit:
-
-- mark missing routing, missing gate, or skipped validation evidence as a warning or approved exception
-- do not fabricate model routing claims after the fact
-- do not claim a model-specific result unless that model or agent was actually routed and recorded
-- record what future runs should do differently
-
-### 6. Implementation QA
-
-QA against the approved `spec.md` or `spec.html`, not against the implementer's summary. In lightweight mode, this can be a parent self-review recorded in `notes.md`; in full mode, use an explicit critic/QA gate.
-
-Categorize findings:
-
-- blocker
-- high
-- medium
-- low
-- spec ambiguity
-- implementation drift
-- missing validation/test
-
-For broad tickets or sensitive changes, include high-risk QA checks for privacy/redaction, authority or irreversible actions, routing/state precedence, mode behavior, numeric/display edge cases, provider/config validation, and external-service failures.
-
-For dynamic workflows, QA must review the synthesis, rejected findings, verifier/refuter results, and any speculative findings.
-
-### 7. Fix/escalation loop
-
-Have the implementer fix normal issues. Escalate if repeated failures or critical ambiguity occur.
-
-Repeated correction is data. Stop blind fix loops when:
-
-- more than two fix cycles are needed
-- the same category of issue reappears
-- implementation drifts from spec
-- QA finds explicit safety/privacy/security violations
-- the parent has to revert implementer edits before continuing
-
-**Escalation target:**
+Escalation result must be one of:
 
 ```text
-Use gpt-5.3-codex-spark when the problem is code correctness, tests, typing,
-refactor quality, or implementation detail.
-
-Use gpt-5.4 when the problem is architecture, requirements ambiguity, product
-behavior, provider design, state-machine design, or cross-system tradeoff.
-
-Use gpt-5.5 only when risk or complexity justifies the highest-reasoning lane.
+continue-child
+revise-child
+revise-parent-spec
+split-new-full-task
+stop-and-ask-human
 ```
 
-**Escalation review prompt shape:**
+## Model & Reasoning Ledger
+
+Required for:
+
+- Lightweight mode
+- Full mode
+
+Not required for Direct mode unless requested.
+
+Possible locations:
+
+```text
+specs/YYYYMMDD-HHMM-task-slug/run.json
+specs/YYYYMMDD-HHMM-task-slug/model-ledger.md
+```
+
+Example JSON entry:
+
+```json
+{
+  "role": "implementer",
+  "intendedModel": "deepseek-v4-flash",
+  "actualModel": "unknown",
+  "reasoningIntensity": "low",
+  "source": "explicit",
+  "reason": "Task was bounded by an approved checklist and allowed files",
+  "task": "Implemented parser regression tests",
+  "result": "completed",
+  "notes": "No architecture decisions delegated to implementer."
+}
+```
+
+Allowed `source` values:
+
+```text
+explicit
+agent-default
+runtime-default
+manual
+exception-approved
+unknown-legacy
+```
+
+Rules:
+
+- never invent model usage
+- use `actualModel: unknown` if Pi does not expose it
+- use `source: manual` if the user manually switched models
+- record reasoning level when known
+- record routing exceptions honestly
+- Direct mode does not require a ledger unless requested
+
+## DeepSeek Implementation Contract
+
+```text
+You are the implementation worker.
+
+Implement only this approved task:
+<task>
+
+Approved spec/checklist:
+<spec path or relevant excerpt>
+
+Scope:
+- Allowed files:
+<files>
+- Do not touch:
+<non-goals>
+
+Rules:
+- Make the smallest correct change.
+- Do not refactor unrelated code.
+- Do not change public behavior outside the spec.
+- Do not make architecture decisions.
+- Do not update run artifacts unless asked.
+- Use low / non-thinking reasoning unless instructed otherwise.
+- Run the specified validation.
+- If the task is ambiguous, stop and report the ambiguity.
+- If tests fail, attempt one focused fix cycle and report evidence.
+
+Return:
+- files changed
+- summary of changes
+- validation commands run
+- exact test/typecheck/lint outcome
+- assumptions
+- unresolved issues
+```
+
+## Escalation Rules
+
+Escalate when:
+
+- DeepSeek fails more than two fix cycles
+- the same failure category reappears
+- implementation drifts from the approved spec
+- tests fail due to hidden coupling or architecture
+- security, privacy, provider, auth, money, trading, or state-machine risk appears
+- implementation touches unrelated files
+- the parent has to revert implementer edits
+- the user explicitly asks for stronger review
+
+Escalation target:
+
+- Use gpt-5.3-codex-spark for code correctness, tests, typing, refactor quality, or implementation detail.
+- Use gpt-5.4 for architecture, requirements ambiguity, product behavior, provider design, state-machine design, or cross-system tradeoff.
+- Use gpt-5.5 when risk or complexity justifies the highest-judgment lane.
+
+## Escalation Review Contract
 
 ```text
 You are the escalation reviewer.
@@ -477,7 +612,7 @@ Review:
 - implementation diff,
 - validation evidence,
 - failure history,
-- model ledger if present.
+- model/reasoning ledger if present.
 
 Your job:
 - identify why the implementation is failing or drifting,
@@ -485,82 +620,140 @@ Your job:
 - recommend whether to:
   1. continue with DeepSeek using narrower instructions,
   2. switch implementation to a stronger Codex/OpenAI model,
-  3. revise the spec,
-  4. stop and ask the human,
+  3. revise the child task,
+  4. revise the parent spec,
+  5. stop and ask the human,
 - list blocker findings first,
 - provide a minimal recovery plan.
 
 Do not rewrite the whole feature unless necessary.
 Do not broaden scope.
-Do not approve final merge unless acceptance criteria and validation evidence
-are satisfied.
+Do not approve final merge unless acceptance criteria and validation evidence are satisfied.
 ```
 
-### 8. Closeout
+## Final Review Contract
 
-For lightweight mode, close out in `notes.md` and `run.json` with concise evidence. Notes-only evidence is acceptable if it names the changed files, validation commands, outcomes, known gaps, and next action.
+Use for:
 
-For full mode, required closeout fields are:
+- Full mode
+- risky Lightweight mode
+- user-requested review
+- before merge or closeout when risk is meaningful
 
-- final status
-- files changed
-- verification commands/evidence
-- known gaps
-- model ledger, including reasoning intensity when available
-- implementation model evaluation, when a model or agent was explicitly chosen
-- critic/QA findings
-- legacy/exception evidence, when applicable
-- fix cycles
-- escalations
-- recommendation for next run
-
-**Final review contract (Full mode, risky Lightweight, or user-requested review):**
-
-Before merge or closeout, perform a final review against the approved spec.
+Reviewer choice:
 
 ```text
-Reviewer choice:
-  gpt-5.3-codex-spark = final code correctness review
-  gpt-5.4             = architecture/product-risk review
-  gpt-5.5             = highest-risk final judgment
+gpt-5.3-codex-spark = final code correctness review
+gpt-5.4 = architecture/product-risk review
+gpt-5.5 = highest-risk final judgment
+```
 
 Review checklist:
+
 - Does the diff satisfy every acceptance criterion?
 - Did implementation respect non-goals?
 - Were there unapproved architecture changes?
 - Were public contracts, schemas, APIs, commands, or config changed?
 - Are tests meaningful?
 - Are skipped tests or missing validation recorded?
-- Are security/privacy/provider/state risks addressed?
+- Are security, privacy, provider, and state risks addressed?
 - Are there brittle assumptions?
 - Is the diff smaller than expected, appropriate, or suspiciously broad?
 - Should this merge, require fixes, or reopen the spec?
 
-Verdict: approve | approve-with-notes | request-changes | reopen-spec
-```
-
-Before closing serious runs, record project-specific governance checks such as typecheck, lint, tests, workflow audits, warnings, and skipped validation. Missing checks should be known gaps or approved exceptions, not hidden.
-
-When telemetry is available, add a small observability/ROI summary: sessions, turns, output tokens, approximate cost, model mix, and whether the process weight was lightweight, justified broad, or overused. Keep this portable: use an environment variable or documented config such as `PI_OBS_DB` for local telemetry databases. Never hard-code personal absolute paths into reusable scripts, templates, or published adapters.
-
-## Visibility banner
-
-At major phase transitions, report compactly:
+Verdict format:
 
 ```text
-Workflow: agentic-delivery-playbook v0.2
-Phase: <n>/<total> — <name>
-Spec: specs/YYYYMMDD-HHMM-<slug>/spec.md or spec.html
-Open HTML: <local preview URL, if using spec.html>
-Run: specs/YYYYMMDD-HHMM-<slug>/run.json
-Active role/model: <role/model or runtime-default>
-Next gate: <gate>
+Verdict: approve | approve-with-notes | request-changes | reopen-spec
+
+Blockers:
+High:
+Medium:
+Low:
+Validation evidence:
+Known gaps:
+Recommended next action:
 ```
 
-If using `spec.html`, prefer a local `127.0.0.1` preview URL when the harness supports it so the human approves the rendered spec instead of raw source.
+## Operational Banner
 
-## Delegation
+At phase changes, print a compact banner:
 
-If a subagent/delegation tool is available, use it for independent critic, implementation, or QA phases. Keep one parent agent in control of the workflow and evidence.
+```text
+Workflow: agentic-delivery-playbook
+Mode: Direct | Lightweight | Full
+Role: spec | implementation | review | escalation | closeout
+Model lane: <intended model/lane>
+Reasoning: <off|minimal|low|medium|high|runtime-default|unknown>
+Next gate: <approval|implementation|validation|escalation|final-review|closeout>
+```
 
-Do not claim a model-specific result unless that model was explicitly routed and recorded.
+## Closeout Requirements
+
+Direct closeout:
+
+```text
+Mode: Direct
+Active model/lane:
+Reasoning level:
+Files changed:
+Validation:
+Result:
+Known gaps:
+```
+
+Lightweight closeout:
+
+```text
+Mode: Lightweight
+Spec/checklist:
+Implementation model:
+Reasoning level:
+Review model:
+Fix cycles:
+Files changed:
+Validation:
+Result:
+Known gaps:
+```
+
+Full closeout:
+
+```text
+Mode: Full
+Spec:
+Spec critic:
+Implementation subtasks:
+Implementation models:
+Reasoning levels:
+Escalations:
+Final reviewer:
+Files changed:
+Validation:
+Known gaps:
+Final verdict:
+Next action:
+```
+
+For Lightweight and Full runs, keep the run artifacts explicit when the run is active.
+
+Minimum files:
+
+```text
+spec.md or spec.html
+run.json
+notes.md
+```
+
+If using `spec.html`, prefer a local preview when the harness supports it so the human approves the rendered spec instead of raw source.
+
+## Existing playbook behavior to preserve
+
+- classify the task before implementation
+- avoid over-planning small tasks
+- require specs or checklists for non-trivial work
+- validate against acceptance criteria
+- close with evidence
+- escalate when work drifts
+- keep honest records of model and reasoning usage
+- never claim a model-specific result unless that model was actually routed and recorded
