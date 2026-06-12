@@ -1,6 +1,6 @@
 ---
 name: agentic-delivery-playbook
-description: Coding Agent Preflight for non-trivial coding work in Pi: classify direct/lightweight/full, lock goal/non-goals/risks/evidence, require approval when needed, and record actual routing. Use when ambiguity, risk, scope, or reviewability justifies a delivery contract; skip clear small direct edits unless asked.
+description: "Coding Agent Preflight for non-trivial coding work in Pi: classify direct/lightweight/full, lock goal/non-goals/risks/evidence, require approval when needed, and record actual routing. Use when ambiguity, risk, scope, or reviewability justifies a delivery contract; skip clear small direct edits unless asked."
 ---
 
 # Agentic Delivery Playbook for Pi
