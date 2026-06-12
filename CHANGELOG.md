@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Repositioned the repo as Pi-first and portable second across README/getting-started/adapter docs.
+- Added `install pi` and `install-pi-skill` CLI targets for Pi global/project skill installation.
+- Reframed the Pi adapter as a lightweight value gate instead of a forced model-routing/spec-first workflow.
+- Simplified Pi routing guidance around recording actual routes and asking before approved exceptions.
+
 ## 0.2.0
 
 - Added Codex `AGENTS.md` adapter at `adapters/codex/`.

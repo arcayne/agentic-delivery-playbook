@@ -1,29 +1,35 @@
-# Coding Agent Playbook
-
-*Repo/package today: `agentic-delivery-playbook`*
+# Agentic Delivery Playbook
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e.svg)](LICENSE)
 [![Status: v0.2.0 draft](https://img.shields.io/badge/status-v0.2.0_draft-2563eb.svg)](CHANGELOG.md)
 [![Node >=18](https://img.shields.io/badge/node-%3E%3D18-339933.svg)](package.json)
 
-**Keep coding agents scoped, testable, and honest.**
+**A Pi-native preflight and closeout skill for keeping coding agents scoped, testable, and honest.**
 
-> Before a coding agent edits your repo, give it a small delivery contract.
+> Before Pi or another coding agent edits your repo, give it a small delivery contract.
 
 <p align="center">
   <img src="assets/agent-preflight-hero.png" alt="Agent preflight checklist: mode, goal, non-goals, risks, approval, and evidence before the agent touches the repo" width="920">
 </p>
 
-A practical safety harness for agent coding: classify the task, lock the scope, stop risky work before implementation, and close out with evidence.
+A practical safety harness for Pi coding sessions: classify the task, lock the scope, stop risky work before implementation, route honestly, and close out with evidence.
 
-**Start here:** [Getting started](docs/getting-started.md) · [Templates](templates/) · [Example run](examples/lightweight-ticket/) · [Security](SECURITY.md) · [Contributing](CONTRIBUTING.md)
+Built and dogfooded in Pi. Portable adapters are included for Claude, Codex, and ChatGPT.
+
+**Start here:** [Getting started](docs/getting-started.md) · [Pi skill](adapters/pi/SKILL.md) · [Templates](templates/) · [Example run](examples/lightweight-ticket/) · [Security](SECURITY.md) · [Contributing](CONTRIBUTING.md)
 
 ## Try it in 60 seconds
 
-Paste this into Claude Code, Codex, ChatGPT, Claude, Cursor, Pi, or another coding assistant:
+In Pi:
 
 ```text
-Use the Coding Agent Playbook.
+/skill:agentic-delivery-playbook <describe the task>
+```
+
+Or paste this into Pi, Claude Code, Codex, ChatGPT, Claude, Cursor, or another coding assistant:
+
+```text
+Use the Agentic Delivery Playbook.
 
 First classify this task:
 - direct: clear, low-risk, narrow edit; no spec or run directory
@@ -48,7 +54,7 @@ Task:
 <describe the task>
 ```
 
-That is the fastest way to get value from this repo. Everything else here helps you make that behavior repeatable.
+That is the fastest way to get value from this repo. Everything else here helps you make that behavior repeatable across Pi and other agent tools.
 
 ## Why this exists
 
@@ -60,7 +66,7 @@ Coding agents are useful, but they drift:
 - retries pile up because the target keeps moving
 - review gets harder because the agent narrates confidence instead of showing evidence
 
-This playbook gives the agent a small delivery contract before it edits.
+This playbook gives Pi, or another coding agent, a small delivery contract before it edits.
 
 ## What this gives you
 
@@ -72,7 +78,7 @@ This playbook gives the agent a small delivery contract before it edits.
 | Agent keeps retrying blindly | Use fix/escalation rules |
 | PR is hard to review | QA against acceptance criteria, not summaries |
 | Risky task starts coding too early | Add an approval gate |
-| Expensive model is used for everything | Route stronger reasoning to spec/QA work |
+| Expensive model is used for everything | Route stronger reasoning to spec/QA work only when it helps |
 
 ## Agent Preflight
 
@@ -98,7 +104,7 @@ Fix the webhook bug.
 Better:
 
 ```text
-Use the Coding Agent Playbook.
+Use the Agentic Delivery Playbook.
 
 Classify the task first.
 
@@ -129,32 +135,52 @@ Choose process weight before creating artifacts.
 | Mode | Use when | What happens |
 | --- | --- | --- |
 | **Direct** | Small, obvious, low-risk change | Edit, validate, report evidence |
-| **Lightweight** | Bounded feature or fix that needs a checklist | Compact spec, approval, implementation, QA |
+| **Lightweight** | Bounded feature or fix that needs a checklist | Compact spec, approval if needed, implementation, QA |
 | **Full** | Risky, ambiguous, cross-system, security/privacy/API/state/provider work | Critique, approval gate, QA evidence, escalation rules |
 | **Full + bounded workflow** | Broad audit, migration, or adversarial review | Parallel or dynamic work only with scope, caps, stop rules, and synthesis |
 
 Do not create heavy artifacts for obvious one-file fixes. Do not let risky work skip approval and evidence.
 
-## Use it with your tool
+## Use it with Pi first
+
+Install the Pi skill globally:
+
+```bash
+npx github:arcayne/agentic-delivery-playbook install pi
+```
+
+Then start a fresh Pi session and run:
+
+```text
+/skill:agentic-delivery-playbook <your task>
+```
+
+Project-local install:
+
+```bash
+npx github:arcayne/agentic-delivery-playbook install pi --project
+```
+
+The Pi skill is a value gate, not a forced spec-first mode. It should change behavior by making scope, approval, routing truth, or evidence clearer. If it would only add ceremony, use Direct mode.
+
+## Portable adapters
 
 Start with [`docs/getting-started.md`](docs/getting-started.md). It includes:
 
+- Pi skill setup and command usage
 - universal prompt-only usage for any assistant
 - Claude and ChatGPT prompts for spec review and QA
 - Claude Code project-memory and slash-command setup
 - Codex `AGENTS.md` setup
-- adapter notes for Pi
 
 Repo adapters:
 
-- [`adapters/claude/`](adapters/claude/)
-- [`adapters/chatgpt/`](adapters/chatgpt/)
-- [`adapters/codex/`](adapters/codex/)
-- [`adapters/pi/`](adapters/pi/)
+- [`adapters/pi/`](adapters/pi/) — primary Pi skill
+- [`adapters/claude/`](adapters/claude/) — Claude skill port
+- [`adapters/codex/`](adapters/codex/) — Codex repo instructions
+- [`adapters/chatgpt/`](adapters/chatgpt/) — ChatGPT Project/custom-GPT instructions
 
 If you want model-routing guidance or bounded fanout patterns, see [`docs/model-routing.md`](docs/model-routing.md) and [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md).
-
-For Pi users with task-fit model routing policy (DeepSeek implementation worker, escalation rules, final review contract), see [`docs/pi-task-fit-model-routing.md`](docs/pi-task-fit-model-routing.md).
 
 ## When to add templates and run artifacts
 
@@ -174,8 +200,9 @@ See [`playbook.md`](playbook.md) for the full workflow and [`examples/lightweigh
 
 ## What is in this repo
 
-- [`playbook.md`](playbook.md) — full workflow
-- [`docs/getting-started.md`](docs/getting-started.md) — fastest setup path
+- [`adapters/pi/SKILL.md`](adapters/pi/SKILL.md) — primary Pi skill
+- [`playbook.md`](playbook.md) — full portable workflow
+- [`docs/getting-started.md`](docs/getting-started.md) — setup and usage
 - [`docs/gates.md`](docs/gates.md) — approval and escalation rules
 - [`docs/failure-modes.md`](docs/failure-modes.md) — common agent failure patterns
 - [`docs/high-risk-qa.md`](docs/high-risk-qa.md) — QA for sensitive changes
@@ -186,39 +213,50 @@ See [`playbook.md`](playbook.md) for the full workflow and [`examples/lightweigh
 
 ## Install adapters
 
-### Claude skill adapter
+### Pi skill
 
 ```bash
 # User skill, available across projects
-npx agentic-delivery-playbook install claude
+npx agentic-delivery-playbook install pi
 
 # Or project skill, available in one repo
-npx agentic-delivery-playbook install claude --project
+npx agentic-delivery-playbook install pi --project
 ```
 
 Until the package is published to npm, install from GitHub:
 
 ```bash
-npx github:arcayne/agentic-delivery-playbook install claude
+npx github:arcayne/agentic-delivery-playbook install pi
 ```
 
-### ChatGPT adapter
+In Pi, load it with:
 
-Use [`adapters/chatgpt/instructions.md`](adapters/chatgpt/instructions.md) as project instructions, custom GPT instructions, or a pasted session instruction.
+```text
+/skill:agentic-delivery-playbook <task>
+```
+
+or prompt normally: `Use agentic-delivery-playbook for <task>`. The bare `/agentic-delivery-playbook` form is for Claude-style skill environments, not Pi.
+
+### Claude skill port
+
+```bash
+npx agentic-delivery-playbook install claude
+npx agentic-delivery-playbook install claude --project
+```
+
+Until the package is published to npm:
+
+```bash
+npx github:arcayne/agentic-delivery-playbook install claude
+```
 
 ### Codex adapter
 
 Copy [`adapters/codex/AGENTS.md`](adapters/codex/AGENTS.md) into the target repository root, or merge it into an existing `AGENTS.md`.
 
-### Pi adapter
+### ChatGPT adapter
 
-Project-local Pi install example:
-
-```bash
-mkdir -p .pi/skills/agentic-delivery-playbook
-cp /path/to/agentic-delivery-playbook/adapters/pi/SKILL.md \
-  .pi/skills/agentic-delivery-playbook/SKILL.md
-```
+Use [`adapters/chatgpt/instructions.md`](adapters/chatgpt/instructions.md) as project instructions, custom GPT instructions, or a pasted session instruction.
 
 ## What this is not
 
@@ -226,9 +264,10 @@ This is not a new agent runtime, orchestrator, queue, dashboard, or multi-agent 
 
 It is a lightweight delivery convention you can use as:
 
+- a Pi skill
 - one pasted prompt
 - a repo-level instructions file
-- a Claude skill
+- a Claude skill port
 - a Codex `AGENTS.md`
 - a review checklist for ChatGPT, Claude, or Pi
 

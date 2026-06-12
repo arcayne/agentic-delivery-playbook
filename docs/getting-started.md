@@ -1,25 +1,56 @@
 # Getting started with the Agentic Delivery Playbook
 
-This is the general onboarding guide for using the playbook with common AI tools: Claude, Claude Code, ChatGPT, and Codex.
+This is the onboarding guide for the Pi-native Agentic Delivery Playbook and its portable adapters for Claude, Claude Code, ChatGPT, and Codex.
 
-The playbook is tool-neutral. Use it as either:
+The primary path is **a Pi skill**. The same delivery discipline can also be used as:
 
-- **a Claude skill** when your Claude environment supports skills
-- **persistent project instructions** for coding agents that can edit a repo, such as Claude Code or Codex
-- **copy/paste review prompts** for chat models, such as Claude or ChatGPT
+- persistent project instructions for coding agents that can edit a repo, such as Claude Code or Codex
+- a Claude skill port when your Claude environment supports skills
+- copy/paste review prompts for chat models, such as Claude or ChatGPT
 
 The same rule applies in every tool: choose the smallest safe process, write a spec only when the task needs one, get approval before implementation unless the human asked for an end-to-end run, and close with evidence.
 
 ## Start here
 
-1. If your agent edits the repo, add persistent instructions:
-   - Claude: install the self-contained skill in `adapters/claude/` when your Claude environment supports skills.
+1. If you use Pi, install the Pi skill and invoke `/skill:agentic-delivery-playbook`.
+2. If another agent edits the repo, add persistent instructions:
    - Claude Code: use the Claude skill, `CLAUDE.md`, or the slash command below.
    - Codex: use `AGENTS.md` or paste the universal prompt.
-2. If your assistant is chat-only and skills are unavailable, use it as a spec author, critic, or QA reviewer by pasting the reusable role prompts below.
-3. For every task, ask the assistant to classify the work first: direct, lightweight, or full.
-4. For non-direct work, approve the spec before implementation unless you explicitly want an end-to-end run.
-5. At closeout, require evidence: changed files, commands run, results, known gaps, and next action.
+   - Claude: install the self-contained skill in `adapters/claude/` when your Claude environment supports skills.
+3. If your assistant is chat-only and skills are unavailable, use it as a spec author, critic, or QA reviewer by pasting the reusable role prompts below.
+4. For every task, ask the assistant to classify the work first: direct, lightweight, or full.
+5. For non-direct work, approve the spec before implementation unless you explicitly want an end-to-end run.
+6. At closeout, require evidence: changed files, commands run, results, known gaps, and next action.
+
+## Pi
+
+Install the skill globally:
+
+```bash
+npx github:arcayne/agentic-delivery-playbook install pi
+```
+
+Or install it into the current project:
+
+```bash
+npx github:arcayne/agentic-delivery-playbook install pi --project
+```
+
+Restart Pi after installation so it rescans skills. Then invoke:
+
+```text
+/skill:agentic-delivery-playbook <your task>
+```
+
+You can also prompt naturally:
+
+```text
+Use agentic-delivery-playbook for: <your task>
+```
+
+Pi skill commands use `/skill:agentic-delivery-playbook`. The bare `/agentic-delivery-playbook` form is for Claude-style skill environments.
+
+The Pi skill is a value gate, not a mandatory spec-first workflow. It should add value by clarifying scope, approval, routing truth, or evidence. If it would only add ceremony, use Direct mode.
 
 ## Universal quick prompt
 

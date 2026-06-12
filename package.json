@@ -1,7 +1,7 @@
 {
   "name": "agentic-delivery-playbook",
   "version": "0.2.0",
-  "description": "Practical safety harness for coding agents: classify, scope, approve, and verify before merge.",
+  "description": "Pi-native delivery skill for coding agents: classify, scope, approve, route honestly, and verify before merge.",
   "license": "MIT",
   "type": "commonjs",
   "bin": {
