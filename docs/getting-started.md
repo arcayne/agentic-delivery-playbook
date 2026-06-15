@@ -50,7 +50,28 @@ Use agentic-delivery-playbook for: <your task>
 
 Pi skill commands use `/skill:agentic-delivery-playbook`. The bare `/agentic-delivery-playbook` form is for Claude-style skill environments.
 
-The Pi skill is a value gate, not a mandatory spec-first workflow. It should add value by clarifying scope, approval, routing truth, or evidence. If it would only add ceremony, use Direct mode.
+The Pi skill is a value gate, not a mandatory spec-first workflow. It should add value by clarifying scope, approval, routing truth, goal lifecycle, subagent separation, or evidence. If it would only add ceremony, use Direct mode.
+
+For Full or long-running work, use the native Pi layering:
+
+```text
+agentic-delivery-playbook = triage, scope, approval, evidence policy
+pi-goal-x                 = durable lifecycle for broad/long-running work
+pi-subagents              = scoped implementation and review lanes
+run artifacts             = evidence trail only when useful
+```
+
+Recommended Full-mode flow:
+
+1. classify Full and draft a compact implementation contract,
+2. create/recommend a Pi goal when work is broad, long-running, or explicitly goal-driven,
+3. get approval,
+4. delegate implementation to one `worker`,
+5. run validation,
+6. delegate independent QA to `reviewer`,
+7. close/complete only with evidence.
+
+If you expect worker/reviewer/planner to use different model lanes, copy [`../templates/pi-settings.template.json`](../templates/pi-settings.template.json) into the target project as `.pi/settings.json` and adjust model names.
 
 ## Universal quick prompt
 

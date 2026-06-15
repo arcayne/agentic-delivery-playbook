@@ -12,7 +12,7 @@
   <img src="assets/agent-preflight-hero.png" alt="Agent preflight checklist: mode, goal, non-goals, risks, approval, and evidence before the agent touches the repo" width="920">
 </p>
 
-A practical safety harness for Pi coding sessions: classify the task, lock the scope, stop risky work before implementation, route honestly, and close out with evidence.
+A practical safety harness for Pi coding sessions: classify the task, lock the scope, coordinate goals/subagents when useful, stop risky work before implementation, route honestly, and close out with evidence.
 
 Built and dogfooded in Pi. Portable adapters are included for Claude, Codex, and ChatGPT.
 
@@ -79,6 +79,7 @@ This playbook gives Pi, or another coding agent, a small delivery contract befor
 | PR is hard to review | QA against acceptance criteria, not summaries |
 | Risky task starts coding too early | Add an approval gate |
 | Expensive model is used for everything | Route stronger reasoning to spec/QA work only when it helps |
+| Full-mode work still uses one parent model | Use Pi goals for lifecycle and subagents for worker/reviewer separation |
 
 ## Agent Preflight
 
@@ -140,6 +141,21 @@ Choose process weight before creating artifacts.
 | **Full + bounded workflow** | Broad audit, migration, or adversarial review | Parallel or dynamic work only with scope, caps, stop rules, and synthesis |
 
 Do not create heavy artifacts for obvious one-file fixes. Do not let risky work skip approval and evidence.
+
+## Pi-native workflow
+
+The playbook is the policy layer. It coordinates existing Pi primitives:
+
+```text
+agentic-delivery-playbook = triage, scope, approval, evidence policy
+pi-goal-x                 = durable lifecycle for broad/long-running work
+pi-subagents              = scoped implementation and review lanes
+run artifacts             = evidence trail only when useful
+```
+
+For Full mode, the expected shape is: parent drafts/approves scope, a `worker` performs the implementation, a `reviewer` checks the diff against the contract, and a Pi goal is used when the work is broad, long-running, or explicitly goal-driven. See [`docs/pi-native-workflow.md`](docs/pi-native-workflow.md).
+
+If you expect different model lanes for worker/reviewer/planner, configure `.pi/settings.json`; see [`templates/pi-settings.template.json`](templates/pi-settings.template.json).
 
 ## Use it with Pi first
 
@@ -203,11 +219,12 @@ See [`playbook.md`](playbook.md) for the full workflow and [`examples/lightweigh
 - [`adapters/pi/SKILL.md`](adapters/pi/SKILL.md) — primary Pi skill
 - [`playbook.md`](playbook.md) — full portable workflow
 - [`docs/getting-started.md`](docs/getting-started.md) — setup and usage
+- [`docs/pi-native-workflow.md`](docs/pi-native-workflow.md) — how the skill layers Pi goals, subagents, and artifacts
 - [`docs/gates.md`](docs/gates.md) — approval and escalation rules
 - [`docs/failure-modes.md`](docs/failure-modes.md) — common agent failure patterns
 - [`docs/high-risk-qa.md`](docs/high-risk-qa.md) — QA for sensitive changes
 - [`docs/visual-specs.md`](docs/visual-specs.md) — when visuals help spec review
-- [`templates/`](templates/) — reusable spec, run, notes, and QA templates
+- [`templates/`](templates/) — reusable spec, run, notes, QA, and Pi settings templates
 - [`examples/`](examples/) — copyable examples of finished artifacts
 - [`docs/adapters.md`](docs/adapters.md) — tool-specific integration notes
 

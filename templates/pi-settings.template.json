@@ -1,0 +1,18 @@
+{
+  "subagents": {
+    "agentOverrides": {
+      "worker": {
+        "model": "openai-codex/gpt-5.3-codex-spark:xhigh",
+        "thinking": "xhigh"
+      },
+      "reviewer": {
+        "model": "openai-codex/gpt-5.4:xhigh",
+        "thinking": "xhigh"
+      },
+      "planner": {
+        "model": "openai-codex/gpt-5.4:xhigh",
+        "thinking": "xhigh"
+      }
+    }
+  }
+}

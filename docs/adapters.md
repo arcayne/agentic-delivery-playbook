@@ -19,7 +19,7 @@ adapters/chatgpt/
 
 ## Pi skill
 
-The Pi adapter packages the workflow as a Pi skill. It is intentionally a value gate: use it when classification, approval, routing truth, or evidence will change the work; skip it for clear direct edits.
+The Pi adapter packages the workflow as a Pi skill. It is intentionally a value gate: use it when classification, approval, routing truth, goal lifecycle, subagent separation, or evidence will change the work; skip it for clear direct edits.
 
 Install globally:
 
@@ -40,6 +40,8 @@ Invoke in Pi:
 ```
 
 Pi skill commands use `/skill:agentic-delivery-playbook`; the bare `/agentic-delivery-playbook` form is for Claude-style skill environments.
+
+For Full-mode work, the Pi adapter should coordinate Pi primitives: `pi-goal-x` for durable lifecycle when needed, `pi-subagents` for worker/reviewer separation, and run artifacts for evidence. See [`pi-native-workflow.md`](pi-native-workflow.md) and [`../templates/pi-settings.template.json`](../templates/pi-settings.template.json).
 
 ## Portable adapters
 

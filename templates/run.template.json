@@ -13,6 +13,20 @@
     "notes": "specs/YYYYMMDD-HHMM-feature-slug/notes.md"
   },
   "artifactFormat": "markdown | html",
+  "piPrimitives": {
+    "goal": {
+      "status": "none | recommended | focused | confirmed | skipped | completed",
+      "goalId": null,
+      "path": null,
+      "verificationContract": null,
+      "exceptionReason": null
+    },
+    "subagents": {
+      "workerDefault": "not-needed | planned | used | failed | skipped-with-exception",
+      "reviewerDefault": "not-needed | planned | used | failed | skipped-with-exception",
+      "plannerDefault": "not-needed | planned | used | failed | skipped-with-exception"
+    }
+  },
   "approval": {
     "required": true,
     "status": "pending",
@@ -57,11 +71,13 @@
     }
   ],
   "reviewGates": {
-    "specCritique": "not-required | parent-self-review | pending | passed | warning",
-    "humanApproval": "pending",
-    "broadTicketPlanning": "not-applicable | pending | passed | warning",
-    "implementationQa": "notes-only | parent-self-review | pending | passed | warning",
-    "closeout": "pending"
+    "goalConfirmation": "not-required | recommended | pending | confirmed | skipped-with-exception",
+    "specCritique": "not-required | parent-self-review | pending | passed | failed | skipped-with-exception | warning",
+    "humanApproval": "pending | passed | skipped-with-exception",
+    "workerImplementation": "not-required | pending | passed | failed | skipped-with-exception",
+    "broadTicketPlanning": "not-applicable | pending | passed | failed | skipped-with-exception | warning",
+    "implementationQa": "notes-only | parent-self-review | pending | passed | failed | skipped-with-exception | warning",
+    "closeout": "pending | passed | failed"
   },
   "broadTicketGate": {
     "required": false,
@@ -93,6 +109,15 @@
     "approvedBy": null,
     "evidence": null
   },
+  "gateFailures": [
+    {
+      "gate": "planner | worker | reviewer | validation | goal-auditor",
+      "agent": null,
+      "reason": "timeout | failed-output | validation-failed | unavailable",
+      "recovery": "retry-narrower | increase-timeout | split-task | switch-route | ask-user | approved-parent-exception",
+      "evidence": null
+    }
+  ],
   "evidenceMode": "direct-validation | notes-only | artifact-backed",
   "observabilitySummary": {
     "available": false,

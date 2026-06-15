@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added Pi-native workflow guidance for layering Agentic Delivery Playbook with pi-goal-x, pi-subagents, and run artifacts.
+- Added a Pi settings template for worker/reviewer/planner model lane separation.
+- Updated the Pi skill so Full mode defaults to worker implementation plus reviewer QA, records gate failures, and treats subagent timeouts as failed gates instead of completed self-review.
 - Repositioned the repo as Pi-first and portable second across README/getting-started/adapter docs.
 - Added `install pi` and `install-pi-skill` CLI targets for Pi global/project skill installation.
 - Reframed the Pi adapter as a lightweight value gate instead of a forced model-routing/spec-first workflow.
