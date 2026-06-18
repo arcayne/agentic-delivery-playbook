@@ -163,6 +163,7 @@ Full rules:
 - get approval before coding unless the user requested an end-to-end run
 - split broad work into implementer-sized tasks before writing code
 - delegate implementation to `worker` by default after approval
+- before coding, run the routing enforcement gate if the contract names a target worker/model or project `.pi/settings.json` defines overrides
 - run independent QA with `reviewer` by default after implementation
 - use `planner`, `scout`, or `context-builder` only for a concrete need: decomposition, local context, or validation/risk mapping
 - use high-risk QA checks for sensitive or cross-system work
@@ -207,7 +208,9 @@ Pi may expose subagents, model overrides, and runtime defaults. Use them when th
 
 ### Recommended project model overrides
 
-When a project expects model separation, configure Pi subagent overrides in `.pi/settings.json` rather than relying on implicit defaults. Example:
+When a project expects model separation, configure Pi subagent overrides in `.pi/settings.json` rather than relying on implicit defaults. The playbook must treat these overrides as an operational requirement, not a note: if the work is routed through a role with a configured override, the run must either use that route or stop for an explicit exception.
+
+Example:
 
 ```json
 {
@@ -222,6 +225,54 @@ When a project expects model separation, configure Pi subagent overrides in `.pi
 ```
 
 Use project-appropriate model names. If these models are unavailable, use equivalent lanes and record the actual route.
+
+### Routing enforcement gate
+
+This gate exists because simply recording `agent-default` or `runtime-default` misses the point when the project expected a stronger or separate implementation model.
+
+Run this gate before implementation when any of these are true:
+
+- Full mode is active.
+- The user asks for a particular model, stronger model, worker, reviewer, or separation of roles.
+- `.pi/settings.json` contains `subagents.agentOverrides` for the intended role.
+- The spec/run artifact names `targetModel`, `implementationTargetModel`, or a project-configured worker/reviewer.
+
+Gate steps:
+
+1. Inspect project `.pi/settings.json` for role overrides.
+2. Decide the target route for each required role: agent, model, reasoning/thinking, and source.
+3. Verify the route is executable in Pi before coding: list available subagents, then call the intended worker/reviewer with an explicit `agent` and, when supported, explicit `model`/`thinking` values.
+4. Record both target and observed route in `run.json` before implementation starts.
+5. If Pi only reports `agent-default`/`runtime-default`, mark the route as unverified unless the agent invocation itself used the configured role or explicit model override.
+6. If the target route cannot be enforced or verified, stop and ask the user to choose one:
+   - switch manually in the Pi model picker,
+   - update `.pi/settings.json`,
+   - continue with `runtime-default` as an approved exception,
+   - split the task so only safe parts use the available route.
+
+Hard rule: do not proceed with a Full-mode implementation that has a required target model but only `runtime-default`/`agent-default` evidence, unless `implementationModelException.approved` is true and the user approved it.
+
+Minimum enforcement record:
+
+```json
+{
+  "routeEnforcement": {
+    "required": true,
+    "reason": "full-mode project worker override",
+    "target": {
+      "role": "implementer",
+      "agent": "worker",
+      "model": "openai-codex/gpt-5.3-codex-spark:xhigh",
+      "reasoningIntensity": "extra-high",
+      "source": "project-settings"
+    },
+    "verification": {
+      "status": "verified | unverified | unavailable | exception-approved",
+      "evidence": "subagent worker invoked with explicit model override"
+    }
+  }
+}
+```
 
 ### Recording actual routing
 
@@ -238,7 +289,7 @@ exception-approved user approved a route different from intended policy
 unknown-legacy     older/interrupted run cannot prove routing
 ```
 
-If a project requires a specific implementation model or worker and Pi cannot enforce it, stop and ask the user to either switch manually, configure `.pi/settings.json`, or approve an exception. If the user approves an exception, record it honestly. If the project does not require a specific model, record `runtime-default` and avoid model-specific claims.
+If a project requires a specific implementation model or worker and Pi cannot enforce it, stop and ask the user to either switch manually, configure `.pi/settings.json`, approve an exception, or narrow the task to Direct/Lightweight work safe for the current route. If the user approves an exception, record it honestly. If the project does not require a specific model, record `runtime-default` and avoid model-specific claims.
 
 Example `run.json` ledger entry:
 
@@ -362,7 +413,7 @@ Known gaps:
 Next action:
 ```
 
-For Full mode, the closeout must say whether the worker and reviewer gates passed, failed, or were explicitly bypassed. If goal lifecycle was used, complete the goal only after evidence satisfies the verification contract.
+For Full mode, the closeout must say whether the route enforcement, worker, and reviewer gates passed, failed, or were explicitly bypassed. If goal lifecycle was used, complete the goal only after evidence satisfies the verification contract.
 
 ## Compact banner
 

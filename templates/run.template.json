@@ -66,14 +66,32 @@
       "agent": null,
       "model": null,
       "reasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
-      "source": "explicit | agent-default | runtime-default | manual",
+      "source": "explicit | agent-default | runtime-default | manual | project-settings | exception-approved",
       "notes": null
     }
   ],
+  "routeEnforcement": {
+    "required": false,
+    "reason": null,
+    "targets": [
+      {
+        "role": "implementer | qaReviewer | critic | planner",
+        "agent": null,
+        "model": null,
+        "reasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
+        "source": "explicit | project-settings | manual | runtime-default"
+      }
+    ],
+    "verification": {
+      "status": "not-required | pending | verified | unverified | unavailable | exception-approved",
+      "evidence": null
+    }
+  },
   "reviewGates": {
     "goalConfirmation": "not-required | recommended | pending | confirmed | skipped-with-exception",
     "specCritique": "not-required | parent-self-review | pending | passed | failed | skipped-with-exception | warning",
     "humanApproval": "pending | passed | skipped-with-exception",
+    "routeEnforcement": "not-required | pending | passed | failed | skipped-with-exception",
     "workerImplementation": "not-required | pending | passed | failed | skipped-with-exception",
     "broadTicketPlanning": "not-applicable | pending | passed | failed | skipped-with-exception | warning",
     "implementationQa": "notes-only | parent-self-review | pending | passed | failed | skipped-with-exception | warning",
