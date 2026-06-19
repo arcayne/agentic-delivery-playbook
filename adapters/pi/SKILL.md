@@ -163,15 +163,17 @@ Full rules:
 - get approval before coding unless the user requested an end-to-end run
 - split broad work into implementer-sized tasks before writing code
 - delegate implementation to `worker` by default after approval
-- before coding, run the routing enforcement gate if the contract names a target worker/model or project `.pi/settings.json` defines overrides
+- before coding, run the routing enforcement gate; Full mode must not silently continue on `agent-default`/`runtime-default`
 - run independent QA with `reviewer` by default after implementation
 - use `planner`, `scout`, or `context-builder` only for a concrete need: decomposition, local context, or validation/risk mapping
 - use high-risk QA checks for sensitive or cross-system work
 - close with files changed, validation evidence, findings, routing ledger, known gaps, and next action
 
-Full mode exception rule:
+Full mode exception rules:
 
-If the parent implements directly or skips independent review in Full mode, record it as an explicit exception with reason and evidence. If the user expected different models/agents, ask before continuing under `runtime-default`.
+- If Full mode has no project `.pi/settings.json` model overrides and no explicit user-selected route, stop before coding and ask whether to add project overrides, switch manually, approve `runtime-default`/`agent-default` for this run, or narrow the task.
+- If the parent implements directly or skips independent review in Full mode, record it as an explicit exception with reason and evidence. If the user expected different models/agents, ask before continuing under `runtime-default`.
+- If a worker/reviewer times out after making partial edits, treat that role gate as failed. Parent recovery is allowed only as an explicit takeover exception; do not mark the worker/reviewer gate passed or partially passed.
 
 ## Preflight contract
 
@@ -188,7 +190,7 @@ Required fields:
 - implementation checklist
 - open questions, if any
 - planned Pi primitives: goal, worker, reviewer, planner/scout, artifacts
-- routing expectations: intended agent/model/source or `runtime-default`
+- routing expectations: intended agent/model/source; for Full mode this must be a real target route, `pending-user-decision`, or an approved exception, not silent `runtime-default`
 
 Ask a focused question only when a missing answer blocks safe implementation. Otherwise draft the contract and stop for approval when required.
 
@@ -205,10 +207,13 @@ Pi may expose subagents, model overrides, and runtime defaults. Use them when th
 - Use `planner`, `scout`, `context-builder`, or `oracle` only for a concrete role: decomposition, context gathering, skeptical review, or drift/decision audit.
 - Keep one writer thread. Parallelize read-only context/review/validation, not normal writes.
 - If the user expects different models, verify the actual route or use explicit model overrides. `agent-default` may still resolve to the current/default model.
+- For Full mode, absence of project overrides is not evidence that `agent-default` is acceptable. It is a decision point that must be resolved before coding.
 
 ### Recommended project model overrides
 
 When a project expects model separation, configure Pi subagent overrides in `.pi/settings.json` rather than relying on implicit defaults. The playbook must treat these overrides as an operational requirement, not a note: if the work is routed through a role with a configured override, the run must either use that route or stop for an explicit exception.
+
+For Full mode, a missing `.pi/settings.json` is not a pass. Before implementation, ask the user whether to create project overrides, manually switch models, approve the current/default route as an exception, or narrow the task. Do not set a Full-mode implementation target to `agent-default` merely because no config exists.
 
 Example:
 
@@ -228,7 +233,7 @@ Use project-appropriate model names. If these models are unavailable, use equiva
 
 ### Routing enforcement gate
 
-This gate exists because simply recording `agent-default` or `runtime-default` misses the point when the project expected a stronger or separate implementation model.
+This gate exists because simply recording `agent-default` or `runtime-default` misses the point when the project expected a stronger or separate implementation model, and because Full mode should make model/role separation an explicit decision rather than an accidental default.
 
 Run this gate before implementation when any of these are true:
 
@@ -240,17 +245,22 @@ Run this gate before implementation when any of these are true:
 Gate steps:
 
 1. Inspect project `.pi/settings.json` for role overrides.
-2. Decide the target route for each required role: agent, model, reasoning/thinking, and source.
-3. Verify the route is executable in Pi before coding: list available subagents, then call the intended worker/reviewer with an explicit `agent` and, when supported, explicit `model`/`thinking` values.
-4. Record both target and observed route in `run.json` before implementation starts.
-5. If Pi only reports `agent-default`/`runtime-default`, mark the route as unverified unless the agent invocation itself used the configured role or explicit model override.
-6. If the target route cannot be enforced or verified, stop and ask the user to choose one:
-   - switch manually in the Pi model picker,
-   - update `.pi/settings.json`,
-   - continue with `runtime-default` as an approved exception,
-   - split the task so only safe parts use the available route.
+2. If Full mode is active and no project overrides or explicit user-selected route exists, stop before coding and ask the user to choose one:
+   - create/update `.pi/settings.json` role overrides,
+   - switch manually in the Pi model picker and record the manual route,
+   - approve `runtime-default`/`agent-default` as an exception for this run,
+   - narrow/split the task so the current route is safe.
+3. Decide the target route for each required role: agent, model, reasoning/thinking, and source. In Full mode, the target route must not be plain `agent-default` or `runtime-default` unless the exception was approved.
+4. Verify the route is executable in Pi before coding: list available subagents, then call the intended worker/reviewer with an explicit `agent` and, when supported, explicit `model`/`thinking` values.
+5. Record both target and observed route in `run.json` before implementation starts.
+6. If Pi only reports `agent-default`/`runtime-default`, mark the route as unverified unless the agent invocation itself used the configured role, explicit model override, manual selection, or approved exception.
+7. If the target route cannot be enforced or verified, stop and ask the user to choose one of the same options above.
 
-Hard rule: do not proceed with a Full-mode implementation that has a required target model but only `runtime-default`/`agent-default` evidence, unless `implementationModelException.approved` is true and the user approved it.
+Hard rules:
+
+- Do not proceed with Full-mode implementation when no project override or explicit/manual route exists unless `implementationModelException.approved` is true and the user approved current/default routing.
+- Do not set a Full-mode target model to `agent-default` just because no config exists; use `pending-user-decision`, create config, or record an approved exception.
+- Do not proceed with a Full-mode implementation that has a required target model but only `runtime-default`/`agent-default` evidence, unless `implementationModelException.approved` is true and the user approved it.
 
 Minimum enforcement record:
 
@@ -258,7 +268,7 @@ Minimum enforcement record:
 {
   "routeEnforcement": {
     "required": true,
-    "reason": "full-mode project worker override",
+    "reason": "full-mode project worker override | full-mode missing route config requires user decision",
     "target": {
       "role": "implementer",
       "agent": "worker",
@@ -267,7 +277,7 @@ Minimum enforcement record:
       "source": "project-settings"
     },
     "verification": {
-      "status": "verified | unverified | unavailable | exception-approved",
+      "status": "verified | unverified | unavailable | config-missing | pending-user-decision | exception-approved",
       "evidence": "subagent worker invoked with explicit model override"
     }
   }
@@ -289,7 +299,7 @@ exception-approved user approved a route different from intended policy
 unknown-legacy     older/interrupted run cannot prove routing
 ```
 
-If a project requires a specific implementation model or worker and Pi cannot enforce it, stop and ask the user to either switch manually, configure `.pi/settings.json`, approve an exception, or narrow the task to Direct/Lightweight work safe for the current route. If the user approves an exception, record it honestly. If the project does not require a specific model, record `runtime-default` and avoid model-specific claims.
+If a project requires a specific implementation model or worker and Pi cannot enforce it, stop and ask the user to either switch manually, configure `.pi/settings.json`, approve an exception, or narrow the task to Direct/Lightweight work safe for the current route. If the user approves an exception, record it honestly. If the project does not require a specific model, record `runtime-default` and avoid model-specific claims. In Full mode, do not infer "project does not require a specific model" from missing config; ask or record an approved exception.
 
 Example `run.json` ledger entry:
 
@@ -340,16 +350,17 @@ For subagent runs that implement a spec, prefer Pi's structured `acceptance` fie
 
 ## Gate failure policy
 
-A timed-out or failed subagent is a failed gate, not a completed review.
+A timed-out or failed subagent is a failed gate, not a completed review or implementation pass.
 
 If `planner`, `worker`, or `reviewer` times out or returns unusable output:
 
 1. record the failed gate in `run.json`/`notes.md`
 2. decide explicitly whether to retry with narrower scope, increase timeout, switch route, split the task, or ask the user
 3. do not silently replace independent review with parent self-review in Full mode
-4. if parent self-review is used anyway, mark it as an approved exception and explain why it is sufficient
+4. if parent self-review or parent implementation takeover is used anyway, mark it as an approved exception and explain why it is sufficient
+5. if the timed-out worker left partial file edits, inspect them as untrusted partial work; the worker gate remains failed unless the same worker or an approved replacement completes and reports usable evidence
 
-Do not close Full mode as reviewed when the only independent reviewer timed out.
+Do not close Full mode as reviewed when the only independent reviewer timed out. Do not close Full mode as worker-implemented when the worker timed out and the parent finished the work; record `workerImplementation: failed` plus an explicit parent-takeover exception.
 
 ## QA and fix loop
 

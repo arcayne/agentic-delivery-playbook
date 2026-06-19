@@ -39,25 +39,25 @@
       "agent": null,
       "model": null,
       "reasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
-      "source": "explicit | agent-default | runtime-default | manual"
+      "source": "explicit | agent-default | runtime-default | manual | project-settings | pending-user-decision | exception-approved"
     },
     "critic": {
       "agent": null,
       "model": null,
       "reasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
-      "source": "explicit | agent-default | runtime-default | manual"
+      "source": "explicit | agent-default | runtime-default | manual | project-settings | pending-user-decision | exception-approved"
     },
     "implementer": {
       "agent": null,
       "model": null,
       "reasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
-      "source": "explicit | agent-default | runtime-default | manual"
+      "source": "explicit | agent-default | runtime-default | manual | project-settings | pending-user-decision | exception-approved"
     },
     "qaReviewer": {
       "agent": null,
       "model": null,
       "reasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
-      "source": "explicit | agent-default | runtime-default | manual"
+      "source": "explicit | agent-default | runtime-default | manual | project-settings | pending-user-decision | exception-approved"
     }
   },
   "modelLedger": [
@@ -79,11 +79,11 @@
         "agent": null,
         "model": null,
         "reasoningIntensity": "low | medium | high | extra-high | runtime-default | unknown",
-        "source": "explicit | project-settings | manual | runtime-default"
+        "source": "explicit | project-settings | manual | pending-user-decision | exception-approved | runtime-default"
       }
     ],
     "verification": {
-      "status": "not-required | pending | verified | unverified | unavailable | exception-approved",
+      "status": "not-required | pending | verified | unverified | unavailable | config-missing | pending-user-decision | exception-approved",
       "evidence": null
     }
   },
@@ -123,7 +123,7 @@
   },
   "implementationModelException": {
     "approved": false,
-    "reason": null,
+    "reason": "missing-full-mode-route-config | route-unavailable | parent-takeover-after-worker-timeout | reviewer-bypass | other | null",
     "approvedBy": null,
     "evidence": null
   },
@@ -132,7 +132,7 @@
       "gate": "planner | worker | reviewer | validation | goal-auditor",
       "agent": null,
       "reason": "timeout | failed-output | validation-failed | unavailable",
-      "recovery": "retry-narrower | increase-timeout | split-task | switch-route | ask-user | approved-parent-exception",
+      "recovery": "retry-narrower | increase-timeout | split-task | switch-route | ask-user | approved-parent-exception | parent-takeover-exception",
       "evidence": null
     }
   ],
