@@ -133,10 +133,13 @@ Dynamic workflows should record the actual roles used, such as orchestrator, wor
 For broad tickets, add a planning/review layer before implementation:
 
 1. split the spec into implementer-sized tasks
-2. identify high-risk QA checks
-3. give the implementer one focused task set at a time
-4. review after the first implementation pass
+2. identify independent slices that can run in parallel
+3. identify high-risk QA checks
+4. assign one focused task set per worker with allowed files and validation
+5. review/synthesize at a barrier after the first implementation pass
 
 This prevents a broad prompt from becoming a large uncontrolled edit.
+
+If the user approved the full outcome or confirmed a goal for the full scope, you may batch independent slices without asking again for each child task. Record a launch note, concurrency cap, conflict rule, and barrier plan. Each child task must apply the same playbook rules at slice scale: objective, non-goals, route evidence or exception, validation, drift check, and closeout.
 
 If the broad ticket becomes a dynamic workflow, require a plain-English launch note before fanout starts and verify findings before folding them into the final answer. See [`dynamic-workflows.md`](dynamic-workflows.md).

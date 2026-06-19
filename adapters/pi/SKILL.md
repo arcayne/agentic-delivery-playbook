@@ -162,6 +162,7 @@ Full rules:
 - critique the spec before implementation
 - get approval before coding unless the user requested an end-to-end run
 - split broad work into implementer-sized tasks before writing code
+- if the user approved the whole outcome or said they want it all, batch independent slices in parallel where safe instead of running one giant worker
 - delegate implementation to `worker` by default after approval
 - before coding, run the routing enforcement gate; Full mode must not silently continue on `agent-default`/`runtime-default`
 - run independent QA with `reviewer` by default after implementation
@@ -208,6 +209,37 @@ Pi may expose subagents, model overrides, and runtime defaults. Use them when th
 - Keep one writer thread. Parallelize read-only context/review/validation, not normal writes.
 - If the user expects different models, verify the actual route or use explicit model overrides. `agent-default` may still resolve to the current/default model.
 - For Full mode, absence of project overrides is not evidence that `agent-default` is acceptable. It is a decision point that must be resolved before coding.
+
+### Parallel slicing and fractal contracts
+
+When Full-mode work is broad and the user has approved the whole outcome, assume parallel slicing is allowed **within the approved scope**. Do not ask for separate permission for every slice unless the launch plan changes scope, risk, budget, or authority.
+
+Use parallel slicing when the work can be separated by file, package, feature lane, fixture set, migration, or acceptance-criteria cluster. Keep sequential work sequential when one slice depends on another.
+
+Rules:
+
+- First create a child-task map: slice id, objective, allowed files, non-goals, dependencies, validation, and owner route.
+- Add a file ownership matrix for shared files. Nav/i18n/router/schema/config/state files get one owner, a serialized lane, or isolated worktrees plus a merge barrier.
+- Each child slice must apply the same playbook rules at its own scale: clear objective, non-goals, route evidence/exception, validation evidence, drift check, and closeout.
+- Keep one writer per file or tightly coupled file cluster. If parallel writers could touch the same file, either use isolated worktrees with a merge barrier or serialize those slices.
+- Use a barrier after parallel implementation: synthesize changed files, conflicts, validation outcomes, known gaps, and child closeouts before QA.
+- Do not let child agents make product/architecture decisions outside their slice. Escalate back to the parent when a child discovers hidden scope or risk.
+- Treat child timeouts as failed gates. Partial edits from a timed-out child are untrusted until inspected and completed by an approved route or explicit takeover exception.
+- Require both child-local validation and parent global validation; child tests alone are not enough.
+- Do not over-parallelize sequential UX flows. Slice by independent surfaces/components/fixtures/acceptance clusters, not by every tiny file.
+- The parent remains responsible for global invariants, final validation, independent review, and truthful routing ledger.
+
+Record the plan in `run.json`/`notes.md` before launch. A compact launch note is enough when the user already approved end-to-end delivery:
+
+```text
+Parallel slice launch:
+Approved scope: <parent spec/goal>
+Slices: <slice ids and owners>
+Concurrency cap: <n or one per independent package>
+Conflict rule: <worktree/serialize shared files>
+Barrier: synthesize child closeouts, run parent validation, then QA
+Stop rule: child ambiguity, route failure, validation repeat failure, or scope drift
+```
 
 ### Recommended project model overrides
 

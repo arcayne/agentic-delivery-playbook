@@ -105,6 +105,37 @@
     "tickets": [],
     "highRiskQaChecks": []
   },
+  "parallelizationPlan": {
+    "approvedByScope": false,
+    "approvalEvidence": null,
+    "launchNote": null,
+    "concurrencyCap": null,
+    "conflictRule": "one-writer-per-file | isolated-worktrees | serialized-shared-files | not-applicable",
+    "sharedFileOwnership": [
+      {
+        "path": null,
+        "ownerSlice": null,
+        "rule": "single-owner | serialized | worktree-merge-barrier"
+      }
+    ],
+    "decisionEscalationRule": "children stop and escalate product/architecture ambiguity to parent",
+    "timeoutPolicy": "timed-out child gate fails; partial edits are untrusted until reviewed/completed by approved route or takeover exception",
+    "validationPolicy": "child-local validation plus parent global validation required",
+    "sequentialFlowRule": "sequential UX/state flows are serialized unless slices are independent surfaces",
+    "barrierPlan": null,
+    "childTasks": [
+      {
+        "id": null,
+        "objective": null,
+        "allowedFiles": [],
+        "nonGoals": [],
+        "dependencies": [],
+        "routeStatus": "pending-user-decision | verified | exception-approved | not-required",
+        "validation": [],
+        "status": "pending | running | passed | failed | blocked"
+      }
+    ]
+  },
   "acceptance": {
     "total": 0,
     "met": 0,

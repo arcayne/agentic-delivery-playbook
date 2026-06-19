@@ -62,6 +62,8 @@ Do not use dynamic workflows for:
 
 Before starting a dynamic workflow or large parallel fanout, state the launch plan in plain English and get approval. Do not rely on blank budget fields that people will not fill.
 
+If the user already approved the full outcome with language like "do it all", "implement the whole PRD", or a confirmed goal covering the full scope, treat that as approval to batch independent slices **inside that scope**. You still must record the launch note, but you do not need to re-ask for every child slice unless the plan changes scope, risk, authority, routing, or cost materially.
+
 The launch note should include:
 
 - **Scope:** what is included and excluded.
@@ -80,7 +82,57 @@ after the verifier pass or when no new high-confidence
 findings remain.
 ```
 
-Record the approved note in `notes.md`, `run.json`, or a workflow artifact. The important part is that the human approves an understandable plan before expensive fanout starts.
+Record the approved note in `notes.md`, `run.json`, or a workflow artifact. The important part is that the human approves an understandable plan before expensive fanout starts, or that the prior full-scope approval is explicitly tied to the launch note.
+
+## Parallel implementation slicing
+
+For broad implementation work, prefer many bounded child tasks over one huge implementation prompt when the slices are independent enough to merge safely.
+
+Good slice boundaries:
+
+- one package, app, service, or adapter
+- one page/component cluster
+- one migration plus its tests
+- one fixture/eval set
+- one acceptance-criteria cluster
+- one read-only audit or verifier rule cluster
+
+Bad slice boundaries:
+
+- multiple workers editing the same core file without worktree isolation
+- slices that need unapproved product decisions
+- slices with hidden ordering dependencies
+- slices where validation cannot prove local correctness
+
+Each child slice is a fractal playbook run. It needs:
+
+- objective and non-goals
+- allowed files and forbidden files
+- route/model expectation or approved exception
+- validation commands or manual evidence
+- stop/escalation rules
+- closeout evidence
+
+Parent responsibilities:
+
+- create the child-task map and concurrency cap
+- prevent file ownership conflicts
+- collect child closeouts at a barrier
+- reject speculative or unverified child findings
+- run parent-level validation and QA after merge/fold-in
+- record worker/reviewer failures truthfully
+
+## Risk controls for parallel implementation
+
+| Risk | Required control |
+| --- | --- |
+| Shared files such as nav, i18n, routers, schemas, config, or central stores attract multiple slices | Create a file ownership matrix before launch. Give each shared file one owner, serialize shared-file slices, or use isolated worktrees with an explicit merge barrier. |
+| A child discovers product, UX, data-model, or architecture ambiguity | Child stops and escalates to parent with options/evidence. Child does not decide outside its slice. |
+| A slice is Full-mode or high-risk | Run route enforcement for that slice. It needs verified model/agent route or an approved exception before coding. |
+| Worker/reviewer times out or returns unusable output | Mark the child gate failed. Treat any partial edits as untrusted until inspected and completed by the same route, an approved replacement, or an explicit parent-takeover exception. |
+| Child tests pass but global behavior may still break | Require both local child validation and parent global validation after synthesis. Child validation is necessary but not sufficient. |
+| UX flow has sequential state or dependent screens | Do not split by tiny files. Slice by independent surfaces or run the sequential flow in a serialized lane with one owner. |
+| Parallel outputs conflict or overlap | Stop at the barrier, resolve conflicts deliberately, rerun affected validation, and record rejected/accepted child changes. |
 
 ## Useful workflow patterns
 

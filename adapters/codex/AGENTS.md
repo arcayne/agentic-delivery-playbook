@@ -139,11 +139,20 @@ Rules:
 - run relevant validation and fix failures
 - report changed files, validation commands, assumptions, and gaps
 
-### Broad-ticket planning gate
+### Broad-ticket planning and parallel slicing gate
 
-If the task fit is `broad-ticket`, split the approved spec into implementer-sized tickets before implementation. Give Codex one focused ticket or tightly grouped ticket set at a time.
+If the task fit is `broad-ticket`, split the approved spec into implementer-sized tickets before implementation.
 
-Record the split and high-risk QA checks in `notes.md` or `run.json`.
+If the user approved the whole outcome or said they want it all, assume independent slices can be batched in parallel within the approved scope. Do not re-ask for each slice unless scope, risk, route, or cost changes materially.
+
+Record in `notes.md` or `run.json`:
+
+- child-task map: slice id, objective, allowed files, non-goals, dependencies, validation, owner route
+- concurrency cap and conflict rule
+- high-risk QA checks
+- synthesis/barrier plan
+
+Each child slice must follow the same playbook rules at slice scale: objective, non-goals, route evidence/exception, validation, drift check, and closeout. Keep one writer per file or coupled file cluster; serialize or isolate worktrees when slices could touch the same files.
 
 ### 6. QA review
 
