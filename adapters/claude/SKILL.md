@@ -21,5 +21,13 @@ Always:
 4. QA the diff against the spec, not against the implementer summary.
 5. Close out with changed files, validation commands/results, known gaps, and next action.
 6. Do not invent evidence or claim model-specific routing unless it was actually controlled and recorded.
+7. For Full mode, do not silently continue on default model routing. If no project route config or explicit user-selected route exists, stop before coding and ask the user to create route overrides, switch/select a model manually, approve a default-route exception, or narrow/split the task.
 
-If model routing, subagents, reasoning controls, or review tools are unavailable, record `runtime-default` and continue without model-specific claims.
+If model routing, subagents, reasoning controls, or review tools are unavailable, record `runtime-default` and avoid model-specific claims. For Full mode, unavailable routing is a blocker until the user approves a default-route exception or the task is narrowed.
+
+Full-mode route rules:
+
+- Missing model config is not approval to target `agent-default` or `runtime-default`.
+- Record Full-mode missing config as `pending-user-decision` until resolved.
+- If the user approves defaults, record `exception-approved` with reason and evidence.
+- If a worker/reviewer times out or returns unusable output, mark that gate failed. Parent takeover is allowed only as an explicit exception; do not mark the timed-out gate as passed.

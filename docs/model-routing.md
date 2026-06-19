@@ -72,12 +72,31 @@ Use `source` values consistently:
 - `agent-default`: an agent profile supplied it
 - `runtime-default`: the harness chose it implicitly
 - `manual`: a human selected it outside the run configuration
+- `project-settings`: project configuration supplied the route
+- `pending-user-decision`: Full-mode routing is unresolved and coding must not start
+- `exception-approved`: the user approved a route different from the normal policy
+
+## Full-mode route enforcement
+
+Full-mode work must not silently drift onto whatever model happens to be active.
+
+Before Full-mode implementation:
+
+1. Inspect the harness/project routing configuration.
+2. If no project override or explicit/manual route exists, stop before coding and ask the user to choose one:
+   - create/update project model or agent overrides,
+   - manually switch/select the intended model,
+   - approve `runtime-default`/`agent-default` as an exception for this run,
+   - narrow or split the task so the current route is safe.
+3. Do not set the implementation target to `agent-default` or `runtime-default` merely because no config exists. Use `pending-user-decision` until resolved, or `exception-approved` after explicit approval.
+4. Record both target and observed route in `run.json`.
+5. If a delegated worker/reviewer times out or returns unusable output, record that gate as failed. Parent takeover is allowed only as an explicit exception; do not mark the timed-out role gate as passed or partially passed.
 
 ## Avoid false claims
 
 Do not claim that a model performed well unless the run actually used that model and recorded it.
 
-If routing failed or the harness used a default, record that honestly. The operational question is not "which model is best?" but "did this run satisfy the approved spec with evidence?"
+If routing failed or the harness used a default, record that honestly. For Full mode, routing failure or missing config is a decision point before coding, not an automatic pass. The operational question is not "which model is best?" but "did this run satisfy the approved spec with evidence under the route that was actually approved and recorded?"
 
 ## Implementation evaluation
 

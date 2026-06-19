@@ -41,10 +41,50 @@ Use `spec.html` only when visual hierarchy, diagrams, screenshots, tables, or st
 Model ledger source values:
 
 ```text
-explicit | agent-default | runtime-default | manual
+explicit | agent-default | runtime-default | manual | project-settings | pending-user-decision | exception-approved
 ```
 
-If routing/model choice cannot be controlled, record `runtime-default` and avoid model-specific claims.
+If routing/model choice cannot be controlled, record `runtime-default` and avoid model-specific claims. For Full mode, do not treat missing model configuration as approval to continue on defaults; stop before coding and resolve the route decision.
+
+## Full-mode routing enforcement
+
+Full mode must make implementation/review routing explicit before coding.
+
+Before Full-mode implementation:
+
+1. Inspect the project for model/agent routing config, such as `.codex`, `.agents`, `.pi/settings.json`, repo instructions, or run/spec model fields.
+2. If no project override or explicit user-selected route exists, stop and ask the user to choose one:
+   - create/update project route overrides,
+   - manually switch/select a model and record it,
+   - approve `runtime-default`/`agent-default` as an exception for this run,
+   - narrow or split the task so the current route is safe.
+3. Do not set a Full-mode implementation target to `agent-default` or `runtime-default` just because no config exists. Use `pending-user-decision` until resolved, or `exception-approved` after explicit approval.
+4. If a worker/reviewer route is used, record target and observed route in `run.json` before implementation starts.
+5. If a worker/reviewer times out or returns unusable output, mark that gate failed. Parent takeover is allowed only as an explicit exception; do not mark the worker/reviewer gate as passed or partially passed.
+
+Minimum `run.json` fields for this gate:
+
+```json
+{
+  "routeEnforcement": {
+    "required": true,
+    "reason": "full-mode missing route config requires user decision",
+    "targets": [
+      {
+        "role": "implementer",
+        "agent": "worker",
+        "model": "pending-user-decision",
+        "reasoningIntensity": "unknown",
+        "source": "pending-user-decision"
+      }
+    ],
+    "verification": {
+      "status": "config-missing | pending-user-decision | verified | exception-approved | unverified | unavailable",
+      "evidence": null
+    }
+  }
+}
+```
 
 ## Workflow
 

@@ -20,8 +20,10 @@ Use `spec.html` only when diagrams, screenshots, state machines, tables, or stro
 Model ledger source values:
 
 ```text
-explicit | agent-default | runtime-default | manual
+explicit | agent-default | runtime-default | manual | project-settings | pending-user-decision | exception-approved
 ```
+
+For Full mode, do not treat missing model/agent routing config as approval to continue on defaults. Resolve routing before coding.
 
 ## 0. Triage
 
@@ -79,7 +81,15 @@ Do not implement until the spec is approved unless the user explicitly requested
 
 Informal approval such as `go`, `approved`, or `implement it` is acceptable. Record it in `run.json` or `notes.md`.
 
-## 5. Implementation
+## 5. Routing enforcement and implementation
+
+Before Full-mode implementation, run a route enforcement gate:
+
+1. Inspect project routing config, Claude settings, repo instructions, run/spec model fields, and any available subagent/review tool configuration.
+2. If no project override or explicit user-selected route exists, stop and ask the user to choose one: create route overrides, switch/select a model manually, approve `runtime-default`/`agent-default` as an exception, or narrow/split the task.
+3. Do not set a Full-mode implementation target to `agent-default` or `runtime-default` just because no config exists. Use `pending-user-decision` until resolved, or `exception-approved` after explicit approval.
+4. Record target and observed route in `run.json` before coding.
+5. If a worker/reviewer times out or returns unusable output, mark that gate failed. Parent takeover is allowed only as an explicit exception; do not mark the timed-out worker/reviewer gate as passed.
 
 Implement only against the approved spec. If the spec becomes ambiguous, stop and ask or reopen the spec phase.
 
@@ -177,4 +187,4 @@ If using `spec.html`, prefer a local `127.0.0.1` preview URL when available so t
 
 If delegation tools are available, use them for independent critic, implementation, or QA phases. Keep one parent agent in control of the workflow and evidence.
 
-If delegation is unavailable, perform critic and QA passes yourself and label them as self-review.
+If delegation is unavailable, perform critic and QA passes yourself and label them as self-review. In Full mode, delegation/model unavailability must also be recorded as an approved exception or a reason to narrow/split the task before implementation.
