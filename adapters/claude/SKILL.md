@@ -22,6 +22,7 @@ Always:
 5. Close out with changed files, validation commands/results, known gaps, and next action.
 6. Do not invent evidence or claim model-specific routing unless it was actually controlled and recorded.
 7. For Full mode, do not silently continue on default model routing. If no project route config or explicit user-selected route exists, stop before coding and ask the user to create route overrides, switch/select a model manually, approve a default-route exception, or narrow/split the task.
+8. For broad Full-mode work, create a child-task map, file ownership matrix, recursion cap, and barrier plan before implementation workers write; do not use one giant whole-PRD worker except as a recorded exception.
 
 If model routing, subagents, reasoning controls, or review tools are unavailable, record `runtime-default` and avoid model-specific claims. For Full mode, unavailable routing is a blocker until the user approves a default-route exception or the task is narrowed.
 

@@ -56,13 +56,13 @@ Before starting a dynamic workflow or large parallel fanout, present a plain-Eng
 The note should state:
 
 - scope: what is included and excluded
-- concrete cap: for example fixed file list, one worker per package, first pass only, no recursive fanout, or one verifier per finding
+- concrete cap: for example fixed file list, one worker per package, first pass only, no unapproved recursive fanout, maximum subtree depth, or one verifier per finding
 - stop rule: what ends the workflow
 - synthesis and verification plan: how results are merged, checked, rejected, or marked speculative
 
 Record the approved launch note in `notes.md`, `run.json`, or a workflow artifact.
 
-Do not launch if the scope, cap, stop rule, or synthesis plan is vague.
+Do not launch if the scope, cap, recursion/depth rule, stop rule, or synthesis plan is vague. If a planner decomposes a still-broad child slice, record its proposed subtree map and parent/orchestrator approval before launching nested workers.
 
 ## Implementation gate
 

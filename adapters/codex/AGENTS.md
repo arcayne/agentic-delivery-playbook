@@ -143,16 +143,23 @@ Rules:
 
 If the task fit is `broad-ticket`, split the approved spec into implementer-sized tickets before implementation.
 
+This gate is required before any implementation worker writes when the approved spec spans multiple packages/services, names explicit rollout slices, has multiple independent acceptance-criteria clusters, or would otherwise require one worker prompt to carry the whole PRD/spec plus broad scout context.
+
+Do not hand a whole PRD/spec to one giant implementation worker unless you record an explicit single-worker exception: why slicing would be less safe or impossible, how context overflow/drift risk is mitigated, and what review/validation compensating controls will run.
+
 If the user approved the whole outcome or said they want it all, assume independent slices can be batched in parallel within the approved scope. Do not re-ask for each slice unless scope, risk, route, or cost changes materially.
 
 Record in `notes.md` or `run.json`:
 
-- child-task map: slice id, objective, allowed files, non-goals, dependencies, validation, owner route
-- concurrency cap and conflict rule
+- child-task map: slice id, objective, allowed files, forbidden files, non-goals, dependencies, validation, owner route
+- proposed subtree maps from any planner that decomposes a still-broad slice
+- recursion cap, concurrency cap, and conflict rule
+- file ownership matrix for shared files and coupled clusters
+- serialized foundation/shared lanes, if other slices depend on them
 - high-risk QA checks
 - synthesis/barrier plan
 
-Each child slice must follow the same playbook rules at slice scale: objective, non-goals, route evidence/exception, validation, drift check, and closeout. Keep one writer per file or coupled file cluster; serialize or isolate worktrees when slices could touch the same files.
+Each child slice must follow the same playbook rules at slice scale: objective, non-goals, route evidence/exception, validation, drift check, and closeout. Each planner owns the proposed subtree map for the slice it decomposes; the parent/orchestrator owns approval, launch, global synthesis, and final evidence. Default to one decomposition level and add another subtree level only when the child slice is still too broad for one focused worker and the run records the reason and cap. Keep one writer per file or coupled file cluster; serialize or isolate worktrees when slices could touch the same files. "One writer" means one owner for a file/cluster, not one worker for the entire broad ticket.
 
 ### 6. QA review
 

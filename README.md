@@ -153,7 +153,7 @@ pi-subagents              = scoped implementation and review lanes
 run artifacts             = evidence trail only when useful
 ```
 
-For Full mode, the expected shape is: parent drafts/approves scope, a `worker` performs the implementation, a `reviewer` checks the diff against the contract, and a Pi goal is used when the work is broad, long-running, or explicitly goal-driven. See [`docs/pi-native-workflow.md`](docs/pi-native-workflow.md).
+For Full mode, the expected shape is: parent drafts/approves scope, one focused `worker` or several non-overlapping slice workers perform implementation, a `reviewer` checks the diff against the contract, and a Pi goal is used when the work is broad, long-running, or explicitly goal-driven. See [`docs/pi-native-workflow.md`](docs/pi-native-workflow.md).
 
 If you expect different model lanes for worker/reviewer/planner, configure `.pi/settings.json`; see [`templates/pi-settings.template.json`](templates/pi-settings.template.json).
 
@@ -163,13 +163,16 @@ When the user approves a whole PRD/goal or says they want the whole outcome, the
 
 The parent must still own scope and evidence:
 
-1. create a child-task map with objective, allowed files, non-goals, route, dependencies, and validation for each slice
-2. protect shared files with an ownership matrix: nav/i18n/router/schema files are serialized unless isolated worktrees are used and merged at a barrier
-3. keep product and architecture decisions in the parent; child agents stop and escalate ambiguity instead of deciding
-4. enforce route/model rules per slice; Full child slices need verified route or an approved exception
-5. treat timeouts as failed gates; partial edits from a timed-out worker are untrusted until reviewed or completed by an approved route
-6. require child-local validation plus parent-level global validation after synthesis
-7. avoid parallelizing sequential UX flows; slice by independent surfaces, packages, fixtures, or acceptance-criteria clusters
+1. create a child-task map with objective, allowed files, forbidden files, non-goals, route, dependencies, and validation for each slice
+2. protect shared files with an ownership matrix: nav/i18n/router/schema/config/lockfile files are serialized unless isolated worktrees are used and merged at a barrier
+3. let each planner that decomposes a still-broad slice propose a local subtree map, while the parent/orchestrator approves recursion depth, launch, and synthesis
+4. keep product and architecture decisions in the parent; child agents stop and escalate ambiguity instead of deciding
+5. enforce route/model rules per slice; Full child slices need verified route or an approved exception
+6. treat timeouts as failed gates; partial edits from a timed-out worker are untrusted until reviewed or completed by an approved route
+7. require child-local validation plus parent-level global validation after synthesis
+8. avoid parallelizing sequential UX flows; slice by independent surfaces, packages, fixtures, or acceptance-criteria clusters
+
+If no safe parallel slices exist, launch one narrow serialized worker for the next slice. A single worker for the entire PRD/spec should be recorded as an explicit exception with a context-risk mitigation plan.
 
 Record the launch note, concurrency cap, conflict rule, and barrier plan in `run.json`/`notes.md`. See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md) and [`templates/child-task.md`](templates/child-task.md).
 

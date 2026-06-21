@@ -109,6 +109,8 @@
     "approvedByScope": false,
     "approvalEvidence": null,
     "launchNote": null,
+    "decompositionTriggers": [],
+    "recursionCap": "one-level | two-level | explicit-depth:<n> | no-nested-fanout | not-applicable",
     "concurrencyCap": null,
     "conflictRule": "one-writer-per-file | isolated-worktrees | serialized-shared-files | not-applicable",
     "sharedFileOwnership": [
@@ -123,6 +125,22 @@
     "validationPolicy": "child-local validation plus parent global validation required",
     "sequentialFlowRule": "sequential UX/state flows are serialized unless slices are independent surfaces",
     "barrierPlan": null,
+    "singleWorkerException": {
+      "approved": false,
+      "reason": null,
+      "contextRiskMitigation": null,
+      "compensatingReviewValidation": null
+    },
+    "plannerSubtrees": [
+      {
+        "plannerSliceId": null,
+        "reason": null,
+        "recursionDepth": 1,
+        "status": "proposed | approved | rejected | not-needed",
+        "childTaskIds": [],
+        "barrierPlan": null
+      }
+    ],
     "childTasks": [
       {
         "id": null,
@@ -130,6 +148,7 @@
         "allowedFiles": [],
         "nonGoals": [],
         "dependencies": [],
+        "subtreePath": [],
         "routeStatus": "pending-user-decision | verified | exception-approved | not-required",
         "validation": [],
         "status": "pending | running | passed | failed | blocked"

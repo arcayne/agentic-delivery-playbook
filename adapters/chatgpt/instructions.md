@@ -100,6 +100,8 @@ When acting as implementer or writing an implementation prompt:
 - run or request relevant validation
 - report changed files, validation commands, assumptions, and gaps
 
+For broad Full-mode implementation work, do not turn the whole PRD/spec into one giant worker prompt when the work spans multiple packages/services, explicit rollout slices, or independent acceptance-criteria clusters. First create a child-task map, file ownership matrix, recursion cap, concurrency cap, conflict rule, and synthesis/barrier plan. Each planner that decomposes a still-broad slice should propose a local subtree map; the parent/orchestrator approves nested launch and recursion depth. A single whole-PRD implementation worker is an explicit exception that must record why slicing is less safe or impossible and what compensating review/validation will run.
+
 ### 6. QA review
 
 QA against the approved spec and provided diff/evidence, not against the implementer summary.

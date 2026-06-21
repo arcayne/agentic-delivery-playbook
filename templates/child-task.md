@@ -17,6 +17,8 @@ Direct | Lightweight | Full
 Can run in parallel with:
 Must wait for:
 File ownership / conflict rule:
+Parent/subtree path:
+Recursion cap for this slice:
 
 ## Objective
 
@@ -45,6 +47,23 @@ Why this lane is safe:
 
 ## Validation Plan
 
+## Planner Subtree Map
+
+Fill this section when this child is still too broad for one focused worker. The planner proposes the subtree; the parent/orchestrator approves launch.
+
+Subtree needed: yes | no
+Reason:
+Proposed child slices:
+- id:
+  objective:
+  allowed files:
+  dependencies:
+  validation:
+  owner route:
+Concurrency cap:
+Barrier / synthesis plan:
+Stop rule:
+
 ## Escalation Conditions
 
 Escalate if:
@@ -70,5 +89,6 @@ Known gaps:
 
 Parent acceptance criteria affected:
 Route evidence:
+Subtree map used/approved: yes | no | not-needed
 Drift check:
 Ready for parent barrier: yes | no

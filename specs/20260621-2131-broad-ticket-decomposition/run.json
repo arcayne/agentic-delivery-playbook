@@ -1,0 +1,140 @@
+{
+  "workflow": {
+    "name": "agentic-delivery-playbook",
+    "version": "0.2.0"
+  },
+  "phase": "closeout",
+  "status": "implemented_validated",
+  "taskFit": "broad-ticket",
+  "processWeight": "full",
+  "paths": {
+    "spec": "specs/20260621-2131-broad-ticket-decomposition/spec.md",
+    "notes": "specs/20260621-2131-broad-ticket-decomposition/notes.md",
+    "reviewerNotes": "specs/20260621-2131-broad-ticket-decomposition/reviewer-notes.md",
+    "reviewerFollowup": "specs/20260621-2131-broad-ticket-decomposition/reviewer-followup.md"
+  },
+  "approval": {
+    "required": true,
+    "status": "approved",
+    "evidence": "User said 'lets do it' after the proposed hardening, then added the recursive planner subtree refinement."
+  },
+  "reviewGates": {
+    "specCritique": "parent-self-review",
+    "humanApproval": "passed",
+    "routeEnforcement": "skipped-with-exception",
+    "workerImplementation": "skipped-with-exception",
+    "broadTicketPlanning": "passed",
+    "implementationQa": "passed",
+    "closeout": "passed"
+  },
+  "routeEnforcement": {
+    "required": false,
+    "reason": "Documentation/policy-only change implemented by parent in current session; no project model separation required for this bounded edit.",
+    "verification": {
+      "status": "not-required",
+      "evidence": null
+    }
+  },
+  "broadTicketGate": {
+    "required": true,
+    "status": "passed",
+    "plannerAgent": "parent",
+    "tickets": [
+      "Pi skill decomposition gate",
+      "Codex/Claude/ChatGPT adapter mirrors",
+      "Workflow/routing docs",
+      "README/playbook summary",
+      "Template/changelog update",
+      "Installed Pi skill sync"
+    ],
+    "highRiskQaChecks": [
+      "Does not over-escalate Direct mode",
+      "Clarifies one writer per file/coupled cluster",
+      "Requires shared-file serialization/ownership",
+      "Planner subtree recursion remains parent-approved and capped"
+    ]
+  },
+  "parallelizationPlan": {
+    "approvedByScope": true,
+    "approvalEvidence": "User approved the patch after investigation.",
+    "launchNote": "Parent made a bounded docs/policy edit across adapter/docs/template files, then ran validation and independent review. No parallel implementation workers because the same policy language spans shared docs and should remain consistent.",
+    "decompositionTriggers": [
+      "public workflow policy change across multiple docs/adapters"
+    ],
+    "recursionCap": "one parent writer for this docs edit; policy now defaults broad implementation decomposition to one level unless another subtree is justified and capped",
+    "concurrencyCap": "one parent writer",
+    "conflictRule": "one-writer-per-file",
+    "barrierPlan": "Run diff checks, independent reviewer QA, fix findings, rerun validation."
+  },
+  "validation": {
+    "commands": [
+      {
+        "command": "node -e \"JSON.parse(require('fs').readFileSync('templates/run.template.json','utf8')); JSON.parse(require('fs').readFileSync('specs/20260621-2131-broad-ticket-decomposition/run.json','utf8')); console.log('json ok')\"",
+        "status": "passed"
+      },
+      {
+        "command": "git diff --check",
+        "status": "passed"
+      },
+      {
+        "command": "node bin/agentic-delivery-playbook.js --help",
+        "status": "passed"
+      },
+      {
+        "command": "rg \"giant worker|whole-PRD|subtree map|recursion cap|file ownership matrix|explicit rollout\" adapters docs templates README.md playbook.md CHANGELOG.md specs/20260621-2131-broad-ticket-decomposition",
+        "status": "passed"
+      },
+      {
+        "command": "diff -q adapters/pi/SKILL.md /Users/dearkane/.pi/agent/skills/agentic-delivery-playbook/SKILL.md",
+        "status": "passed"
+      }
+    ],
+    "evidence": [
+      "JSON validation printed json ok.",
+      "git diff --check produced no errors.",
+      "CLI help printed usage header.",
+      "Installed Pi skill matches repo Pi adapter."
+    ]
+  },
+  "implementation": {
+    "changedFiles": [
+      "CHANGELOG.md",
+      "README.md",
+      "adapters/chatgpt/instructions.md",
+      "adapters/claude/SKILL.md",
+      "adapters/claude/workflow.md",
+      "adapters/codex/AGENTS.md",
+      "adapters/pi/SKILL.md",
+      "docs/dynamic-workflows.md",
+      "docs/gates.md",
+      "docs/model-routing.md",
+      "docs/pi-native-workflow.md",
+      "playbook.md",
+      "templates/child-task.md",
+      "templates/notes.template.md",
+      "templates/run.template.json",
+      "specs/20260621-2131-broad-ticket-decomposition/spec.md",
+      "specs/20260621-2131-broad-ticket-decomposition/run.json",
+      "specs/20260621-2131-broad-ticket-decomposition/notes.md",
+      "specs/20260621-2131-broad-ticket-decomposition/reviewer-notes.md",
+      "specs/20260621-2131-broad-ticket-decomposition/reviewer-followup.md"
+    ],
+    "fixCycles": 1,
+    "drift": "none",
+    "unapprovedDecisions": []
+  },
+  "findings": {
+    "blocker": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 1,
+    "specAmbiguity": 0,
+    "missingValidation": 0
+  },
+  "review": {
+    "initial": "Independent reviewer found one medium stale 'one writer thread' phrasing and one low 'single writer' wording issue.",
+    "followup": "no required fixes"
+  },
+  "knownGaps": [],
+  "nextAction": "review/commit changes"
+}

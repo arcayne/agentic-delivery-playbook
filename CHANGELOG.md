@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Hardened Full-mode broad-ticket policy: multi-package/explicit-rollout work now requires a child-task map, file ownership matrix, recursion cap, and barrier plan before implementation workers write; whole-PRD single-worker prompts are recorded exceptions.
+- Added recursive/fractal planner guidance: each planner that decomposes a still-broad slice proposes a subtree map, while the parent/orchestrator controls launch approval, recursion depth, and synthesis.
 - Added Pi-native workflow guidance for layering Agentic Delivery Playbook with pi-goal-x, pi-subagents, and run artifacts.
 - Added a Pi settings template for worker/reviewer/planner model lane separation.
 - Updated the Pi skill so Full mode defaults to worker implementation plus reviewer QA, records gate failures, and treats subagent timeouts as failed gates instead of completed self-review.

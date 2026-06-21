@@ -67,7 +67,7 @@ If the user already approved the full outcome with language like "do it all", "i
 The launch note should include:
 
 - **Scope:** what is included and excluded.
-- **Concrete cap:** a human-readable boundary such as one worker per package, first pass only, fixed file list, no recursive fanout, or max one verifier per finding.
+- **Concrete cap:** a human-readable boundary such as one worker per package, first pass only, fixed file list, no unapproved recursive fanout, maximum subtree depth, or max one verifier per finding.
 - **Stop rule:** what ends the workflow.
 - **Synthesis and verification plan:** how results are folded in, checked, and rejected.
 
@@ -87,6 +87,21 @@ Record the approved note in `notes.md`, `run.json`, or a workflow artifact. The 
 ## Parallel implementation slicing
 
 For broad implementation work, prefer many bounded child tasks over one huge implementation prompt when the slices are independent enough to merge safely.
+
+A decomposition gate is required before implementation when Full-mode work spans multiple packages/services, names explicit rollout slices, has several independent acceptance-criteria clusters, or would require one worker to carry the whole PRD/spec plus broad scout reports. Scouts can gather local context, but scout output is not the child-task map.
+
+Do not send the entire broad PRD/spec to one giant implementation worker unless a recorded exception explains why slicing is less safe or impossible, how context overflow/drift risk is mitigated, and what compensating review/validation will run.
+
+A safe broad implementation shape is usually:
+
+```text
+parent/planner creates global child-task map + file ownership matrix
+-> serialized foundation/shared-contract/config slice, if needed
+-> slice planner creates a local subtree map only if that slice is still broad
+-> parallel app/service/surface worker leaves with non-overlapping ownership
+-> parent synthesis barrier + global validation
+-> independent QA/reviewer
+```
 
 Good slice boundaries:
 
@@ -113,10 +128,13 @@ Each child slice is a fractal playbook run. It needs:
 - stop/escalation rules
 - closeout evidence
 
+Each planner in that tree owns the proposed subtree map for the slice it is asked to decompose. The parent/orchestrator owns approval to launch that subtree, the recursion/depth cap, and the final synthesis. Default to one decomposition level; add another planner level only when a child slice is still too broad for one focused worker and the run records why.
+
 Parent responsibilities:
 
-- create the child-task map and concurrency cap
+- create the child-task map, file ownership matrix, recursion cap, and concurrency cap before workers write
 - prevent file ownership conflicts
+- serialize or single-own shared schemas/contracts, env examples, lockfiles, routers, nav/i18n, central stores, and config unless using isolated worktrees plus a merge barrier
 - collect child closeouts at a barrier
 - reject speculative or unverified child findings
 - run parent-level validation and QA after merge/fold-in

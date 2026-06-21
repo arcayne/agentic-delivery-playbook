@@ -134,12 +134,22 @@ For broad tickets, add a planning/review layer before implementation:
 
 1. split the spec into implementer-sized tasks
 2. identify independent slices that can run in parallel
-3. identify high-risk QA checks
-4. assign one focused task set per worker with allowed files and validation
-5. review/synthesize at a barrier after the first implementation pass
+3. identify shared/foundation files that need one owner or serialization
+4. identify high-risk QA checks
+5. assign one focused task set per worker with allowed files and validation
+6. require any planner that decomposes a still-broad slice to return a local subtree map
+7. review/synthesize at a barrier after the first implementation pass
 
 This prevents a broad prompt from becoming a large uncontrolled edit.
 
-If the user approved the full outcome or confirmed a goal for the full scope, you may batch independent slices without asking again for each child task. Record a launch note, concurrency cap, conflict rule, and barrier plan. Each child task must apply the same playbook rules at slice scale: objective, non-goals, route evidence or exception, validation, drift check, and closeout.
+Run this decomposition gate before any implementation worker writes when the approved spec spans multiple packages/services, names explicit rollout slices, has multiple independent acceptance-criteria clusters, or would require one worker prompt to carry the whole PRD/spec plus broad scout context.
+
+Do not hand a whole PRD/spec to one giant implementation worker unless you record an explicit single-worker exception: why slicing would be less safe or impossible, how context overflow/drift risk is mitigated, and what review/validation compensating controls will run.
+
+If the user approved the full outcome or confirmed a goal for the full scope, you may batch independent slices without asking again for each child task. Record a launch note, recursion cap, concurrency cap, conflict rule, file ownership matrix, and barrier plan. Each child task must apply the same playbook rules at slice scale: objective, non-goals, route evidence or exception, validation, drift check, and closeout.
+
+Each planner owns the proposed subtree map for the slice it decomposes; the parent/orchestrator owns approval, launch, global synthesis, and final evidence. Default to one decomposition level and add another subtree level only when the child slice is still too broad for one focused worker and the run records the reason and cap.
+
+"One writer" means one owner for a file or tightly coupled cluster, not one worker for the whole repo. Serialize shared schemas/contracts, env examples, lockfiles, routers, nav/i18n, central stores, and config unless worktrees and a merge barrier make parallel edits safe.
 
 If the broad ticket becomes a dynamic workflow, require a plain-English launch note before fanout starts and verify findings before folding them into the final answer. See [`dynamic-workflows.md`](dynamic-workflows.md).

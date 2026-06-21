@@ -75,6 +75,8 @@ Signals:
 Full mode contract:
 
 - broad-ticket planning before implementation when the spec is too large for one focused implementer pass
+- child-task map, file ownership matrix, recursion cap, and barrier plan before workers write when the spec spans multiple packages/services, explicit rollout slices, or independent feature lanes
+- no whole-PRD giant implementation worker unless an explicit exception records why slicing is less safe or impossible and how context/drift risk will be mitigated
 - explicit model/agent and reasoning ledger when routing controls are available
 - critic/QA gate, preferably independent when available
 - high-risk QA for sensitive, authority, provider, state, privacy, or cross-system changes
@@ -94,7 +96,7 @@ A goal loop is depth: it iterates against a completion condition. A dynamic work
 
 Dynamic workflows are a full-mode escalation for broad audits, migrations, root-cause hypothesis panels, evals, rule-adherence checks, or critical plans that need independent attempts and adversarial review. They are not for small edits, unclear scope, low-value knowledge work, or tightly sequential tasks.
 
-Before launching a dynamic workflow or large parallel fanout, write a short launch note with scope, a concrete cap, a stop rule, and the synthesis/verification plan. Do not create blank budget fields that people will not fill.
+Before launching a dynamic workflow or large parallel fanout, write a short launch note with scope, a concrete cap, a recursion/depth cap when nested planners are used, a stop rule, and the synthesis/verification plan. Do not create blank budget fields that people will not fill. Each planner may propose the subtree map for the slice it decomposes; the parent/orchestrator approves launch, recursion depth, and final synthesis.
 
 See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md).
 

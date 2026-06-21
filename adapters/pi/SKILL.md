@@ -57,7 +57,7 @@ Important boundaries:
 - The parent session owns scope, approval, synthesis, and final evidence.
 - A worker may write code, but it does not own product or architecture decisions.
 - Reviewers inspect and report; they do not decide merge/complete by themselves.
-- Parallelize read-only context/review/validation. Keep normal code edits to one writer thread.
+- Parallelize read-only context/review/validation. For code edits, keep one writer per file or tightly coupled cluster; parallel writers require explicit ownership/conflict rules or isolated worktrees.
 
 ## Goal policy
 
@@ -162,7 +162,9 @@ Full rules:
 - critique the spec before implementation
 - get approval before coding unless the user requested an end-to-end run
 - split broad work into implementer-sized tasks before writing code
+- when the spec spans multiple packages/services, explicit rollout slices, or multiple independent feature lanes, run the broad implementation decomposition gate before any worker writes
 - if the user approved the whole outcome or said they want it all, batch independent slices in parallel where safe instead of running one giant worker
+- do not hand a whole PRD/spec to one giant implementation worker unless you record an explicit single-worker exception and why narrower slices are unsafe or impossible
 - delegate implementation to `worker` by default after approval
 - before coding, run the routing enforcement gate; Full mode must not silently continue on `agent-default`/`runtime-default`
 - run independent QA with `reviewer` by default after implementation
@@ -206,9 +208,31 @@ Pi may expose subagents, model overrides, and runtime defaults. Use them when th
 - For Full mode, use a delegated `worker` for implementation by default after approval.
 - For Full mode, use a delegated `reviewer` for independent QA by default after implementation.
 - Use `planner`, `scout`, `context-builder`, or `oracle` only for a concrete role: decomposition, context gathering, skeptical review, or drift/decision audit.
-- Keep one writer thread. Parallelize read-only context/review/validation, not normal writes.
+- Keep one writer per file or tightly coupled file cluster. Parallel implementation is allowed only when ownership/conflict rules are explicit; otherwise serialize writes.
+- Parallelize read-only context/review/validation freely when useful.
 - If the user expects different models, verify the actual route or use explicit model overrides. `agent-default` may still resolve to the current/default model.
 - For Full mode, absence of project overrides is not evidence that `agent-default` is acceptable. It is a decision point that must be resolved before coding.
+
+### Broad implementation decomposition gate
+
+Run this gate before implementation when Full-mode work has any broad implementation signal:
+
+- multiple packages, apps, services, providers, or surfaces
+- explicit rollout slices in the PRD/spec
+- more than one independent acceptance-criteria cluster
+- a first worker prompt that would need to include the whole PRD/spec plus several scout reports
+- prior worker context overflow, timeout, or drift caused by broad scope
+
+Gate rules:
+
+- Create a child-task map before any implementation worker writes: slice id, objective, allowed files, forbidden files, non-goals, dependencies, validation, and owner route.
+- Create a file ownership matrix for shared files. Shared schemas/contracts, env examples, lockfiles, routers, nav/i18n, central stores, and config get one owner, a serialized lane, or isolated worktrees with a merge barrier.
+- Treat foundation/shared contract work as a likely serialized first slice when other slices depend on it.
+- Use a planner or parent-authored decomposition when the slice boundaries are not obvious. Scouts may inform the map, but scout output is not a substitute for the map.
+- Preserve the fractal shape: each planner that receives a still-broad slice must return a proposed subtree map for that slice before launching workers. The parent/orchestrator approves the subtree, recursion cap, concurrency cap, and synthesis barrier before any nested fanout starts.
+- Default to one decomposition level. Add another planner/subtree level only when a child slice is still too broad for one focused worker and the run records the reason and cap.
+- If no safe parallel slices exist, record the no-parallel rationale and launch one narrow worker for the next serialized slice, not a whole-PRD worker.
+- A single giant implementation worker is an exception. Record why slicing would be less safe or impossible, the context-risk mitigation, and the review/validation compensating controls.
 
 ### Parallel slicing and fractal contracts
 
@@ -218,8 +242,9 @@ Use parallel slicing when the work can be separated by file, package, feature la
 
 Rules:
 
-- First create a child-task map: slice id, objective, allowed files, non-goals, dependencies, validation, and owner route.
+- First create a child-task map: slice id, objective, allowed files, forbidden files, non-goals, dependencies, validation, and owner route.
 - Add a file ownership matrix for shared files. Nav/i18n/router/schema/config/state files get one owner, a serialized lane, or isolated worktrees plus a merge barrier.
+- Each planner owns the proposed subtree map for the slice it is asked to decompose; the parent owns approval, launch, global synthesis, and final evidence.
 - Each child slice must apply the same playbook rules at its own scale: clear objective, non-goals, route evidence/exception, validation evidence, drift check, and closeout.
 - Keep one writer per file or tightly coupled file cluster. If parallel writers could touch the same file, either use isolated worktrees with a merge barrier or serialize those slices.
 - Use a barrier after parallel implementation: synthesize changed files, conflicts, validation outcomes, known gaps, and child closeouts before QA.
@@ -234,7 +259,8 @@ Record the plan in `run.json`/`notes.md` before launch. A compact launch note is
 ```text
 Parallel slice launch:
 Approved scope: <parent spec/goal>
-Slices: <slice ids and owners>
+Slices/subtree: <slice ids, owners, and any nested planner subtree maps>
+Recursion cap: <default one level unless explicitly justified>
 Concurrency cap: <n or one per independent package>
 Conflict rule: <worktree/serialize shared files>
 Barrier: synthesize child closeouts, run parent validation, then QA

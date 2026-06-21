@@ -15,10 +15,12 @@
 Use only for dynamic workflows or large parallel fanout. Prefer a short plain-English approval note over blank budget fields.
 
 ```text
-<scope, concrete cap, stop rule, and synthesis/verification plan>
+<scope, concrete cap, recursion/depth cap if nested planners are used, stop rule, and synthesis/verification plan>
 ```
 
 - Approval evidence: <quote, message, ticket link, or note>
+- Planner subtree maps: <none | paths/ids and approval status>
+- Single-worker exception: <none | reason/context-risk mitigation/compensating checks>
 
 ## Intake decisions
 

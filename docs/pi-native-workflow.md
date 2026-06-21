@@ -25,14 +25,15 @@ run artifacts             = evidence trail only when useful
 2. If broad/long-running, create or recommend a Pi goal with a verification contract.
 3. Draft the compact implementation contract.
 4. Get approval unless the user explicitly requested end-to-end execution.
-5. Delegate implementation to one worker.
-6. Run validation.
-7. Run independent reviewer QA.
-8. Fix or escalate findings.
-9. Close with evidence; complete the goal only after the verification contract is satisfied.
+5. If broad, create a child-task map, file ownership matrix, recursion cap, and barrier plan before workers write.
+6. Delegate implementation to one focused worker or several non-overlapping slice workers.
+7. Run validation.
+8. Run independent reviewer QA.
+9. Fix or escalate findings.
+10. Close with evidence; complete the goal only after the verification contract is satisfied.
 ```
 
-The parent session owns scope, approval, synthesis, and final evidence. Subagents are lanes, not decision-makers.
+The parent session owns scope, approval, launch decisions, synthesis, and final evidence. Subagents are lanes, not decision-makers. Each planner may propose the subtree map for the slice it decomposes, but the parent/orchestrator approves recursion depth, concurrency, and barriers before nested fanout starts.
 
 ## Goal usage
 
@@ -59,13 +60,13 @@ Use subagents when they create real separation of duties.
 
 Default Full-mode lanes:
 
-- `worker` — single writer, receives the approved contract and acceptance criteria
+- `worker` — writer for its assigned file/cluster slice, receives the approved contract and acceptance criteria
 - `reviewer` — independent QA against the contract and actual diff
-- `planner` — only when the spec is too broad for one worker pass
+- `planner` — when the spec or a child slice is too broad for one worker pass; returns a proposed task/subagent subtree map, not unapproved launches
 - `scout` or `context-builder` — only when local context is unclear
 - `oracle` — only for drift, repeated failure, or architectural/product judgment
 
-Do not launch subagents merely to make the workflow look agentic. Do not let multiple writers edit the same worktree unless they are isolated in separate worktrees.
+Do not launch subagents merely to make the workflow look agentic. Do not let multiple writers touch the same file or tightly coupled cluster unless they are isolated in separate worktrees with an explicit merge barrier.
 
 ## Model routing
 
