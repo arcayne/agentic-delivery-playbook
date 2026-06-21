@@ -102,7 +102,9 @@
     "status": "not-applicable | pending | passed | warning",
     "plannerAgent": null,
     "plannerModel": null,
+    "decompositionStrategy": "none | coarse-launch-tree | serialized-first-slice | planner-subtree | single-worker-exception",
     "tickets": [],
+    "ticketsScope": "coarse-all | active-launch-only | subtree-only | not-applicable",
     "highRiskQaChecks": []
   },
   "parallelizationPlan": {
@@ -110,9 +112,16 @@
     "approvalEvidence": null,
     "launchNote": null,
     "decompositionTriggers": [],
+    "launchTree": {
+      "scope": "coarse-root | subtree | serialized-slice | not-applicable",
+      "sliceIds": [],
+      "dependencies": [],
+      "firstLaunchSliceIds": []
+    },
     "recursionCap": "one-level | two-level | explicit-depth:<n> | no-nested-fanout | not-applicable",
     "concurrencyCap": null,
     "conflictRule": "one-writer-per-file | isolated-worktrees | serialized-shared-files | not-applicable",
+    "sharedFileOwnershipActiveLaunchOnly": true,
     "sharedFileOwnership": [
       {
         "path": null,
@@ -146,9 +155,11 @@
         "id": null,
         "objective": null,
         "allowedFiles": [],
+        "forbiddenFiles": [],
         "nonGoals": [],
         "dependencies": [],
         "subtreePath": [],
+        "ownershipConflictRule": null,
         "routeStatus": "pending-user-decision | verified | exception-approved | not-required",
         "validation": [],
         "status": "pending | running | passed | failed | blocked"

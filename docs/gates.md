@@ -62,7 +62,7 @@ The note should state:
 
 Record the approved launch note in `notes.md`, `run.json`, or a workflow artifact.
 
-Do not launch if the scope, cap, recursion/depth rule, stop rule, or synthesis plan is vague. If a planner decomposes a still-broad child slice, record its proposed subtree map and parent/orchestrator approval before launching nested workers.
+Do not launch if the scope, cap, recursion/depth rule, stop rule, or synthesis plan is vague. For broad implementation, a coarse launch tree is enough at the root; record detailed ownership/conflict rules for siblings launching now. If a planner decomposes a still-broad child slice, record its proposed subtree map and parent/orchestrator approval before launching nested workers.
 
 ## Implementation gate
 

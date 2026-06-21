@@ -161,10 +161,11 @@ Full rules:
 - recommend or use a Pi goal when work is long-running, broad, or user asked to continue until done
 - critique the spec before implementation
 - get approval before coding unless the user requested an end-to-end run
-- split broad work into implementer-sized tasks before writing code
-- when the spec spans multiple packages/services, explicit rollout slices, or multiple independent feature lanes, run the broad implementation decomposition gate before any worker writes
+- split broad work into implementer-sized tasks before writing code when that changes safety or speed
+- when the spec spans multiple packages/services, explicit rollout slices, or multiple independent feature lanes, choose a recursive decomposition strategy before implementation workers write
+- keep the root plan coarse by default: launch tree, dependencies, recursion/concurrency caps, and first safe slice(s), not a full repo-wide file map
 - if the user approved the whole outcome or said they want it all, batch independent slices in parallel where safe instead of running one giant worker
-- do not hand a whole PRD/spec to one giant implementation worker unless you record an explicit single-worker exception and why narrower slices are unsafe or impossible
+- do not hand a whole PRD/spec to one giant implementation worker unless you record an explicit single-worker exception and why narrower recursive slices are unsafe or impossible
 - delegate implementation to `worker` by default after approval
 - before coding, run the routing enforcement gate; Full mode must not silently continue on `agent-default`/`runtime-default`
 - run independent QA with `reviewer` by default after implementation
@@ -213,7 +214,7 @@ Pi may expose subagents, model overrides, and runtime defaults. Use them when th
 - If the user expects different models, verify the actual route or use explicit model overrides. `agent-default` may still resolve to the current/default model.
 - For Full mode, absence of project overrides is not evidence that `agent-default` is acceptable. It is a decision point that must be resolved before coding.
 
-### Broad implementation decomposition gate
+### Recursive decomposition strategy gate
 
 Run this gate before implementation when Full-mode work has any broad implementation signal:
 
@@ -225,14 +226,15 @@ Run this gate before implementation when Full-mode work has any broad implementa
 
 Gate rules:
 
-- Create a child-task map before any implementation worker writes: slice id, objective, allowed files, forbidden files, non-goals, dependencies, validation, and owner route.
-- Create a file ownership matrix for shared files. Shared schemas/contracts, env examples, lockfiles, routers, nav/i18n, central stores, and config get one owner, a serialized lane, or isolated worktrees with a merge barrier.
-- Treat foundation/shared contract work as a likely serialized first slice when other slices depend on it.
-- Use a planner or parent-authored decomposition when the slice boundaries are not obvious. Scouts may inform the map, but scout output is not a substitute for the map.
-- Preserve the fractal shape: each planner that receives a still-broad slice must return a proposed subtree map for that slice before launching workers. The parent/orchestrator approves the subtree, recursion cap, concurrency cap, and synthesis barrier before any nested fanout starts.
+- Choose a decomposition strategy before implementation workers write. The strategy can be: one narrow serialized slice, a coarse launch tree with parallel siblings, or a planner-owned subtree for a still-broad slice.
+- Keep the first/root planner lightweight by default. It should identify coarse slices, dependencies, launch order, recursion cap, and the first safe worker handoffs. It should not inspect every surface deeply or produce a full repo-wide file ownership matrix unless those sibling workers are about to launch.
+- The immediate parent of each worker must provide that worker a bounded slice contract: objective, allowed files, forbidden files, non-goals, dependencies, validation, route, and ownership/conflict rule.
+- Create file ownership/conflict rules only for siblings being launched now. Shared schemas/contracts, env examples, lockfiles, routers, nav/i18n, central stores, and config get one owner, a serialized lane, or isolated worktrees with a merge barrier when they are in the active launch set.
+- Treat foundation/shared contract work as a likely serialized first slice when other slices depend on it, but avoid pre-planning every downstream file before the foundation lands.
+- Preserve the fractal shape: each planner that receives a still-broad slice returns the proposed subtree map for that slice. The parent/orchestrator approves the subtree, recursion cap, concurrency cap, and synthesis barrier before any nested fanout starts.
 - Default to one decomposition level. Add another planner/subtree level only when a child slice is still too broad for one focused worker and the run records the reason and cap.
-- If no safe parallel slices exist, record the no-parallel rationale and launch one narrow worker for the next serialized slice, not a whole-PRD worker.
-- A single giant implementation worker is an exception. Record why slicing would be less safe or impossible, the context-risk mitigation, and the review/validation compensating controls.
+- If no safe parallel slices exist yet, record the no-parallel rationale and launch one narrow worker for the next serialized slice, not a whole-PRD worker.
+- A single giant implementation worker is an exception. Record why recursive slicing would be less safe or impossible, the context-risk mitigation, and the review/validation compensating controls.
 
 ### Parallel slicing and fractal contracts
 
@@ -242,8 +244,8 @@ Use parallel slicing when the work can be separated by file, package, feature la
 
 Rules:
 
-- First create a child-task map: slice id, objective, allowed files, forbidden files, non-goals, dependencies, validation, and owner route.
-- Add a file ownership matrix for shared files. Nav/i18n/router/schema/config/state files get one owner, a serialized lane, or isolated worktrees plus a merge barrier.
+- First choose a launch tree: coarse slice ids, dependencies, recursion/concurrency caps, and which siblings are launching now.
+- For siblings launching now, record bounded child-task contracts and ownership/conflict rules. Nav/i18n/router/schema/config/state files get one owner, a serialized lane, or isolated worktrees plus a merge barrier when they are in the active launch set.
 - Each planner owns the proposed subtree map for the slice it is asked to decompose; the parent owns approval, launch, global synthesis, and final evidence.
 - Each child slice must apply the same playbook rules at its own scale: clear objective, non-goals, route evidence/exception, validation evidence, drift check, and closeout.
 - Keep one writer per file or tightly coupled file cluster. If parallel writers could touch the same file, either use isolated worktrees with a merge barrier or serialize those slices.
@@ -259,10 +261,11 @@ Record the plan in `run.json`/`notes.md` before launch. A compact launch note is
 ```text
 Parallel slice launch:
 Approved scope: <parent spec/goal>
-Slices/subtree: <slice ids, owners, and any nested planner subtree maps>
+Launch tree: <coarse slice ids, dependencies, first slice(s) launching now>
+Subtrees: <only nested planner maps approved for this launch>
 Recursion cap: <default one level unless explicitly justified>
-Concurrency cap: <n or one per independent package>
-Conflict rule: <worktree/serialize shared files>
+Concurrency cap: <n or one per independent package for this launch>
+Conflict rule: <ownership/serialize shared files/worktree for this launch>
 Barrier: synthesize child closeouts, run parent validation, then QA
 Stop rule: child ambiguity, route failure, validation repeat failure, or scope drift
 ```
@@ -393,6 +396,7 @@ Rules:
 - Do not broaden scope or refactor unrelated code.
 - Do not make unapproved product/architecture decisions.
 - Do not edit run artifacts unless explicitly asked.
+- Do not clean up, revert, delete, or tidy files outside the allowed scope, including pre-existing dirty files or run artifacts; report them to the parent instead.
 - Run the specified validation or report why it cannot run.
 - Stop and report ambiguity instead of guessing.
 

@@ -88,20 +88,22 @@ Record the approved note in `notes.md`, `run.json`, or a workflow artifact. The 
 
 For broad implementation work, prefer many bounded child tasks over one huge implementation prompt when the slices are independent enough to merge safely.
 
-A decomposition gate is required before implementation when Full-mode work spans multiple packages/services, names explicit rollout slices, has several independent acceptance-criteria clusters, or would require one worker to carry the whole PRD/spec plus broad scout reports. Scouts can gather local context, but scout output is not the child-task map.
+A decomposition strategy gate is required before implementation when Full-mode work spans multiple packages/services, names explicit rollout slices, has several independent acceptance-criteria clusters, or would require one worker to carry the whole PRD/spec plus broad scout reports. Scouts can gather local context, but scout output is not the decomposition strategy.
 
-Do not send the entire broad PRD/spec to one giant implementation worker unless a recorded exception explains why slicing is less safe or impossible, how context overflow/drift risk is mitigated, and what compensating review/validation will run.
+Do not send the entire broad PRD/spec to one giant implementation worker unless a recorded exception explains why recursive slicing is less safe or impossible, how context overflow/drift risk is mitigated, and what compensating review/validation will run.
 
 A safe broad implementation shape is usually:
 
 ```text
-parent/planner creates global child-task map + file ownership matrix
+parent/planner creates coarse launch tree + caps + first slice(s)
 -> serialized foundation/shared-contract/config slice, if needed
 -> slice planner creates a local subtree map only if that slice is still broad
--> parallel app/service/surface worker leaves with non-overlapping ownership
+-> parallel app/service/surface worker leaves with non-overlapping ownership for the active launch
 -> parent synthesis barrier + global validation
 -> independent QA/reviewer
 ```
+
+The root planner should not deep-inspect every package or produce a full repo-wide file ownership matrix unless those sibling workers are launching now.
 
 Good slice boundaries:
 
@@ -132,9 +134,10 @@ Each planner in that tree owns the proposed subtree map for the slice it is aske
 
 Parent responsibilities:
 
-- create the child-task map, file ownership matrix, recursion cap, and concurrency cap before workers write
-- prevent file ownership conflicts
-- serialize or single-own shared schemas/contracts, env examples, lockfiles, routers, nav/i18n, central stores, and config unless using isolated worktrees plus a merge barrier
+- create the coarse launch tree, recursion cap, concurrency cap, and first launch plan before workers write
+- ensure the immediate parent of each worker provides a bounded slice contract and ownership/conflict rule
+- prevent file ownership conflicts among siblings being launched now
+- serialize or single-own shared schemas/contracts, env examples, lockfiles, routers, nav/i18n, central stores, and config when they are in the active launch set unless using isolated worktrees plus a merge barrier
 - collect child closeouts at a barrier
 - reject speculative or unverified child findings
 - run parent-level validation and QA after merge/fold-in
@@ -144,7 +147,7 @@ Parent responsibilities:
 
 | Risk | Required control |
 | --- | --- |
-| Shared files such as nav, i18n, routers, schemas, config, or central stores attract multiple slices | Create a file ownership matrix before launch. Give each shared file one owner, serialize shared-file slices, or use isolated worktrees with an explicit merge barrier. |
+| Shared files such as nav, i18n, routers, schemas, config, or central stores attract multiple slices | For siblings launching now, assign each shared file one owner, serialize shared-file slices, or use isolated worktrees with an explicit merge barrier. Do not require the root planner to map every downstream shared file before the first slice starts. |
 | A child discovers product, UX, data-model, or architecture ambiguity | Child stops and escalates to parent with options/evidence. Child does not decide outside its slice. |
 | A slice is Full-mode or high-risk | Run route enforcement for that slice. It needs verified model/agent route or an approved exception before coding. |
 | Worker/reviewer times out or returns unusable output | Mark the child gate failed. Treat any partial edits as untrusted until inspected and completed by the same route, an approved replacement, or an explicit parent-takeover exception. |

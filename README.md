@@ -163,18 +163,20 @@ When the user approves a whole PRD/goal or says they want the whole outcome, the
 
 The parent must still own scope and evidence:
 
-1. create a child-task map with objective, allowed files, forbidden files, non-goals, route, dependencies, and validation for each slice
-2. protect shared files with an ownership matrix: nav/i18n/router/schema/config/lockfile files are serialized unless isolated worktrees are used and merged at a barrier
-3. let each planner that decomposes a still-broad slice propose a local subtree map, while the parent/orchestrator approves recursion depth, launch, and synthesis
-4. keep product and architecture decisions in the parent; child agents stop and escalate ambiguity instead of deciding
-5. enforce route/model rules per slice; Full child slices need verified route or an approved exception
-6. treat timeouts as failed gates; partial edits from a timed-out worker are untrusted until reviewed or completed by an approved route
-7. require child-local validation plus parent-level global validation after synthesis
-8. avoid parallelizing sequential UX flows; slice by independent surfaces, packages, fixtures, or acceptance-criteria clusters
+1. choose a recursive decomposition strategy before workers write: coarse launch tree, dependencies, caps, and first safe slice(s)
+2. keep root planning lightweight by default; do not require the first planner to map every downstream file before the first slice starts
+3. give each launched worker a bounded slice contract with allowed files, forbidden files, non-goals, route, dependencies, validation, and an ownership/conflict rule
+4. protect shared files for siblings launching now: nav/i18n/router/schema/config/lockfile files are single-owner, serialized, or isolated in worktrees with a merge barrier
+5. let each planner that decomposes a still-broad slice propose a local subtree map, while the parent/orchestrator approves recursion depth, launch, and synthesis
+6. keep product and architecture decisions in the parent; child agents stop and escalate ambiguity instead of deciding
+7. enforce route/model rules per slice; Full child slices need verified route or an approved exception
+8. treat timeouts as failed gates; partial edits from a timed-out worker are untrusted until reviewed or completed by an approved route
+9. require child-local validation plus parent-level global validation after synthesis
+10. avoid parallelizing sequential UX flows; slice by independent surfaces, packages, fixtures, or acceptance-criteria clusters
 
-If no safe parallel slices exist, launch one narrow serialized worker for the next slice. A single worker for the entire PRD/spec should be recorded as an explicit exception with a context-risk mitigation plan.
+If no safe parallel slices exist yet, launch one narrow serialized worker for the next slice. A single worker for the entire PRD/spec should be recorded as an explicit exception with a context-risk mitigation plan.
 
-Record the launch note, concurrency cap, conflict rule, and barrier plan in `run.json`/`notes.md`. See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md) and [`templates/child-task.md`](templates/child-task.md).
+Record the launch note, recursion/concurrency cap, conflict rule for the active launch, and barrier plan in `run.json`/`notes.md`. See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md) and [`templates/child-task.md`](templates/child-task.md).
 
 ## Use it with Pi first
 

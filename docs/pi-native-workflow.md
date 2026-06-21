@@ -25,15 +25,15 @@ run artifacts             = evidence trail only when useful
 2. If broad/long-running, create or recommend a Pi goal with a verification contract.
 3. Draft the compact implementation contract.
 4. Get approval unless the user explicitly requested end-to-end execution.
-5. If broad, create a child-task map, file ownership matrix, recursion cap, and barrier plan before workers write.
-6. Delegate implementation to one focused worker or several non-overlapping slice workers.
+5. If broad, choose a recursive decomposition strategy: coarse launch tree, first slice(s), recursion/concurrency caps, and barrier plan.
+6. Delegate implementation to one focused worker or several non-overlapping slice workers with bounded contracts and ownership/conflict rules for the active launch.
 7. Run validation.
 8. Run independent reviewer QA.
 9. Fix or escalate findings.
 10. Close with evidence; complete the goal only after the verification contract is satisfied.
 ```
 
-The parent session owns scope, approval, launch decisions, synthesis, and final evidence. Subagents are lanes, not decision-makers. Each planner may propose the subtree map for the slice it decomposes, but the parent/orchestrator approves recursion depth, concurrency, and barriers before nested fanout starts.
+The parent session owns scope, approval, launch decisions, synthesis, and final evidence. Subagents are lanes, not decision-makers. Root planning stays coarse by default; each planner may propose the subtree map for the slice it decomposes, but the parent/orchestrator approves recursion depth, concurrency, and barriers before nested fanout starts.
 
 ## Goal usage
 
@@ -62,7 +62,7 @@ Default Full-mode lanes:
 
 - `worker` — writer for its assigned file/cluster slice, receives the approved contract and acceptance criteria
 - `reviewer` — independent QA against the contract and actual diff
-- `planner` — when the spec or a child slice is too broad for one worker pass; returns a proposed task/subagent subtree map, not unapproved launches
+- `planner` — when the spec or a child slice is too broad for one worker pass; returns a coarse launch tree or local task/subagent subtree map, not unapproved launches
 - `scout` or `context-builder` — only when local context is unclear
 - `oracle` — only for drift, repeated failure, or architectural/product judgment
 

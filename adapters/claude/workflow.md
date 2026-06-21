@@ -99,25 +99,26 @@ Implementation rules:
 - make the smallest correct change
 - do not broaden scope or refactor unrelated code
 - do not edit run artifacts unless explicitly asked
+- do not clean up, revert, delete, or tidy files outside the allowed scope, including pre-existing dirty files or run artifacts; report them instead
 - run relevant validation and fix failures
 - report changed files, validation commands, assumptions, and spec ambiguities
 
 ## Broad-ticket planning and parallel slicing gate
 
-If `taskFit` is `broad-ticket`, split the approved spec into implementer-sized tickets before implementation.
+If `taskFit` is `broad-ticket`, choose a recursive decomposition strategy before implementation.
 
 This gate is required before implementation when the approved spec spans multiple packages/services, names explicit rollout slices, has multiple independent acceptance-criteria clusters, or would require one worker prompt to carry the whole PRD/spec plus broad scout context.
 
-Do not hand a whole PRD/spec to one giant implementation worker unless you record an explicit single-worker exception: why slicing would be less safe or impossible, how context overflow/drift risk is mitigated, and what review/validation compensating controls will run.
+Do not hand a whole PRD/spec to one giant implementation worker unless you record an explicit single-worker exception: why recursive slicing would be less safe or impossible, how context overflow/drift risk is mitigated, and what review/validation compensating controls will run.
 
 When the user approved the whole outcome or said they want it all, assume independent slices can be batched in parallel inside the approved scope. Do not re-ask for each child slice unless scope, risk, route, or cost changes materially.
 
 For broad tickets:
 
-1. use a strong planner/reviewer to split tasks and list high-risk QA checks
-2. create a child-task map with slice id, objective, allowed files, forbidden files, non-goals, dependencies, validation, and owner route
-3. create a file ownership matrix for shared files/coupled clusters; serialize foundation/shared lanes when other slices depend on them
-4. record recursion cap, concurrency cap, conflict rule, and synthesis/barrier plan
+1. create a coarse launch tree first: slice ids, dependencies, first slice(s), recursion cap, and barrier plan
+2. keep root planning lightweight; do not deep-inspect every surface or build a full repo file map unless those sibling workers are launching now
+3. give each launched worker a bounded child-task contract with objective, allowed files, forbidden files, non-goals, dependencies, validation, owner route, and ownership/conflict rule
+4. record shared-file ownership only for siblings launching now; serialize foundation/shared lanes when active slices depend on them
 5. have any planner that decomposes a still-broad slice return a proposed subtree map; parent/orchestrator approves nested launch and recursion depth
 6. keep one writer per file or coupled file cluster; serialize or isolate worktrees when slices could touch the same files
 7. require every child slice to follow the same playbook rules at slice scale: objective, non-goals, route evidence/exception, validation, drift check, and closeout

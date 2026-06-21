@@ -19,7 +19,9 @@ Use only for dynamic workflows or large parallel fanout. Prefer a short plain-En
 ```
 
 - Approval evidence: <quote, message, ticket link, or note>
-- Planner subtree maps: <none | paths/ids and approval status>
+- Launch tree: <none | coarse slice ids/dependencies/first launch>
+- Active-launch ownership/conflict rules: <none | paths/ids and approval status>
+- Planner subtree maps: <none | only nested maps approved for launched child slices>
 - Single-worker exception: <none | reason/context-risk mitigation/compensating checks>
 
 ## Intake decisions

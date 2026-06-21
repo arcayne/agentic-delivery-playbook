@@ -30,6 +30,8 @@ Allowed files:
 
 Do not touch:
 
+Out-of-scope dirty files/artifacts policy: report them to the parent; do not clean up, revert, delete, or tidy them unless this contract explicitly allows it.
+
 ## Acceptance Criteria
 
 ## Route / Model Lane
@@ -69,6 +71,7 @@ Stop rule:
 Escalate if:
 
 - implementation needs files outside allowed scope,
+- cleanup/revert/delete appears necessary outside allowed scope,
 - another worker owns the same file or coupled area,
 - acceptance criteria are ambiguous,
 - route/model verification fails or is only a default without approved exception,
