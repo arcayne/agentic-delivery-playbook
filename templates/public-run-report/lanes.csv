@@ -1,0 +1,1 @@
+laneId,role,agent,model,reasoning,source,taskType,status,acceptedUse,durationMs,turns,inputTokens,outputTokens,cacheReadTokens,cacheWriteTokens,costApprox,toolCalls,artifactPath,filesChanged,reworkCaused,residualRisks

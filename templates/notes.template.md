@@ -22,6 +22,7 @@ Use only for dynamic workflows or large parallel fanout. Prefer a short plain-En
 - Launch tree: <none | coarse slice ids/dependencies/first launch>
 - Active-launch ownership/conflict rules: <none | paths/ids and approval status>
 - Planner subtree maps: <none | only nested maps approved for launched child slices>
+- Context/guardrail artifact paths: <none | paths and one-line purpose; keep large reports out of notes by default>
 - Single-worker exception: <none | reason/context-risk mitigation/compensating checks>
 
 ## Intake decisions
@@ -69,6 +70,18 @@ Evidence mode: direct-validation | notes-only | artifact-backed
 
 - Count: 0
 - Notes: <none>
+
+## Handoff economics / observability
+
+- Observability source: <PI_OBS_DB | harness telemetry | manual estimate | unavailable>
+- Whole operation: wall-clock <duration>, sum model time <duration>, approx cost <amount | unknown>
+- Lane breakdown: <path to run.json/observability.md or compact table>
+- Handoff overhead: <parent setup + coordination + synthesis + rework, or unknown>
+- Accepted lanes: <accepted>/<launched>
+- Rejected/duplicative lanes: <none | list>
+- Counterfactual baseline: <all-strongest-high-xhigh | parent-only | unknown>
+- Cost likely lower than baseline: <yes | no | unknown> because <evidence>
+- Public report: <path | none | unavailable>
 
 ## Implementation model evaluation
 

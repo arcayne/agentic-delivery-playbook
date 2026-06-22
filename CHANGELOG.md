@@ -5,6 +5,8 @@
 - Refined Full-mode broad-ticket policy: multi-package/explicit-rollout work now requires a recursive decomposition strategy before implementation workers write, while root planning stays coarse by default.
 - Added recursive/fractal planner guidance: each planner that decomposes a still-broad slice proposes a local subtree map, while the parent/orchestrator controls launch approval, recursion depth, and synthesis.
 - Clarified worker scope safety: workers must not clean up, revert, delete, or tidy files outside their allowed scope, including pre-existing dirty files or run artifacts.
+- Added guidance for read-only context/guardrail lanes: keep large outputs as separate artifacts, synthesize briefly, and do not treat pre-implementation guardrail review as final QA.
+- Added model-mix cost/quota guidance: mixed lanes can be cheaper than all-high/xhigh only when bounded outputs prevent rework; record telemetry instead of claiming savings.
 - Added Pi-native workflow guidance for layering Agentic Delivery Playbook with pi-goal-x, pi-subagents, and run artifacts.
 - Added a Pi settings template for worker/reviewer/planner model lane separation.
 - Updated the Pi skill so Full mode defaults to worker implementation plus reviewer QA, records gate failures, and treats subagent timeouts as failed gates instead of completed self-review.

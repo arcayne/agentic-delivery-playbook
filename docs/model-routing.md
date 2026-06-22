@@ -98,6 +98,27 @@ Do not claim that a model performed well unless the run actually used that model
 
 If routing failed or the harness used a default, record that honestly. For Full mode, routing failure or missing config is a decision point before coding, not an automatic pass. The operational question is not "which model is best?" but "did this run satisfy the approved spec with evidence under the route that was actually approved and recorded?"
 
+## Model mix and cost/quota discipline
+
+Using different model lanes is expected when it improves role fit. Typical safe mix:
+
+- medium/lower-cost lanes for read-only repository context, inventory, and narrow handoff notes
+- stronger reasoning for product/architecture decisions, route selection, guardrail review, and final QA
+- implementation workers chosen for reliable edits under bounded contracts, not for broad planning
+
+Mixed models can reduce API cost compared with running every lane on the strongest high/xhigh model **when** prompts are bounded, accepted evidence is synthesized once, and the cheaper lanes do not cause rework. It is not automatic: parallel fanout can increase total tokens and burn quota faster, and a weak lane that causes rework can cost more than a stronger lane used narrowly.
+
+Record enough telemetry to evaluate the tradeoff locally:
+
+- role, agent/model, reasoning level, and source
+- input/output tokens, cache reads/writes, turns, duration, and approximate cost when available
+- whether the lane prevented rework, found defects, or produced accepted evidence
+- whether any output was rejected as speculative, duplicated, or too broad
+
+Do not compare model cost by prose impression. Compare the accepted evidence and total run cost against the likely alternative, e.g. “all lanes on strongest high/xhigh.” If exact provider pricing or quota accounting is unavailable, record `unknown` rather than inventing a savings claim.
+
+For the detailed measurement model and public reporting schema, see [`handoff-economics.md`](handoff-economics.md).
+
 ## Implementation evaluation
 
 When implementation used an explicitly chosen model or agent, record a short post-QA evaluation:

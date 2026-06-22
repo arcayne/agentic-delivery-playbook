@@ -206,6 +206,10 @@ Each worker result should name:
 - validation performed
 - verifier/refuter result, when applicable
 
+For read-only context/scout or pre-implementation guardrail lanes, prefer a focused artifact file plus a short parent synthesis. Do not paste large context reports into `notes.md` by default. Their acceptance evidence should be files inspected, commands run, residual risks, no source edits, and output path; `changed-files` and `tests-added` are normally `none`.
+
+A pre-implementation guardrail or reviewer lane is not final QA. It can shape tests and stop rules, but final QA still reviews the actual diff, validation output, and accepted child closeouts.
+
 The synthesizer should record:
 
 - accepted findings

@@ -217,7 +217,7 @@ Repo adapters:
 - [`adapters/codex/`](adapters/codex/) — Codex repo instructions
 - [`adapters/chatgpt/`](adapters/chatgpt/) — ChatGPT Project/custom-GPT instructions
 
-If you want model-routing guidance or bounded fanout patterns, see [`docs/model-routing.md`](docs/model-routing.md) and [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md).
+If you want model-routing guidance, bounded fanout patterns, or handoff ROI/observability, see [`docs/model-routing.md`](docs/model-routing.md), [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md), and [`docs/handoff-economics.md`](docs/handoff-economics.md).
 
 ## When to add templates and run artifacts
 

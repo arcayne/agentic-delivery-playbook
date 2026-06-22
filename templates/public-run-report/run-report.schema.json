@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/agentic-delivery-playbook/public-run-report.schema.json",
+  "title": "Agentic Delivery Public Run Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "privacyTier",
+    "report",
+    "task",
+    "harness",
+    "workflow",
+    "operationMetrics",
+    "lanes",
+    "validation",
+    "publicSafety",
+    "conclusions"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "0.1"
+    },
+    "privacyTier": {
+      "type": "string",
+      "enum": ["public-summary", "public-artifacts", "private-raw-available", "private-only"]
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "date", "reporter"],
+      "properties": {
+        "title": { "type": "string" },
+        "date": { "type": "string" },
+        "reporter": { "type": ["string", "null"] },
+        "sourceUrl": { "type": ["string", "null"] },
+        "notes": { "type": ["string", "null"] }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "summary", "riskCategories", "repo", "commitBefore", "commitAfter"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["bugfix", "broad-prd", "refactor", "migration", "review", "research", "feature", "other"]
+        },
+        "summary": { "type": "string" },
+        "riskCategories": { "type": "array", "items": { "type": "string" } },
+        "repo": { "type": ["string", "null"] },
+        "commitBefore": { "type": ["string", "null"] },
+        "commitAfter": { "type": ["string", "null"] },
+        "scope": { "type": ["string", "null"] }
+      }
+    },
+    "harness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": ["string", "null"] },
+        "extensions": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shape", "goalUsed", "routePolicy", "decomposition"],
+      "properties": {
+        "shape": { "type": "string" },
+        "goalUsed": { "type": ["boolean", "null"] },
+        "goalId": { "type": ["string", "null"] },
+        "routePolicy": { "type": "string" },
+        "decomposition": { "type": ["string", "null"] }
+      }
+    },
+    "operationMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["wallClockDurationMs", "sumModelDurationMs", "totalTokens", "costApprox", "toolCalls"],
+      "properties": {
+        "wallClockDurationMs": { "type": ["number", "null"] },
+        "sumModelDurationMs": { "type": ["number", "null"] },
+        "criticalPath": { "type": ["string", "null"] },
+        "inputTokens": { "type": ["number", "null"] },
+        "outputTokens": { "type": ["number", "null"] },
+        "cacheReadTokens": { "type": ["number", "null"] },
+        "cacheWriteTokens": { "type": ["number", "null"] },
+        "totalTokens": { "type": ["number", "null"] },
+        "costApprox": { "type": ["number", "string", "null"] },
+        "toolCalls": { "type": ["number", "null"] },
+        "turns": { "type": ["number", "null"] },
+        "fixCycles": { "type": ["number", "null"] },
+        "failedGates": { "type": ["number", "null"] },
+        "acceptedLanes": { "type": ["number", "null"] },
+        "launchedLanes": { "type": ["number", "null"] }
+      }
+    },
+    "lanes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["laneId", "role", "agent", "model", "taskType", "status"],
+        "properties": {
+          "laneId": { "type": "string" },
+          "role": { "type": "string" },
+          "agent": { "type": ["string", "null"] },
+          "model": { "type": ["string", "null"] },
+          "reasoning": { "type": ["string", "null"] },
+          "source": { "type": ["string", "null"] },
+          "taskType": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["accepted", "accepted-with-edits", "rejected", "failed-gate", "superseded", "duplicative", "unknown"]
+          },
+          "acceptedUse": { "type": ["string", "null"] },
+          "durationMs": { "type": ["number", "null"] },
+          "turns": { "type": ["number", "null"] },
+          "inputTokens": { "type": ["number", "null"] },
+          "outputTokens": { "type": ["number", "null"] },
+          "cacheReadTokens": { "type": ["number", "null"] },
+          "cacheWriteTokens": { "type": ["number", "null"] },
+          "costApprox": { "type": ["number", "string", "null"] },
+          "toolCalls": { "type": ["number", "null"] },
+          "artifactPath": { "type": ["string", "null"] },
+          "filesChanged": { "type": "array", "items": { "type": "string" } },
+          "reworkCaused": { "type": ["boolean", "null"] },
+          "residualRisks": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "handoffEconomics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "counterfactualBaseline": { "type": ["string", "null"] },
+        "costLikelyLowerThanBaseline": { "type": ["string", "null"], "enum": ["yes", "no", "unknown", null] },
+        "quotaRisk": { "type": ["string", "null"], "enum": ["low", "medium", "high", "unknown", null] },
+        "handoffOverheadRatio": { "type": ["number", "null"] },
+        "parallelEfficiency": { "type": ["number", "null"] },
+        "acceptedOutputRatio": { "type": ["number", "null"] },
+        "notes": { "type": ["string", "null"] }
+      }
+    },
+    "validation": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["command", "status"],
+        "properties": {
+          "command": { "type": "string" },
+          "status": { "type": "string", "enum": ["passed", "failed", "skipped", "unknown"] },
+          "notes": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "purpose", "privacyReviewed"],
+        "properties": {
+          "path": { "type": "string" },
+          "purpose": { "type": "string" },
+          "privacyReviewed": { "type": "boolean" }
+        }
+      }
+    },
+    "publicSafety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rawLogsPublished", "rawPromptsPublished", "secretsChecked", "redactionNotes"],
+      "properties": {
+        "rawLogsPublished": { "type": "boolean" },
+        "rawPromptsPublished": { "type": "boolean" },
+        "secretsChecked": { "type": "boolean" },
+        "redactionNotes": { "type": ["string", "null"] }
+      }
+    },
+    "conclusions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "lessons", "routeDifferentlyNextTime", "knownGaps"],
+      "properties": {
+        "outcome": { "type": "string" },
+        "lessons": { "type": "array", "items": { "type": "string" } },
+        "routeDifferentlyNextTime": { "type": "array", "items": { "type": "string" } },
+        "knownGaps": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

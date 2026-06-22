@@ -134,6 +134,15 @@
     "validationPolicy": "child-local validation plus parent global validation required",
     "sequentialFlowRule": "sequential UX/state flows are serialized unless slices are independent surfaces",
     "barrierPlan": null,
+    "contextArtifacts": [
+      {
+        "path": null,
+        "purpose": null,
+        "lane": "scout | context-builder | guardrail-reviewer | planner | other",
+        "sourceEdits": "none | unknown | not-applicable",
+        "synthesisStatus": "pending | summarized | rejected | superseded"
+      }
+    ],
     "singleWorkerException": {
       "approved": false,
       "reason": null,
@@ -202,10 +211,55 @@
     "available": false,
     "source": "PI_OBS_DB | harness telemetry | manual estimate | unavailable",
     "sessions": null,
+    "wallClockDurationMs": null,
+    "sumModelDurationMs": null,
+    "criticalPath": null,
     "turns": null,
+    "inputTokens": null,
     "outputTokens": null,
+    "cacheReadTokens": null,
+    "cacheWriteTokens": null,
     "costApprox": null,
+    "toolCalls": null,
     "modelMix": {},
+    "laneBreakdown": [
+      {
+        "laneId": null,
+        "role": null,
+        "agent": null,
+        "model": null,
+        "reasoning": null,
+        "source": "explicit | agent-default | runtime-default | manual | project-settings | exception-approved | unknown",
+        "taskType": "context | planner | worker | reviewer | verifier | parent | other",
+        "durationMs": null,
+        "turns": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "cacheReadTokens": null,
+        "cacheWriteTokens": null,
+        "costApprox": null,
+        "toolCalls": null,
+        "artifactPath": null,
+        "accepted": null,
+        "acceptedUse": null,
+        "reworkCaused": null
+      }
+    ],
+    "modelMixEvaluation": {
+      "baselineComparedTo": "all-strongest-high-xhigh | parent-only | unknown",
+      "costLikelyLower": "yes | no | unknown",
+      "quotaRisk": "low | medium | high | unknown",
+      "handoffOverheadRatio": null,
+      "parallelEfficiency": null,
+      "acceptedOutputRatio": null,
+      "reason": null,
+      "rejectedOrDuplicativeLanes": []
+    },
+    "publicReport": {
+      "status": "not-needed | planned | published | unavailable",
+      "path": null,
+      "redactionNotes": null
+    },
     "processWeight": "lightweight | justified-broad | overused | unknown",
     "notes": null
   },

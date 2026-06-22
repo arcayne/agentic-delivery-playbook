@@ -211,6 +211,7 @@ Pi may expose subagents, model overrides, and runtime defaults. Use them when th
 - Use `planner`, `scout`, `context-builder`, or `oracle` only for a concrete role: decomposition, context gathering, skeptical review, or drift/decision audit.
 - Keep one writer per file or tightly coupled file cluster. Parallel implementation is allowed only when ownership/conflict rules are explicit; otherwise serialize writes.
 - Parallelize read-only context/review/validation freely when useful.
+- Use mixed model lanes by role fit: cheaper/medium lanes for bounded read-only context, stronger lanes for product/architecture decisions and final QA. This can reduce cost versus all-high/xhigh only when outputs are bounded and accepted; record telemetry instead of claiming savings.
 - If the user expects different models, verify the actual route or use explicit model overrides. `agent-default` may still resolve to the current/default model.
 - For Full mode, absence of project overrides is not evidence that `agent-default` is acceptable. It is a decision point that must be resolved before coding.
 
@@ -227,7 +228,7 @@ Run this gate before implementation when Full-mode work has any broad implementa
 Gate rules:
 
 - Choose a decomposition strategy before implementation workers write. The strategy can be: one narrow serialized slice, a coarse launch tree with parallel siblings, or a planner-owned subtree for a still-broad slice.
-- Keep the first/root planner lightweight by default. It should identify coarse slices, dependencies, launch order, recursion cap, and the first safe worker handoffs. It should not inspect every surface deeply or produce a full repo-wide file ownership matrix unless those sibling workers are about to launch.
+- Keep the first/root planner lightweight by default. It should identify coarse slices, dependencies, launch order, recursion cap, and the first safe worker handoffs. It should not inspect every surface deeply or produce a full repo-wide file ownership matrix unless those sibling workers are about to launch. Scouts/context-builders may inform the launch tree, but their output is not the launch tree.
 - The immediate parent of each worker must provide that worker a bounded slice contract: objective, allowed files, forbidden files, non-goals, dependencies, validation, route, and ownership/conflict rule.
 - Create file ownership/conflict rules only for siblings being launched now. Shared schemas/contracts, env examples, lockfiles, routers, nav/i18n, central stores, and config get one owner, a serialized lane, or isolated worktrees with a merge barrier when they are in the active launch set.
 - Treat foundation/shared contract work as a likely serialized first slice when other slices depend on it, but avoid pre-planning every downstream file before the foundation lands.
@@ -250,6 +251,7 @@ Rules:
 - Each child slice must apply the same playbook rules at its own scale: clear objective, non-goals, route evidence/exception, validation evidence, drift check, and closeout.
 - Keep one writer per file or tightly coupled file cluster. If parallel writers could touch the same file, either use isolated worktrees with a merge barrier or serialize those slices.
 - Use a barrier after parallel implementation: synthesize changed files, conflicts, validation outcomes, known gaps, and child closeouts before QA.
+- Keep context artifacts as separate files and fold them into a short synthesis. Do not append large scout/context reports into `notes.md` unless the run explicitly needs a full transcript there.
 - Do not let child agents make product/architecture decisions outside their slice. Escalate back to the parent when a child discovers hidden scope or risk.
 - Treat child timeouts as failed gates. Partial edits from a timed-out child are untrusted until inspected and completed by an approved route or explicit takeover exception.
 - Require both child-local validation and parent global validation; child tests alone are not enough.
@@ -269,6 +271,18 @@ Conflict rule: <ownership/serialize shared files/worktree for this launch>
 Barrier: synthesize child closeouts, run parent validation, then QA
 Stop rule: child ambiguity, route failure, validation repeat failure, or scope drift
 ```
+
+### Read-only context and guardrail lanes
+
+Use `scout`/`context-builder` and pre-implementation guardrail/reviewer lanes for read-only repository facts, local conventions, slice handoff notes, or test/risk matrices. Their acceptance contract should ask for:
+
+- files inspected and commands run
+- evidence-backed findings with paths
+- residual risks and unknowns
+- confirmation that source files were not modified
+- output artifact path
+
+Do not require read-only lanes to report `changed-files` or `tests-added` except to say `none`. A pre-implementation guardrail/reviewer lane is not final QA; final review still needs to inspect the actual diff and validation evidence.
 
 ### Recommended project model overrides
 

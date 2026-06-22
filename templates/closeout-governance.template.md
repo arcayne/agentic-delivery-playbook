@@ -24,15 +24,29 @@ Project specific commands:
 - [ ] The run does not claim model or agent routing that was not actually used.
 - [ ] Legacy or pre governance runs are marked clearly instead of backfilled with invented evidence.
 
-## Process weight
+## Process weight and handoff economics
 
 ```text
 Observability source: <PI_OBS_DB | harness telemetry | manual estimate | unavailable>
-Sessions:
+Wall-clock duration:
+Sum model duration:
+Critical path:
 Turns:
+Input tokens:
 Output tokens:
+Cache read/write tokens:
 Approx cost:
+Tool calls:
 Model mix:
+Accepted lanes / launched lanes:
+Rejected or superseded lanes:
+Timeouts / failed gates:
+Fix cycles:
+Handoff overhead note:
+Counterfactual baseline: <all-strongest-high-xhigh | parent-only | unknown>
+Cost likely lower than baseline: <yes | no | unknown>
+Quota risk: <low | medium | high | unknown>
+Public observability artifact: <path | none | unavailable>
 Classification: <lightweight | justified-broad | overused | unknown>
 Budget note:
 ```

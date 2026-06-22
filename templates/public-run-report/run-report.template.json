@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "0.1",
+  "privacyTier": "public-summary",
+  "report": {
+    "title": "<run title>",
+    "date": "<YYYY-MM-DD>",
+    "reporter": null,
+    "sourceUrl": null,
+    "notes": null
+  },
+  "task": {
+    "type": "broad-prd",
+    "summary": "<task summary>",
+    "riskCategories": [],
+    "repo": null,
+    "commitBefore": null,
+    "commitAfter": null,
+    "scope": null
+  },
+  "harness": {
+    "name": "Pi",
+    "version": null,
+    "extensions": []
+  },
+  "workflow": {
+    "shape": "<parent-only | scout-worker-reviewer | recursive-slices | dynamic-workflow>",
+    "goalUsed": null,
+    "goalId": null,
+    "routePolicy": "unknown",
+    "decomposition": null
+  },
+  "operationMetrics": {
+    "wallClockDurationMs": null,
+    "sumModelDurationMs": null,
+    "criticalPath": null,
+    "inputTokens": null,
+    "outputTokens": null,
+    "cacheReadTokens": null,
+    "cacheWriteTokens": null,
+    "totalTokens": null,
+    "costApprox": "unknown",
+    "toolCalls": null,
+    "turns": null,
+    "fixCycles": null,
+    "failedGates": null,
+    "acceptedLanes": null,
+    "launchedLanes": null
+  },
+  "lanes": [
+    {
+      "laneId": "<lane-id>",
+      "role": "<context | planner | worker | reviewer | parent>",
+      "agent": null,
+      "model": null,
+      "reasoning": null,
+      "source": null,
+      "taskType": "<task type>",
+      "status": "unknown",
+      "acceptedUse": null,
+      "durationMs": null,
+      "turns": null,
+      "inputTokens": null,
+      "outputTokens": null,
+      "cacheReadTokens": null,
+      "cacheWriteTokens": null,
+      "costApprox": "unknown",
+      "toolCalls": null,
+      "artifactPath": null,
+      "filesChanged": [],
+      "reworkCaused": null,
+      "residualRisks": []
+    }
+  ],
+  "handoffEconomics": {
+    "counterfactualBaseline": "unknown",
+    "costLikelyLowerThanBaseline": "unknown",
+    "quotaRisk": "unknown",
+    "handoffOverheadRatio": null,
+    "parallelEfficiency": null,
+    "acceptedOutputRatio": null,
+    "notes": null
+  },
+  "validation": [
+    {
+      "command": "<command or manual check>",
+      "status": "unknown",
+      "notes": null
+    }
+  ],
+  "artifacts": [],
+  "publicSafety": {
+    "rawLogsPublished": false,
+    "rawPromptsPublished": false,
+    "secretsChecked": false,
+    "redactionNotes": null
+  },
+  "conclusions": {
+    "outcome": "<outcome>",
+    "lessons": [],
+    "routeDifferentlyNextTime": [],
+    "knownGaps": []
+  }
+}
