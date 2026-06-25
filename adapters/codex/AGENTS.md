@@ -152,6 +152,8 @@ If the user approved the whole outcome or said they want it all, assume independ
 
 Record in `notes.md` or `run.json` at the level needed for the next launch:
 
+- current status dashboard: phase/slice, accepted slices, blocked slices, in-flight lanes, known validation exceptions, and next gate
+- PRD implementation ledger for broad PRD/spec runs: PRD area, requirement, slice, status, evidence, remaining gap, and owner/next gate
 - coarse launch tree: slice ids, dependencies, first slice(s) to launch, recursion cap, concurrency cap, and barrier plan
 - bounded child-task contracts for siblings launching now: objective, allowed files, forbidden files, non-goals, dependencies, validation, owner route, and ownership/conflict rule
 - proposed subtree maps from any planner that decomposes a still-broad slice
@@ -159,7 +161,7 @@ Record in `notes.md` or `run.json` at the level needed for the next launch:
 - serialized foundation/shared lanes, if other active slices depend on them
 - high-risk QA checks
 
-Each child slice must follow the same playbook rules at slice scale: objective, non-goals, route evidence/exception, validation, drift check, and closeout. Each planner owns the proposed subtree map for the slice it decomposes; the parent/orchestrator owns approval, launch, global synthesis, and final evidence. Default to one decomposition level and add another subtree level only when the child slice is still too broad for one focused worker and the run records the reason and cap. Keep one writer per file or coupled file cluster; serialize or isolate worktrees when slices could touch the same files. "One writer" means one owner for a file/cluster, not one worker for the entire broad ticket.
+Each child slice must follow the same playbook rules at slice scale: objective, non-goals, route evidence/exception, validation, drift check, and closeout. Each planner owns the proposed subtree map for the slice it decomposes; the parent/orchestrator owns approval, launch, global synthesis, final evidence, and the PRD ledger/status dashboard. Default to one decomposition level and add another subtree level only when the child slice is still too broad for one focused worker and the run records the reason and cap. Keep one writer per file or coupled file cluster; serialize or isolate worktrees when slices could touch the same files. "One writer" means one owner for a file/cluster, not one worker for the entire broad ticket.
 
 ### 6. QA review
 
@@ -188,6 +190,7 @@ Stop blind fix loops when:
 Close with:
 
 - final status
+- for broad PRD/spec runs, current PRD ledger status and next unfinished requirement
 - files changed
 - validation commands/evidence
 - known gaps

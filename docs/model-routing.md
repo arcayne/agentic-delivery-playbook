@@ -115,7 +115,7 @@ Record enough telemetry to evaluate the tradeoff locally:
 - whether the lane prevented rework, found defects, or produced accepted evidence
 - whether any output was rejected as speculative, duplicated, or too broad
 
-Do not compare model cost by prose impression. Compare the accepted evidence and total run cost against the likely alternative, e.g. “all lanes on strongest high/xhigh.” If exact provider pricing or quota accounting is unavailable, record `unknown` rather than inventing a savings claim.
+Do not compare model cost by prose impression. Compare the accepted evidence and total run cost against the likely alternative, e.g. "all lanes on strongest high/xhigh." If exact provider pricing or quota accounting is unavailable, record `unknown` rather than inventing a savings claim.
 
 For the detailed measurement model and public reporting schema, see [`handoff-economics.md`](handoff-economics.md).
 

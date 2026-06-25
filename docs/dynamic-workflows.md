@@ -84,6 +84,26 @@ findings remain.
 
 Record the approved note in `notes.md`, `run.json`, or a workflow artifact. The important part is that the human approves an understandable plan before expensive fanout starts, or that the prior full-scope approval is explicitly tied to the launch note.
 
+For PRD-sized implementation, also create a lightweight status dashboard and PRD implementation ledger before or during decomposition. The dashboard answers the current operational question; the ledger maps product requirements to slice evidence.
+
+Minimum dashboard:
+
+```text
+Current phase/slice: <id>
+Accepted slices: <ids>
+Blocked slices: <ids + blocker reports>
+In-flight lanes: <run ids + purpose>
+Known validation exceptions: <command + reason + scope>
+Next gate: <approval | worker | parent validation | reviewer | closeout>
+```
+
+Minimum PRD ledger:
+
+| PRD area | Requirement | Slice | Status | Evidence | Remaining gap | Owner / next gate |
+| --- | --- | --- | --- | --- | --- | --- |
+
+Use status values `not-started`, `planned`, `in-progress`, `implemented`, `blocked`, `accepted`, `deferred`, and `out-of-scope`. Update the ledger after every worker, review, parent fix, and acceptance decision. Do not rely on scattered reports to answer "where are we in the PRD?".
+
 ## Parallel implementation slicing
 
 For broad implementation work, prefer many bounded child tasks over one huge implementation prompt when the slices are independent enough to merge safely.
@@ -135,6 +155,7 @@ Each planner in that tree owns the proposed subtree map for the slice it is aske
 Parent responsibilities:
 
 - create the coarse launch tree, recursion cap, concurrency cap, and first launch plan before workers write
+- maintain the status dashboard and PRD implementation ledger for broad PRD/spec runs
 - ensure the immediate parent of each worker provides a bounded slice contract and ownership/conflict rule
 - prevent file ownership conflicts among siblings being launched now
 - serialize or single-own shared schemas/contracts, env examples, lockfiles, routers, nav/i18n, central stores, and config when they are in the active launch set unless using isolated worktrees plus a merge barrier
@@ -206,12 +227,15 @@ Each worker result should name:
 - validation performed
 - verifier/refuter result, when applicable
 
-For read-only context/scout or pre-implementation guardrail lanes, prefer a focused artifact file plus a short parent synthesis. Do not paste large context reports into `notes.md` by default. Their acceptance evidence should be files inspected, commands run, residual risks, no source edits, and output path; `changed-files` and `tests-added` are normally `none`.
+For read-only context, scout, or pre-implementation guardrail lanes, keep the full output in a focused artifact and add only a short parent synthesis to `notes.md`. Acceptance evidence should be files inspected, commands run, residual risks, no source edits, and output path; `changed-files` and `tests-added` are normally `none`.
 
-A pre-implementation guardrail or reviewer lane is not final QA. It can shape tests and stop rules, but final QA still reviews the actual diff, validation output, and accepted child closeouts.
+Pre-implementation guardrail review can shape tests and stop rules, but it is not final QA. Final QA still reviews the actual diff, validation output, and accepted child closeouts.
 
 The synthesizer should record:
 
+- current phase/slice and next gate
+- accepted, blocked, and in-flight slices
+- PRD ledger updates with evidence paths and remaining gaps
 - accepted findings
 - rejected findings
 - speculative findings

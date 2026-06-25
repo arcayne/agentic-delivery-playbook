@@ -94,3 +94,12 @@ When a subagent gate fails:
 5. ask the user before replacing an independent Full-mode gate with parent self-review.
 
 Closeout must distinguish passed, failed, skipped, and approved-exception gates.
+
+## PRD visibility
+
+For broad PRD/spec implementation, keep two small progress artifacts current:
+
+- **Status dashboard:** current phase/slice, accepted slices, blocked slices, in-flight lanes, known validation exceptions, and next gate.
+- **PRD implementation ledger:** PRD area, requirement, slice, status, evidence, remaining gap, and owner/next gate.
+
+Update both after each worker, review, parent fix, and acceptance decision. The parent should be able to answer "where are we in the PRD?" from the dashboard and ledger without rereading every subagent report.

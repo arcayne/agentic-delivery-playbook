@@ -87,6 +87,46 @@
       "evidence": null
     }
   },
+  "statusDashboard": {
+    "currentPhaseOrSlice": null,
+    "acceptedSlices": [],
+    "blockedSlices": [
+      {
+        "sliceId": null,
+        "blocker": null,
+        "reportPath": null,
+        "nextGate": null
+      }
+    ],
+    "inFlightLanes": [
+      {
+        "runId": null,
+        "purpose": null,
+        "status": "running | blocked | complete | failed | unknown"
+      }
+    ],
+    "knownValidationExceptions": [
+      {
+        "command": null,
+        "reason": null,
+        "scope": null,
+        "expiresWhen": null
+      }
+    ],
+    "nextGate": "approval | worker | parent-validation | reviewer | targeted-rereview | closeout | human-decision | none"
+  },
+  "prdImplementationLedger": [
+    {
+      "area": null,
+      "requirement": null,
+      "sliceId": null,
+      "status": "not-started | planned | in-progress | implemented | blocked | accepted | deferred | out-of-scope",
+      "evidence": [],
+      "remainingGap": null,
+      "ownerOrNextGate": null,
+      "updatedAt": null
+    }
+  ],
   "reviewGates": {
     "goalConfirmation": "not-required | recommended | pending | confirmed | skipped-with-exception",
     "specCritique": "not-required | parent-self-review | pending | passed | failed | skipped-with-exception | warning",

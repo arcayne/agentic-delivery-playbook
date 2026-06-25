@@ -4,7 +4,7 @@ Use this as a final gate before closing a playbook run.
 
 ## Required checks
 
-Project specific commands:
+Project-specific commands:
 
 ```text
 <typecheck command>

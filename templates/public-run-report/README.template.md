@@ -58,7 +58,7 @@ See [`lanes.csv`](lanes.csv).
 
 | Question | Answer |
 | --- | --- |
-| What was the handoff overhead? | <parent setup + child startup + synthesis + rework, or unknown> |
+| What was the handoff overhead? | <parent setup + child startup + coordination + synthesis + conflicts/rework, or unknown> |
 | Did parallelism reduce wall-clock time? | <yes/no/unknown + evidence> |
 | Did cheaper/weaker lanes cause rework? | <yes/no/unknown + evidence> |
 | Was model mix likely cheaper than baseline? | <yes/no/unknown + evidence> |

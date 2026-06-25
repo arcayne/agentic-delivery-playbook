@@ -44,13 +44,14 @@ A handoff can create value through:
 | Accepted work | Output used without major rewrite | accepted findings/files/patches |
 | Wall-clock compression | Parallel lanes shorten elapsed time | total model-minutes vs wall-clock minutes |
 | Risk reduction | Independent lane catches issue before implementation/ship | guardrail findings, QA findings |
+| Evidence quality | Output is auditable and reusable | artifact path, cited files, validation evidence |
 | Better fit | A specialized/cheaper model handles a bounded task well | low drift, tests pass, no rework |
 | Context isolation | Child avoids contaminating parent state or enables clean review | separate artifact/session |
 
 Approximate lane value:
 
 ```text
-handoff_value = accepted_work + wall_clock_saved + risk_reduction + evidence_quality - rejected_output
+handoff_value = accepted_work + wall_clock_compression + risk_reduction + evidence_quality - rejected_output
 ```
 
 ## Break-even rule
@@ -89,12 +90,12 @@ Useful derived signals:
 
 ```text
 parallel_efficiency = sum_model_duration / wall_clock_duration
-handoff_overhead_ratio = (parent_setup + synthesis + coordination) / total_run_cost
+handoff_overhead_ratio = handoff_overhead / total_run
 accepted_output_ratio = accepted_lanes / launched_lanes
 rework_rate = fix_cycles / accepted_worker_lanes
 ```
 
-These are directional, not universal benchmark scores.
+Use the same unit on both sides of a ratio: time, tokens, or cost. These are directional signals, not universal benchmark scores.
 
 ## Model-mix comparison
 
@@ -114,7 +115,7 @@ Record:
 - quality delta: accepted/rejected lanes, drift, fix cycles, findings
 - quota impact: whether parallelism increased total token burn or hit rate limits
 
-Do not conclude “stronger models only” or “cheaper implementers always” from one run. Build a local dataset by task shape.
+Do not conclude "stronger models only" or "cheaper implementers always" from one run. Build a local dataset by task shape.
 
 ## Lane telemetry schema
 
@@ -163,10 +164,10 @@ This data should be public when possible because model-routing claims need evide
 Recommended public artifacts:
 
 ```text
-run.json                 machine-readable run + lane metrics
-notes.md                 concise synthesis and decision log
-observability.md         human-readable lane table and handoff economics
-context/*.md             focused context artifacts, not pasted into notes
+run-report.json          machine-readable public run + lane metrics
+lanes.csv                flat lane table for analysis
+README.md                concise synthesis and decision log
+artifacts/*.md           focused context artifacts, not pasted into notes
 ```
 
 ## Closeout questions

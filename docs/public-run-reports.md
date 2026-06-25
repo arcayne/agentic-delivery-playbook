@@ -12,7 +12,7 @@ See also [`handoff-economics.md`](handoff-economics.md) for the measurement mode
 
 ## What to publish
 
-A useful public report has four layers:
+A useful public report has this shape:
 
 ```text
 public-runs/<date>-<safe-run-slug>/
@@ -23,11 +23,7 @@ public-runs/<date>-<safe-run-slug>/
   artifacts/             optional sanitized context/review/synthesis artifacts
 ```
 
-Recommended minimum:
-
-- `README.md`
-- `run-report.json`
-- `lanes.csv`
+Recommended minimum: `README.md`, `run-report.json`, and `lanes.csv`.
 
 Optional artifacts are useful when they help readers audit the report, but do not publish raw session logs by default.
 

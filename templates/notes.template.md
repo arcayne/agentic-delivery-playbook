@@ -2,13 +2,31 @@
 
 ## Timeline
 
-- <timestamp> — <event>
+- <timestamp> - <event>
 
 ## Process weight
 
 - Mode: direct | lightweight | full
 - Rationale: <why this process weight is enough>
 - Escalation signal: <none or risk that requires heavier process>
+
+## Current status dashboard (Full/broad runs)
+
+- Current phase/slice: <phase or slice id>
+- Accepted slices: <none | slice ids>
+- Blocked slices: <none | slice ids + blocker report>
+- In-flight lanes: <none | run ids + purpose>
+- Known validation exceptions: <none | command + reason + scope>
+- Next gate: <approval | worker | parent validation | reviewer | targeted rereview | closeout>
+
+## PRD implementation ledger (Full/broad runs)
+
+| PRD area | Requirement | Slice | Status | Evidence | Remaining gap | Owner / next gate |
+| --- | --- | --- | --- | --- | --- | --- |
+| <area> | <requirement> | <slice id> | not-started | <artifact/command> | <gap> | <owner/gate> |
+
+Status values: `not-started`, `planned`, `in-progress`, `implemented`, `blocked`, `accepted`, `deferred`, `out-of-scope`.
+Update this ledger after each worker, review, parent fix, and acceptance decision so the run can answer "where are we in the PRD?" without reading every report.
 
 ## Dynamic workflow launch note (delete if unused)
 
@@ -54,7 +72,7 @@ Evidence mode: direct-validation | notes-only | artifact-backed
 ## Closeout governance
 
 - Required checks run:
-  - `<command>` — passed | failed | skipped
+  - `<command>` - passed | failed | skipped
 - Warnings:
   - <warning or None>
 - Approved exceptions:

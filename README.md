@@ -176,7 +176,7 @@ The parent must still own scope and evidence:
 
 If no safe parallel slices exist yet, launch one narrow serialized worker for the next slice. A single worker for the entire PRD/spec should be recorded as an explicit exception with a context-risk mitigation plan.
 
-Record the launch note, recursion/concurrency cap, conflict rule for the active launch, and barrier plan in `run.json`/`notes.md`. See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md) and [`templates/child-task.md`](templates/child-task.md).
+Record the launch note, recursion/concurrency cap, conflict rule for the active launch, barrier plan, status dashboard, and PRD implementation ledger in `run.json`/`notes.md`. The ledger maps each PRD requirement to a slice, status, evidence, remaining gap, and next gate so the run can answer "where are we in the PRD?" without reading every report. See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md) and [`templates/child-task.md`](templates/child-task.md).
 
 ## Use it with Pi first
 
@@ -217,7 +217,7 @@ Repo adapters:
 - [`adapters/codex/`](adapters/codex/) — Codex repo instructions
 - [`adapters/chatgpt/`](adapters/chatgpt/) — ChatGPT Project/custom-GPT instructions
 
-If you want model-routing guidance, bounded fanout patterns, or handoff ROI/observability, see [`docs/model-routing.md`](docs/model-routing.md), [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md), and [`docs/handoff-economics.md`](docs/handoff-economics.md).
+For model routing, bounded fanout, and handoff economics, see [`docs/model-routing.md`](docs/model-routing.md), [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md), and [`docs/handoff-economics.md`](docs/handoff-economics.md).
 
 ## When to add templates and run artifacts
 

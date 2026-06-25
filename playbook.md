@@ -82,6 +82,7 @@ Full mode contract:
 - critic/QA gate, preferably independent when available
 - high-risk QA for sensitive, authority, provider, state, privacy, or cross-system changes
 - dynamic workflow/fanout only after a plain-English launch note is approved
+- for broad PRD/spec runs, a status dashboard and PRD implementation ledger that map requirements to slices, evidence, gaps, and next gates
 - workflow findings accepted only after synthesis plus independent verification, or clearly marked speculative
 - required closeout fields for files changed, validation, findings, model ledger, known gaps, fix cycles, and next action
 
@@ -98,6 +99,8 @@ A goal loop is depth: it iterates against a completion condition. A dynamic work
 Dynamic workflows are a full-mode escalation for broad audits, migrations, root-cause hypothesis panels, evals, rule-adherence checks, or critical plans that need independent attempts and adversarial review. They are not for small edits, unclear scope, low-value knowledge work, or tightly sequential tasks.
 
 Before launching a dynamic workflow or large parallel fanout, write a short launch note with scope, a concrete cap, a recursion/depth cap when nested planners are used, a stop rule, and the synthesis/verification plan. Do not create blank budget fields that people will not fill. Each planner may propose the subtree map for the slice it decomposes; the parent/orchestrator approves launch, recursion depth, and final synthesis. File ownership/conflict rules are required for siblings being launched now, not for every possible downstream file before the first slice starts.
+
+For broad PRD/spec implementation, keep a compact status dashboard and PRD implementation ledger in `notes.md`/`run.json`. Update them after each worker, review, parent fix, and acceptance decision so the run can answer "where are we in the PRD?" without reading every child report.
 
 See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md).
 

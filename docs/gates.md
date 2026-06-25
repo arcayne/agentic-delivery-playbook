@@ -62,7 +62,9 @@ The note should state:
 
 Record the approved launch note in `notes.md`, `run.json`, or a workflow artifact.
 
-Do not launch if the scope, cap, recursion/depth rule, stop rule, or synthesis plan is vague. For broad implementation, a coarse launch tree is enough at the root; record detailed ownership/conflict rules for siblings launching now. If a planner decomposes a still-broad child slice, record its proposed subtree map and parent/orchestrator approval before launching nested workers.
+For broad PRD/spec implementation, also create or update the status dashboard and PRD implementation ledger before launching writers. The dashboard tracks current phase/slice, accepted slices, blocked slices, in-flight lanes, known validation exceptions, and next gate. The ledger maps each PRD requirement to a slice, status, evidence, remaining gap, and owner/next gate.
+
+Do not launch if the scope, cap, recursion/depth rule, stop rule, synthesis plan, or PRD progress accounting is vague. For broad implementation, a coarse launch tree is enough at the root; record detailed ownership/conflict rules for siblings launching now. If a planner decomposes a still-broad child slice, record its proposed subtree map and parent/orchestrator approval before launching nested workers.
 
 ## Implementation gate
 

@@ -23,7 +23,7 @@
     "extensions": []
   },
   "workflow": {
-    "shape": "<parent-only | scout-worker-reviewer | recursive-slices | dynamic-workflow>",
+    "shape": "<parent-only | scout+worker+reviewer | recursive-slices | dynamic-workflow>",
     "goalUsed": null,
     "goalId": null,
     "routePolicy": "unknown",

@@ -163,7 +163,7 @@ Full rules:
 - get approval before coding unless the user requested an end-to-end run
 - split broad work into implementer-sized tasks before writing code when that changes safety or speed
 - when the spec spans multiple packages/services, explicit rollout slices, or multiple independent feature lanes, choose a recursive decomposition strategy before implementation workers write
-- keep the root plan coarse by default: launch tree, dependencies, recursion/concurrency caps, and first safe slice(s), not a full repo-wide file map
+- keep the root plan coarse by default: launch tree, dependencies, recursion/concurrency caps, first safe slice(s), and a PRD implementation ledger, not a full repo-wide file map
 - if the user approved the whole outcome or said they want it all, batch independent slices in parallel where safe instead of running one giant worker
 - do not hand a whole PRD/spec to one giant implementation worker unless you record an explicit single-worker exception and why narrower recursive slices are unsafe or impossible
 - delegate implementation to `worker` by default after approval
@@ -211,7 +211,7 @@ Pi may expose subagents, model overrides, and runtime defaults. Use them when th
 - Use `planner`, `scout`, `context-builder`, or `oracle` only for a concrete role: decomposition, context gathering, skeptical review, or drift/decision audit.
 - Keep one writer per file or tightly coupled file cluster. Parallel implementation is allowed only when ownership/conflict rules are explicit; otherwise serialize writes.
 - Parallelize read-only context/review/validation freely when useful.
-- Use mixed model lanes by role fit: cheaper/medium lanes for bounded read-only context, stronger lanes for product/architecture decisions and final QA. This can reduce cost versus all-high/xhigh only when outputs are bounded and accepted; record telemetry instead of claiming savings.
+- Use role-fit model lanes: cheaper/medium lanes for bounded read-only context, stronger lanes for product/architecture decisions and final QA. Record telemetry instead of claiming savings.
 - If the user expects different models, verify the actual route or use explicit model overrides. `agent-default` may still resolve to the current/default model.
 - For Full mode, absence of project overrides is not evidence that `agent-default` is acceptable. It is a decision point that must be resolved before coding.
 
@@ -258,7 +258,28 @@ Rules:
 - Do not over-parallelize sequential UX flows. Slice by independent surfaces/components/fixtures/acceptance clusters, not by every tiny file.
 - The parent remains responsible for global invariants, final validation, independent review, and truthful routing ledger.
 
-Record the plan in `run.json`/`notes.md` before launch. A compact launch note is enough when the user already approved end-to-end delivery:
+Record the plan in `run.json`/`notes.md` before launch. For broad PRD/spec work, also maintain a compact status dashboard and PRD implementation ledger so the parent can answer where the run is without reading every report.
+
+Status dashboard fields:
+
+```text
+Current phase/slice: <id>
+Accepted slices: <ids>
+Blocked slices: <ids + blocker reports>
+In-flight lanes: <run ids + purpose>
+Known validation exceptions: <command + reason + scope>
+Next gate: <approval | worker | parent validation | reviewer | closeout>
+```
+
+PRD ledger row shape:
+
+```text
+PRD area | Requirement | Slice | Status | Evidence | Remaining gap | Owner / next gate
+```
+
+Use status values `not-started`, `planned`, `in-progress`, `implemented`, `blocked`, `accepted`, `deferred`, and `out-of-scope`. Update the dashboard and ledger after each worker, review, parent fix, and acceptance decision.
+
+A compact launch note is enough when the user already approved end-to-end delivery:
 
 ```text
 Parallel slice launch:
@@ -274,7 +295,7 @@ Stop rule: child ambiguity, route failure, validation repeat failure, or scope d
 
 ### Read-only context and guardrail lanes
 
-Use `scout`/`context-builder` and pre-implementation guardrail/reviewer lanes for read-only repository facts, local conventions, slice handoff notes, or test/risk matrices. Their acceptance contract should ask for:
+For read-only repository facts, local conventions, slice handoff notes, or test/risk matrices, use `scout`/`context-builder` or pre-implementation guardrail/reviewer lanes. Ask for:
 
 - files inspected and commands run
 - evidence-backed findings with paths
@@ -513,6 +534,12 @@ Phase: triage | goal | spec | approval | implementation | QA | closeout
 Goal: <none | focused | recommended>
 Active route: <parent/runtime-default | worker/agent-default | explicit model>
 Next gate: <none | goal confirmation | approval | worker | validation | reviewer | human decision>
+```
+
+For broad PRD/spec runs, include one extra compact progress line when useful:
+
+```text
+PRD progress: accepted <slice ids>; blocked <slice ids or none>; in flight <slice ids or none>; next <slice/gate>
 ```
 
 ## Operating rule
