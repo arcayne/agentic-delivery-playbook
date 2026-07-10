@@ -18,7 +18,7 @@ GPT-5.6 Sol, Terra, and Luna are selected for task shape, independently of the d
 | Route | Use for | Topology |
 | --- | --- | --- |
 | Luna | Clear, repeatable mechanical work with objective checks. | Single agent; raise effort only when interpretation appears. |
-| Terra | Ordinary bounded implementation; use high effort when stronger implementation judgment is needed. | Single agent or one focused worker. |
+| Terra | gpt-5.6-terra with medium reasoning is the default route for everyday bounded implementation; use high effort when stronger implementation judgment is needed. | Single agent or one focused worker. |
 | Sol | Ambiguous, architecture-sensitive, risky, high-value judgment, escalation, and fresh-context review. | Single agent by default. |
 | Ultra | Broad work with genuinely independent lanes. | Maximum reasoning with one synthesis barrier; it is not another process mode. |
 
