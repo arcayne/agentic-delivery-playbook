@@ -1,7 +1,7 @@
 {
   "name": "agentic-delivery-playbook",
-  "version": "0.2.0",
-  "description": "Pi-native delivery skill for coding agents: classify, scope, approve, route honestly, and verify before merge.",
+  "version": "0.3.0",
+  "description": "GPT-5.6-first delivery kernel for Codex and ChatGPT Work: classify risk, route minimally, and verify from evidence.",
   "license": "MIT",
   "type": "commonjs",
   "bin": {
@@ -9,11 +9,15 @@
   },
   "files": [
     "adapters/chatgpt",
-    "adapters/claude",
     "adapters/codex",
-    "adapters/pi",
     "bin",
-    "docs",
+    "docs/adapters.md",
+    "docs/evaluation.md",
+    "docs/getting-started.md",
+    "docs/publishing.md",
+    "lib",
+    "profiles",
+    "scripts",
     "templates",
     "playbook.md",
     "README.md",
@@ -21,11 +25,10 @@
   ],
   "keywords": [
     "coding-agents",
-    "coding-agent-playbook",
-    "agent-preflight",
-    "claude-code",
     "codex",
-    "ai-assisted-development",
+    "chatgpt-work",
+    "gpt-5.6",
+    "agentic-delivery",
     "software-engineering",
     "human-in-the-loop"
   ],
@@ -37,6 +40,8 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "validate:policy": "node scripts/validate-active-policy.js",
+    "check": "npm test && npm run validate:policy"
   }
 }
