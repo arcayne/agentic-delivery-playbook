@@ -1,6 +1,6 @@
 ---
 name: Adapter request
-description: Request support for another coding-agent harness or editor.
+description: Propose a community-maintained adapter beyond the maintained Codex and ChatGPT Work boundary.
 title: "Adapter: "
 labels: [adapter]
 body:
@@ -8,20 +8,27 @@ body:
     id: harness
     attributes:
       label: Harness or editor
-      placeholder: e.g. Claude Code, Cursor, Codex CLI, Copilot Workspace
+      placeholder: e.g. editor, coding agent, or workspace
     validations:
       required: true
   - type: textarea
     id: mapping
     attributes:
-      label: Needed mapping
-      description: How should the playbook map to this tool's commands, rules, agents, or settings?
+      label: Kernel mapping
+      description: How would Direct and Controlled, evidence, and GPT-5.6 route observability map to this runtime?
+    validations:
+      required: true
+  - type: textarea
+    id: maintenance
+    attributes:
+      label: Maintenance and testing commitment
+      description: Who will maintain and test this adapter, against which runtime versions and deterministic checks?
     validations:
       required: true
   - type: textarea
     id: constraints
     attributes:
       label: Constraints
-      description: Any model-routing, approval, tool-use, or artifact constraints?
+      description: What authority, routing, configuration, or evidence limits must the adapter disclose?
     validations:
       required: false

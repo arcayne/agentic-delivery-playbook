@@ -65,3 +65,63 @@ test('the breaking package release excludes legacy material', () => {
   assert.equal(manifest.files.includes('legacy'), false);
   assert.equal(manifest.files.includes('test'), false);
 });
+
+test('public docs describe the maintained surface honestly', () => {
+  const readme = readUtf8(root, 'README.md');
+  assert.match(readme, /Direct and Controlled/);
+  assert.match(readme, /GPT-5\.6 Sol, Terra, and Luna/);
+  assert.match(readme, /Codex and ChatGPT Work/);
+  assert.match(readme, /docs\/evaluation\.md/);
+  assert.doesNotMatch(readme, /Pi-first|Direct.*Lightweight.*Full/is);
+
+  const evaluation = readUtf8(root, 'docs/evaluation.md');
+  for (const arm of [
+    'Sol medium without the playbook',
+    'Sol medium with the simplified kernel',
+    'Routed GPT-5.6 family with the simplified kernel',
+    'Sol Ultra high-compute comparison',
+  ]) {
+    assert.match(evaluation, new RegExp(arm, 'i'));
+  }
+});
+
+test('repository contribution and support metadata matches 0.3', () => {
+  const security = readUtf8(root, 'SECURITY.md');
+  const contributing = readUtf8(root, 'CONTRIBUTING.md');
+  const pullRequest = readUtf8(root, '.github/pull_request_template.md');
+  assert.match(security, /\| 0\.3\.x \| Yes \|/);
+  assert.match(security, /\| 0\.2\.x and earlier \| No \|/);
+  assert.match(contributing, /Direct and Controlled/);
+  assert.match(contributing, /GPT-5\.6/);
+  assert.match(pullRequest, /Direct and Controlled/);
+  assert.match(pullRequest, /active profile/i);
+});
+
+test('local links in the maintained public docs resolve', () => {
+  const publicDocs = [
+    'README.md',
+    'BUSINESS-CONTEXT.md',
+    'playbook.md',
+    'profiles/gpt-5.6.md',
+    'adapters/codex/README.md',
+    'adapters/chatgpt/README.md',
+    'docs/getting-started.md',
+    'docs/adapters.md',
+    'docs/business-assumptions.md',
+    'docs/evaluation.md',
+    'docs/publishing.md',
+    'examples/README.md',
+  ];
+  const linkPattern = /!?\[[^\]]*\]\(([^)]+)\)/g;
+
+  for (const file of publicDocs) {
+    const sourcePath = path.join(root, file);
+    for (const match of fs.readFileSync(sourcePath, 'utf8').matchAll(linkPattern)) {
+      const rawTarget = match[1].trim().replace(/^<|>$/g, '');
+      if (/^(?:https?:|mailto:|#)/.test(rawTarget)) continue;
+      const localTarget = decodeURI(rawTarget.split('#')[0]);
+      const resolved = path.resolve(path.dirname(sourcePath), localTarget);
+      assert.ok(fs.existsSync(resolved), `${file}: broken local link ${rawTarget}`);
+    }
+  }
+});

@@ -1,15 +1,5 @@
-# Examples
+# Active examples
 
-Examples are intentionally fictional and provider-neutral. They demonstrate the shape of run artifacts, not a specific codebase.
+The only active example is [controlled-run/](controlled-run/), a fictional versioned API response change with a completed contract and accepted run record.
 
-## Available examples
-
-```text
-lightweight-ticket/
-```
-
-A compact example for adding retry classification to a webhook consumer.
-
-## What to copy
-
-For a new run, copy from `templates/`, not from examples. Examples include completed-run values that should be replaced with real evidence.
+Direct work normally needs no artifact directory. Copy [templates/](../templates/) for a new run instead of reusing completed example values.

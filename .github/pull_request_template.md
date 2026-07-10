@@ -4,20 +4,21 @@ What does this change improve?
 
 ## Type of change
 
-- [ ] Workflow/docs clarification
-- [ ] Template improvement
+- [ ] Kernel or profile clarification
 - [ ] Adapter improvement
-- [ ] Example improvement
-- [ ] Bug/security fix in guidance
+- [ ] Template or evidence-schema improvement
+- [ ] Active example improvement
+- [ ] Security fix in guidance
 
 ## Checklist
 
-- [ ] Keeps the core playbook provider-neutral
-- [ ] Puts harness-specific guidance under `adapters/`
-- [ ] Preserves human approval gates for risky work
-- [ ] Prefers evidence over agent summaries
-- [ ] Updates examples/templates if behavior changed
+- [ ] Uses Direct and Controlled consistently with playbook.md.
+- [ ] Contains no stale active model, provider, or process references.
+- [ ] Updates evidence/schema documentation and focused tests when semantics changed.
+- [ ] Keeps the active profile consistent with profiles/gpt-5.6.md.
+- [ ] Does not make unsupported performance, cost, route, or review claims.
+- [ ] Keeps unsupported material in legacy/.
 
-## Notes
+## Evidence
 
-Any tradeoffs, open questions, or follow-up work?
+List validation commands, exit codes, output references, assumptions, and known gaps.
