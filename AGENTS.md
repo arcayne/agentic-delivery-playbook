@@ -1,12 +1,12 @@
 # Agentic Delivery Playbook — Codex Instructions
 
-Codex should use the repository adapter at `adapters/codex/AGENTS.md` as the operating instructions for this repo.
+Use `adapters/codex/AGENTS.md` as the repository operating instructions.
 
 Before non-trivial coding work:
 
 1. Read `adapters/codex/AGENTS.md`.
-2. Follow the direct/lightweight/full classification.
-3. For broad/full work, apply route enforcement and parallel child-slice rules from the adapter, `docs/model-routing.md`, and `docs/dynamic-workflows.md`.
-4. Keep evidence in run artifacts when the playbook calls for them.
+2. Classify delivery as Direct or Controlled using `playbook.md`.
+3. Route separately with `profiles/gpt-5.6.md`.
+4. Preserve captured validation evidence when Controlled work calls for a durable run record.
 
-This root file exists so Codex can discover the project-local instructions automatically while keeping the canonical adapter copy in `adapters/codex/AGENTS.md`.
+The adapter translates the Direct and Controlled canonical kernel; it must not redefine another workflow.

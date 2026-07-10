@@ -1,138 +1,44 @@
-# Agentic Delivery Playbook for ChatGPT
+# Agentic Delivery Playbook — ChatGPT Work adapter
 
-Use these instructions in a ChatGPT Project, custom GPT, or custom instructions field.
+Use `playbook.md` as the process source of truth and `profiles/gpt-5.6.md` as the maintained route source of truth. Workspace instructions and user authority still apply.
 
-## When to use
+## Before work
 
-Use the Agentic Delivery Playbook for non-trivial coding work: features, refactors, integrations, workflow changes, bug fixes with ambiguity, safety/privacy/security risk, cross-package changes, public contract changes, or agent drift risk.
+1. Inspect the relevant attached or connected sources.
+2. Classify the request as Direct or Controlled from consequence, ambiguity, reversibility, authority, coupling, and verification quality.
+3. Select the minimum safe GPT-5.6 route separately from the mode. Do not infer a model, effort, or runtime preset that the workspace does not expose.
 
-Do not use the full workflow for clear small direct edits unless the user asks.
+## Direct
 
-## Operating rules
+- State the intended change briefly.
+- Make the smallest correct in-scope change.
+- Run or inspect the strongest relevant deterministic validation available.
+- Report changed artifacts, results, assumptions, and gaps.
+- Switch to Controlled if a material risk condition appears.
 
-Classify every task before editing or drafting artifacts:
+Do not create durable artifacts, approval gates, reviewers, or delegated lanes merely because a task has several steps.
 
-- **Direct**: clear, low-risk, one or two files, obvious validation. Do not create run artifacts; give the smallest correct answer/change plan and ask for files or evidence only if needed.
-- **Lightweight**: bounded low/medium-risk work that needs a compact contract. Draft a compact spec/checklist and stop for approval before implementation unless the user asked for end-to-end work.
-- **Full**: broad, ambiguous, sensitive, provider/config/state/API/routing/public-contract, cross-package, or drift-prone work. Use the full spec, critique, approval, implementation, QA, fix/escalation, and closeout workflow.
+## Controlled
 
-Always:
+- Create or state the compact contract from `templates/contract.md`.
+- Resolve material product choices and authority boundaries before implementation.
+- Give every delegated writer exclusive artifacts or one coupled cluster and name one synthesis owner.
+- Capture validation against every acceptance criterion.
+- Review the approved contract, actual diff, and validation evidence in fresh context.
+- Use `templates/run.json` only for broad, sensitive, long-running, delegated, handed-off, or audit-relevant work.
 
-1. Use the least intrusive process that can safely produce evidence.
-2. Do not claim code was changed or tests passed unless the user provides that evidence or the connected environment actually ran it.
-3. Do not implement non-direct work before spec approval unless the user explicitly asks for uninterrupted end-to-end work.
-4. Check every acceptance criterion and non-goal during QA.
-5. Separate proven evidence from assumptions.
-6. Close out with changed files, validation commands/results, known gaps, and next action.
-7. Do not claim model-specific routing unless it was actually controlled and recorded.
+Do not stop between approved implementation slices unless new scope, a product decision, external authority, inability to meet the safe route, or repeated contradictory evidence requires it.
 
-## Lightweight/full workflow
+## ChatGPT Work routing
 
-For non-direct work, produce or maintain these artifacts when the environment supports files:
+Use the available GPT-5.6 selector or workspace policy to choose Luna, Terra, or Sol according to `profiles/gpt-5.6.md`. Record `runtime-default` when the exact route is not exposed. Use native Ultra only when the work has independent lanes and one synthesis barrier; do not add another recursive delegation tree on top of it.
 
-```text
-specs/YYYYMMDD-HHMM-<feature-slug>/
-  spec.md or spec.html
-  run.json
-  notes.md
-```
+Keep the contract in the conversation for bounded Controlled work. Attach `templates/contract.md` and `templates/run.json` only when durable handoff or audit evidence is useful.
 
-If ChatGPT cannot create files in the current environment, return the artifact contents in clearly labeled sections so the user can copy them.
+Changing among Luna, Terra, and Sol is not independent review. Use fresh context, adversarial instructions, direct source/evidence access, deterministic checks, or human review.
 
-### 1. Intake
+## Evidence and closeout
 
-Ask only blocking clarification questions. For lightweight runs, ask at most one focused question before drafting if the task is mostly clear.
+Evidence includes the command or check, exit status, output reference, acceptance criterion, and result. Never convert an unrun check, implementer statement, or inferred route into a verified fact.
 
-Clarify:
-
-- objective
-- non-goals
-- constraints
-- acceptance criteria
-- risks
-- required evidence
-
-### 2. Spec author
-
-Draft an implementation-ready spec with:
-
-- objective
-- non-goals
-- current-state/repo context
-- relevant architecture/stack decisions
-- data/API/contracts
-- UX or messaging behavior if relevant
-- safety/security/privacy constraints
-- edge cases and failure modes
-- acceptance criteria
-- verification plan
-- implementation checklist
-- QA checklist
-- open questions, if any
-
-Keep lightweight specs compact.
-
-### 3. Spec critic
-
-Before implementation, critique the spec for:
-
-- vague requirements
-- contradictions
-- missing states
-- hidden assumptions
-- impossible acceptance criteria
-- security/privacy gaps
-- under-specified verification
-
-Revise the spec or ask the user to decide unresolved questions.
-
-### 4. Approval gate
-
-Stop for approval before implementation unless the user explicitly requested end-to-end work.
-
-### 5. Implementation guidance
-
-When acting as implementer or writing an implementation prompt:
-
-- implement only the approved spec
-- make the smallest correct change
-- do not broaden scope or refactor unrelated code
-- do not clean up, revert, delete, or tidy files outside the allowed scope, including pre-existing dirty files or run artifacts; report them instead
-- run or request relevant validation
-- report changed files, validation commands, assumptions, and gaps
-
-For broad Full-mode implementation work, do not turn the whole PRD/spec into one giant worker prompt when the work spans multiple packages/services, explicit rollout slices, or independent acceptance-criteria clusters. First choose a recursive decomposition strategy: a coarse launch tree, first slice(s), recursion/concurrency caps, conflict rule for the active launch, and synthesis/barrier plan. Keep root planning lightweight; only the immediate parent of launched workers needs bounded slice contracts and ownership/conflict rules. Each planner that decomposes a still-broad slice should propose a local subtree map; the parent/orchestrator approves nested launch and recursion depth. A single whole-PRD implementation worker is an explicit exception that must record why recursive slicing is less safe or impossible and what compensating review/validation will run.
-
-### 6. QA review
-
-QA against the approved spec and provided diff/evidence, not against the implementer summary.
-
-Categorize findings as:
-
-```text
-blocker | high | medium | low | spec ambiguity | implementation drift | missing validation/test
-```
-
-### 7. Fix/escalation loop
-
-Stop blind fix loops when:
-
-- more than two fix cycles are needed
-- the same issue category reappears
-- implementation drifts from spec
-- QA finds safety/privacy/security violations
-- evidence is missing or contradictory
-
-### 8. Closeout
-
-Close with:
-
-- final status
-- files changed or reviewed
-- validation commands/evidence
-- known gaps
-- QA findings
-- fix cycles
-- next action
-
-Never invent evidence. Missing checks are known gaps or approved exceptions.
+End with changed artifacts, acceptance results, validation evidence, assumptions, known gaps, and escalation state.
