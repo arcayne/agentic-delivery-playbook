@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "mode": "controlled",
-  "status": "in-progress",
+  "status": "accepted",
   "contract": {
     "path": "specs/20260710-gpt-5-6-simplification/contract.md",
     "sha256": "sha256:b96a244827719de6aad817f01b6a525725919c185b44a0bbdb0a155bb77e0783",
@@ -9,8 +9,8 @@
   },
   "source": {
     "baseCommit": "da250b3",
-    "finalCommit": null,
-    "diffSha256": null
+    "finalCommit": "29311123414bc8318ccb046e7a9bc9783d9fc72a",
+    "diffSha256": "sha256:10556d7393dd97a3aeba6f7da0ec46c58b9d17602e053db4f8cadcf92987114c"
   },
   "route": {
     "policy": "profiles/gpt-5.6.md",
@@ -34,17 +34,17 @@
         "threadId": "unknown",
         "source": "unavailable"
       },
-      "status": "in-progress",
-      "evidence": ["Task 4 request"]
+      "status": "accepted",
+      "evidence": ["artifacts/npm-check.log", "artifacts/active-surface.log", "artifacts/final-verification.log"]
     },
     {
       "id": "review",
       "role": "reviewer",
-      "taskShape": "fresh-context-review",
+      "taskShape": "fresh-context-same-family-review",
       "ownership": ["read-only migration diff and evidence"],
       "requested": {
         "model": "gpt-5.6-sol",
-        "effort": "high",
+        "effort": "max",
         "topology": "single"
       },
       "observed": {
@@ -54,90 +54,113 @@
         "threadId": "unknown",
         "source": "unavailable"
       },
-      "status": "planned",
-      "evidence": []
+      "status": "accepted",
+      "evidence": ["artifacts/reviewer.md", "artifacts/final-verification.log"]
     }
+  ],
+  "artifacts": [
+    { "path": "artifacts/active-surface.log", "sha256": "sha256:a33283b890e811f1a1fac7891a318a859c7bd964b1e063c77ac78c6a4fa3f84d" },
+    { "path": "artifacts/chatgpt-show.md", "sha256": "sha256:c03020a713386e62b2fc57bbb3a73615a5497d8a3db4008814ce072d26a8d3b2" },
+    { "path": "artifacts/codex-show.md", "sha256": "sha256:4a546c12e3641254e45a3d97296e317e14c46633c13230ea373d9077cc98a447" },
+    { "path": "artifacts/final-verification.log", "sha256": "sha256:ab3baeb45a024ed37aed67e9cddcff492112b252acfa0d0a430b82ff87118de4" },
+    { "path": "artifacts/npm-check.log", "sha256": "sha256:913d74b391eb8aee6a89da0665484f52c47a692762c05ba2cbd49f69d3e56290" },
+    { "path": "artifacts/npm-pack.log", "sha256": "sha256:8da30f7f0fc87b836f8cae9e5e94da123901764ae60a171cb6d67b9f7b2945f1" },
+    { "path": "artifacts/profile-show.md", "sha256": "sha256:8a11fe105d3989f479059c4022d0038e8a46481fa72eae2aea4331b54e99d66a" },
+    { "path": "artifacts/reviewer.md", "sha256": "sha256:c65bedab7aeb5c5e53263489c0cb5cf82038aab2c75f220acfa4d329cf904c40" }
   ],
   "validation": [
     {
       "id": "validation-1",
-      "command": "node --test test/kernel.test.js",
-      "exitCode": null,
-      "startedAt": null,
-      "endedAt": null,
-      "outputReference": "Task 8: artifacts/npm-check.log",
-      "outputSha256": null,
-      "status": "pending"
+      "command": "rtk npm run check",
+      "exitCode": 0,
+      "startedAt": "2026-07-10T09:41:48Z",
+      "endedAt": "2026-07-10T09:41:48Z",
+      "outputReference": ["artifacts/final-verification.log"],
+      "outputSha256": ["sha256:ab3baeb45a024ed37aed67e9cddcff492112b252acfa0d0a430b82ff87118de4"],
+      "status": "passed"
     },
     {
       "id": "validation-2",
-      "command": "node --test test/routing-profile.test.js",
-      "exitCode": null,
-      "startedAt": null,
-      "endedAt": null,
-      "outputReference": "Task 8: artifacts/npm-check.log and artifacts/profile-show.md",
-      "outputSha256": null,
-      "status": "pending"
+      "command": "rtk npm run check",
+      "exitCode": 0,
+      "startedAt": "2026-07-10T09:41:48Z",
+      "endedAt": "2026-07-10T09:41:48Z",
+      "outputReference": ["artifacts/final-verification.log", "artifacts/profile-show.md"],
+      "outputSha256": ["sha256:ab3baeb45a024ed37aed67e9cddcff492112b252acfa0d0a430b82ff87118de4", "sha256:8a11fe105d3989f479059c4022d0038e8a46481fa72eae2aea4331b54e99d66a"],
+      "status": "passed"
     },
     {
       "id": "validation-3",
-      "command": "node --test test/run-record.test.js",
-      "exitCode": null,
-      "startedAt": null,
-      "endedAt": null,
-      "outputReference": "Task 8: artifacts/npm-check.log and active-surface.log",
-      "outputSha256": null,
-      "status": "pending"
+      "command": "rtk npm run check",
+      "exitCode": 0,
+      "startedAt": "2026-07-10T09:41:48Z",
+      "endedAt": "2026-07-10T09:41:48Z",
+      "outputReference": ["artifacts/final-verification.log", "artifacts/active-surface.log"],
+      "outputSha256": ["sha256:ab3baeb45a024ed37aed67e9cddcff492112b252acfa0d0a430b82ff87118de4", "sha256:a33283b890e811f1a1fac7891a318a859c7bd964b1e063c77ac78c6a4fa3f84d"],
+      "status": "passed"
     },
     {
       "id": "validation-4",
-      "command": "node --test test/adapters.test.js",
-      "exitCode": null,
-      "startedAt": null,
-      "endedAt": null,
-      "outputReference": "Task 8: artifacts/npm-check.log, codex-show.md, and chatgpt-show.md",
-      "outputSha256": null,
-      "status": "pending"
+      "command": "rtk npm run check",
+      "exitCode": 0,
+      "startedAt": "2026-07-10T09:41:48Z",
+      "endedAt": "2026-07-10T09:41:48Z",
+      "outputReference": ["artifacts/final-verification.log", "artifacts/codex-show.md", "artifacts/chatgpt-show.md"],
+      "outputSha256": ["sha256:ab3baeb45a024ed37aed67e9cddcff492112b252acfa0d0a430b82ff87118de4", "sha256:4a546c12e3641254e45a3d97296e317e14c46633c13230ea373d9077cc98a447", "sha256:c03020a713386e62b2fc57bbb3a73615a5497d8a3db4008814ce072d26a8d3b2"],
+      "status": "passed"
     },
     {
       "id": "validation-5",
-      "command": "node --test test/active-surface.test.js; npm pack --dry-run",
-      "exitCode": null,
-      "startedAt": null,
-      "endedAt": null,
-      "outputReference": "Task 8: artifacts/active-surface.log and npm-pack.log",
-      "outputSha256": null,
-      "status": "pending"
+      "command": "rtk npm run check; rtk proxy npm pack --dry-run",
+      "exitCode": 0,
+      "startedAt": "2026-07-10T09:41:48Z",
+      "endedAt": "2026-07-10T09:41:48Z",
+      "outputReference": ["artifacts/final-verification.log", "artifacts/active-surface.log"],
+      "outputSha256": ["sha256:ab3baeb45a024ed37aed67e9cddcff492112b252acfa0d0a430b82ff87118de4", "sha256:a33283b890e811f1a1fac7891a318a859c7bd964b1e063c77ac78c6a4fa3f84d"],
+      "status": "passed"
     },
     {
       "id": "validation-6",
-      "command": "npm run check; git diff --check",
-      "exitCode": null,
-      "startedAt": null,
-      "endedAt": null,
-      "outputReference": "Task 8: artifacts/npm-check.log and task output",
-      "outputSha256": null,
-      "status": "pending"
+      "command": "rtk npm run check; rtk git diff --check",
+      "exitCode": 0,
+      "startedAt": "2026-07-10T09:41:48Z",
+      "endedAt": "2026-07-10T09:41:48Z",
+      "outputReference": ["artifacts/final-verification.log"],
+      "outputSha256": ["sha256:ab3baeb45a024ed37aed67e9cddcff492112b252acfa0d0a430b82ff87118de4"],
+      "status": "passed"
     }
   ],
   "acceptance": [
-    { "criterion": "AC-1", "status": "pending", "evidence": ["validation:validation-1"] },
-    { "criterion": "AC-2", "status": "pending", "evidence": ["validation:validation-2"] },
-    { "criterion": "AC-3", "status": "pending", "evidence": ["validation:validation-3"] },
-    { "criterion": "AC-4", "status": "pending", "evidence": ["validation:validation-4"] },
-    { "criterion": "AC-5", "status": "pending", "evidence": ["validation:validation-5"] },
-    { "criterion": "AC-6", "status": "pending", "evidence": ["validation:validation-6"] }
+    { "criterion": "AC-1", "status": "met", "evidence": ["validation:validation-1"] },
+    { "criterion": "AC-2", "status": "met", "evidence": ["validation:validation-2"] },
+    { "criterion": "AC-3", "status": "met", "evidence": ["validation:validation-3"] },
+    { "criterion": "AC-4", "status": "met", "evidence": ["validation:validation-4"] },
+    { "criterion": "AC-5", "status": "met", "evidence": ["validation:validation-5"] },
+    { "criterion": "AC-6", "status": "met", "evidence": ["validation:validation-6"] }
   ],
   "review": {
     "reviewerLaneId": "review",
-    "diffReviewed": false,
-    "evidenceReviewed": false,
-    "decision": "pending",
-    "findings": []
+    "reviewType": "fresh-context-same-family",
+    "independent": false,
+    "diffReviewed": true,
+    "evidenceReviewed": true,
+    "decision": "accepted",
+    "findings": [
+      {
+        "id": "I1",
+        "severity": "important",
+        "status": "resolved",
+        "disposition": "Resolved by this evidence-only closeout: the run record binds the reviewed implementation range, fresh validation, reviewer evidence, and all artifact hashes; no active-policy change was required.",
+        "evidence": ["artifacts/reviewer.md", "artifacts/final-verification.log"]
+      }
+    ]
   },
   "closeout": {
-    "outcome": "pending",
-    "knownGaps": ["Model, effort, runtime-preset, and thread telemetry are unavailable.", "Final validation and fresh-context review are deferred to Task 8."],
+    "outcome": "accepted",
+    "knownGaps": [
+      "Model, effort, runtime-preset, and thread telemetry are unavailable; requested routes are not observed selections.",
+      "The final review was fresh-context and same-family, not an independent model-family review."
+    ],
     "escalation": null
   }
 }

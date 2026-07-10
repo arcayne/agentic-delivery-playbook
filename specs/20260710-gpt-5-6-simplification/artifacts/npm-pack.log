@@ -1,0 +1,38 @@
+npm notice
+npm notice 📦  agentic-delivery-playbook@0.3.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 3.9kB README.md
+npm notice 2.8kB adapters/chatgpt/instructions.md
+npm notice 429B adapters/chatgpt/README.md
+npm notice 2.8kB adapters/codex/AGENTS.md
+npm notice 524B adapters/codex/README.md
+npm notice 1.0kB bin/agentic-delivery-playbook.js
+npm notice 971B docs/adapters.md
+npm notice 4.1kB docs/evaluation.md
+npm notice 2.7kB docs/getting-started.md
+npm notice 1.4kB docs/publishing.md
+npm notice 839B lib/policy-helpers.js
+npm notice 1.1kB package.json
+npm notice 4.7kB playbook.md
+npm notice 289B profiles/codex/agents/escalation-reviewer.toml
+npm notice 242B profiles/codex/agents/explorer.toml
+npm notice 238B profiles/codex/agents/mechanical-worker.toml
+npm notice 262B profiles/codex/agents/reviewer.toml
+npm notice 243B profiles/codex/agents/worker.toml
+npm notice 757B profiles/codex/config.toml
+npm notice 3.2kB profiles/gpt-5.6.md
+npm notice 1.5kB scripts/validate-active-policy.js
+npm notice 1.1kB templates/contract.md
+npm notice 1.6kB templates/run.json
+npm notice Tarball Details
+npm notice name: agentic-delivery-playbook
+npm notice version: 0.3.0
+npm notice filename: agentic-delivery-playbook-0.3.0.tgz
+npm notice package size: 12.7 kB
+npm notice unpacked size: 37.7 kB
+npm notice shasum: a9f1621e2e2780e58bf0990e35c0e414aa5b146d
+npm notice integrity: sha512-JylVmD17N+NZH[...]LuhW+nYwOieDA==
+npm notice total files: 24
+npm notice
+agentic-delivery-playbook-0.3.0.tgz
