@@ -643,14 +643,20 @@ Run:
 ```bash
 node --test test/routing-profile.test.js
 npm test
-CODEX_HOME="$PWD/profiles/codex" rtk codex --strict-config --help >/tmp/adp-codex-config-help.txt
+set +e
+CODEX_HOME="$PWD/profiles/codex" rtk codex --strict-config doctor >/tmp/adp-codex-doctor.txt 2>&1
+DOCTOR_EXIT=$?
+set -e
+rtk rg -q 'config\.toml[[:space:]]+parse[[:space:]]+ok' /tmp/adp-codex-doctor.txt
+rtk rg -q 'model[[:space:]]+gpt-5\.6-terra' /tmp/adp-codex-doctor.txt
+rtk /bin/rm -rf profiles/codex/tmp
 wc -l profiles/gpt-5.6.md
 git diff --check
 ```
 
-Expected: all tests pass; Codex accepts the project example through its supported global strict-config parse check; the profile is no more than 120 lines.
+Expected: the routing tests pass; the doctor output shows that the profile `config.toml` loaded and parsed successfully with Terra as the model; an otherwise nonzero doctor exit is acceptable only when its diagnostics are unrelated to configuration (for example auth, terminal, or network); the profile remains no more than 120 lines.
 
-The `features` subcommand rejects `--strict-config` before parsing configuration, so it is not a configuration validation command.
+The `features` subcommand rejects `--strict-config` before parsing configuration, so it is not a configuration validation command. The `--help` command is also not a configuration-loading probe; use `doctor` for this validation.
 
 Commit:
 
