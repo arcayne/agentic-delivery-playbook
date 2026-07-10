@@ -66,7 +66,7 @@
     { "path": "artifacts/npm-check.log", "sha256": "sha256:913d74b391eb8aee6a89da0665484f52c47a692762c05ba2cbd49f69d3e56290" },
     { "path": "artifacts/npm-pack.log", "sha256": "sha256:8da30f7f0fc87b836f8cae9e5e94da123901764ae60a171cb6d67b9f7b2945f1" },
     { "path": "artifacts/profile-show.md", "sha256": "sha256:8a11fe105d3989f479059c4022d0038e8a46481fa72eae2aea4331b54e99d66a" },
-    { "path": "artifacts/reviewer.md", "sha256": "sha256:c65bedab7aeb5c5e53263489c0cb5cf82038aab2c75f220acfa4d329cf904c40" }
+    { "path": "artifacts/reviewer.md", "sha256": "sha256:fa71a966fbead9435df01854b52c6f559e60c9f089865f549e05529d91aa3f47" }
   ],
   "validation": [
     {
