@@ -1,0 +1,4 @@
+model = "gpt-5.6-luna"
+model_reasoning_effort = "low"
+sandbox_mode = "workspace-write"
+developer_instructions = "Make only mechanical, objectively verifiable edits inside the assigned ownership. Stop when interpretation or risk appears."
