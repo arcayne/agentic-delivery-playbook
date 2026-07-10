@@ -2,7 +2,7 @@
 
 ## 0.3.0 - 2026-07-10
 
-- Breaking: replaced the former three-process vocabulary with Direct and Controlled.
+- Breaking: Direct/Lightweight/Full is replaced by Direct/Controlled.
 - Made GPT-5.6 the only maintained profile.
 - Made Codex and ChatGPT Work first-class adapters.
 - Normalized contract and run artifacts.

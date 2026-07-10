@@ -125,3 +125,22 @@ test('local links in the maintained public docs resolve', () => {
     }
   }
 });
+
+test('controlled guidance matches the active example and migration mapping', () => {
+  const gettingStarted = readUtf8(root, 'docs/getting-started.md');
+  const run = JSON.parse(readUtf8(root, 'examples/controlled-run/run.json'));
+  const changelog = readUtf8(root, 'CHANGELOG.md');
+
+  assert.match(gettingStarted, /Route the bounded implementation to Terra high\./);
+  assert.match(gettingStarted, /Sol high in a fresh context to review/);
+
+  const implementation = run.lanes.find((lane) => lane.id === 'implementation');
+  const review = run.lanes.find((lane) => lane.id === 'fresh-context-review');
+  assert.equal(implementation.requested.model, 'gpt-5.6-terra');
+  assert.equal(implementation.requested.effort, 'high');
+  assert.equal(review.requested.model, 'gpt-5.6-sol');
+  assert.equal(review.requested.effort, 'high');
+
+  assert.match(changelog, /Direct\/Lightweight\/Full/);
+  assert.match(changelog, /Direct\/Controlled/);
+});

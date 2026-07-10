@@ -23,7 +23,7 @@ Request: add a version field to the fictional Acme Catalog API v2 product respon
 
 This is Controlled because it changes a public contract. Write the compact contract before implementation, including the response field, compatibility boundary, non-goals, acceptance criteria, ownership, and evidence plan. The completed fictional contract is [examples/controlled-run/contract.md](../examples/controlled-run/contract.md).
 
-Mode does not select the model. A bounded internal implementation with stable compatibility evidence can use Terra high. For this example, the public-client compatibility risk calls for Sol high before implementation; use fresh-context Sol high for the review as well.
+Mode does not select the model. Route the bounded implementation to Terra high. Because this changes a public contract, use Sol high in a fresh context to review the contract, actual diff, and validation evidence.
 
 Capture evidence for every acceptance criterion. One recorded row could be:
 
