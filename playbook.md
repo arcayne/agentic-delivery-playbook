@@ -1,322 +1,76 @@
 # Agentic Delivery Playbook
 
-This playbook is a spec-gated workflow for using coding agents on software delivery tasks.
+A small delivery kernel for coding work: classify by risk, choose the minimum safe route, bound ownership, and close from evidence.
 
-It is designed for situations where a direct edit is too risky or too ambiguous, but a heavyweight process would slow the team down. It gives agents a clear contract, gives humans approval points, and preserves evidence for review.
+## Decide the process mode
 
-## The delivery loop
+Use **Direct** only when all are true:
 
-```text
-0. triage
-1. intake
-2. spec authoring
-3. spec critique
-4. approval gate
-5. implementation
-6. implementation QA
-7. fix or escalate
-8. closeout
-```
+- intent and acceptance are clear
+- effects are low-consequence or readily reversible
+- no material security, privacy, auth, payment, financial, destructive, public-contract, or external-authority concern exists
+- one owner can make the change without unsafe coordination
+- completion is objectively verifiable
 
-## 0. Triage: process weight first
+Use **Controlled** when any condition above is false, or when broad delegated work needs ownership and synthesis controls. File count is context, not the deciding rule.
 
-Classify the task before creating artifacts, choosing models, or delegating reviewers. Use the least intrusive mode that can safely produce evidence.
+## Direct mode
 
-### Direct mode: small direct change
+1. State the intended change in one or two sentences.
+2. Inspect the relevant code and local instructions.
+3. Make the smallest correct edit.
+4. Run the strongest relevant deterministic validation available.
+5. Report changed files, validation results, assumptions, and known gaps.
 
-Implement directly when the change is clear, low-risk, narrow, and easy to validate.
+Direct mode does not require a durable contract, run record, approval gate, independent reviewer, or explicit route record. A short checklist may be used without creating another mode.
 
-Signals:
+Switch to Controlled mode if ambiguity, consequence, authority, coupling, or weak verification appears during execution.
 
-- one or two files
-- no public contract change
-- no sensitive data or external-provider behavior
-- no security, auth, payment, financial, destructive, or irreversible action
-- obvious validation command
+## Controlled mode
 
-Direct mode contract:
+1. Write a compact delivery contract using `templates/contract.md`.
+2. Obtain approval for unresolved product choices, authority changes, or material boundaries.
+3. Select the minimum safe route from the maintained profile and record exceptions.
+4. Give every writer exclusive files or a coupled file cluster; cap delegation and define a synthesis owner.
+5. Implement against the approved acceptance criteria.
+6. Capture commands, exit status, and evidence for each acceptance criterion.
+7. Review the approved contract, actual diff, and validation evidence in a fresh context.
+8. Close as accepted, partially accepted, escalated, or blocked; never infer success from narration alone.
 
-- no run directory
-- no spec artifact unless the human asks for one
-- edit, run the obvious validation, and report changed files plus evidence
+A durable contract and run record are required when Controlled work is broad, sensitive, long-running, delegated, handed off, or audit-relevant. Bounded Controlled work may keep the contract in the task.
 
-### Lightweight mode: compact ticket
+When the user approved an end-to-end outcome, do not stop for repeated slice approvals. Stop only for new scope, an unresolved product decision, a new authority requirement, inability to satisfy the minimum safe route, or contradictory evidence after two focused fix cycles.
 
-Use a compact spec/checklist when the change is bounded but still benefits from a written contract.
+## Route separately from process
 
-Signals:
-
-- two to five files
-- one package or one feature area
-- clear acceptance criteria after at most one or two questions
-- low or medium risk
-
-Lightweight mode contract:
-
-- minimal run directory with `spec.md` or `spec.html`, `run.json`, and `notes.md`
-- compact spec/checklist instead of a full PRD
-- notes-only evidence is acceptable when commands and outcomes are explicit
-- parent self-review is acceptable when no serious risk appears
-- no independent critic, broad-ticket planning gate, or high-risk QA checklist unless risk appears
-
-### Full mode: broad or risky ticket
-
-Use the full workflow when implementation drift would be costly.
-
-Signals:
-
-- more than five files
-- cross-package or cross-service changes
-- public contract, routing, state-machine, provider, auth, privacy, or data-flow changes
-- subtle negative cases
-- multiple operating modes
-- vague initial implementation prompt
-
-Full mode contract:
-
-- broad-ticket planning before implementation when the spec is too large for one focused implementer pass
-- recursive decomposition strategy before workers write when the spec spans multiple packages/services, explicit rollout slices, or independent feature lanes
-- root planning stays coarse by default: launch tree, dependencies, caps, and first safe slice(s), not a full repo-wide file map
-- no whole-PRD giant implementation worker unless an explicit exception records why recursive slicing is less safe or impossible and how context/drift risk will be mitigated
-- explicit model/agent and reasoning ledger when routing controls are available
-- critic/QA gate, preferably independent when available
-- high-risk QA for sensitive, authority, provider, state, privacy, or cross-system changes
-- dynamic workflow/fanout only after a plain-English launch note is approved
-- for broad PRD/spec runs, a status dashboard and PRD implementation ledger that map requirements to slices, evidence, gaps, and next gates
-- workflow findings accepted only after synthesis plus independent verification, or clearly marked speculative
-- required closeout fields for files changed, validation, findings, model ledger, known gaps, fix cycles, and next action
-
-### Harness ladder: choose the smallest runtime
-
-Use the smallest harness that safely fits the work:
+Record a route as:
 
 ```text
-direct prompt -> skill -> subagent -> chain / agent team -> goal loop -> dynamic workflow
+model tier + reasoning effort + topology
 ```
 
-A goal loop is depth: it iterates against a completion condition. A dynamic workflow is width: many agents explore, verify, compare, or classify in parallel, then a synthesizer folds the work into one answer.
+Process mode does not imply a model. Use `profiles/gpt-5.6.md` for the maintained mapping. A runtime preset such as Ultra is topology plus effort, not a fourth model tier or process mode.
 
-Dynamic workflows are a full-mode escalation for broad audits, migrations, root-cause hypothesis panels, evals, rule-adherence checks, or critical plans that need independent attempts and adversarial review. They are not for small edits, unclear scope, low-value knowledge work, or tightly sequential tasks.
+Escalate only from evidence: the task stopped being mechanical, interpretation became material, a focused retry failed, hidden coupling appeared, or risk increased. Higher effort is not an unlimited retry loop.
 
-Before launching a dynamic workflow or large parallel fanout, write a short launch note with scope, a concrete cap, a recursion/depth cap when nested planners are used, a stop rule, and the synthesis/verification plan. Do not create blank budget fields that people will not fill. Each planner may propose the subtree map for the slice it decomposes; the parent/orchestrator approves launch, recursion depth, and final synthesis. File ownership/conflict rules are required for siblings being launched now, not for every possible downstream file before the first slice starts.
+## Delegation and review
 
-For broad PRD/spec implementation, keep a compact status dashboard and PRD implementation ledger in `notes.md`/`run.json`. Update them after each worker, review, parent fix, and acceptance decision so the run can answer "where are we in the PRD?" without reading every child report.
+- Prefer one capable agent for tightly coupled work.
+- Delegate only genuinely independent lanes with explicit inputs, outputs, ownership, and a synthesis barrier.
+- Use one orchestration plane. Do not add recursive fanout on top of native Ultra delegation by default.
+- Default nesting depth is one.
+- A different GPT-5.6 tier is not independent review by itself. Fresh context, adversarial instructions, direct diff access, deterministic checks, and human authority provide stronger separation.
 
-See [`docs/dynamic-workflows.md`](docs/dynamic-workflows.md).
+## Failure rules
 
-## 1. Intake
+- If the minimum safe route is unavailable, use the next safe configured route, narrow the task, add compensating deterministic checks, or ask the user. Do not silently run below a Controlled task's safety floor.
+- Mark a timed-out or unusable lane failed and treat its edits as untrusted. Retry once with a narrower contract, replace the route, or record an explicit takeover.
+- Stop conflicting parallel edits at the synthesis barrier, restore exclusive ownership, and rerun affected validation.
+- Stop the affected lane when contract or product ambiguity appears; a worker cannot silently decide outside its contract.
+- Missing or contradictory evidence prevents accepted closeout. Rerun the check or record an explicitly accepted gap.
 
-Clarify enough to write an implementation-ready spec.
+## Evidence and closeout
 
-Capture:
+Evidence records the command or check, exit status, output reference, acceptance criterion, and result. The final report distinguishes verified facts, assumptions, skipped checks, and known gaps.
 
-- objective
-- non-goals
-- user-visible behavior
-- affected systems
-- constraints
-- acceptance criteria
-- verification evidence
-- safety, security, privacy, and rollback concerns
-- open questions
-
-If a question blocks safe implementation, ask it before writing code.
-
-## 2. Spec authoring
-
-Write the spec as a contract for implementation and QA.
-
-A good spec is:
-
-- concrete enough for an implementer to act on
-- strict enough for QA to reject drift
-- small enough to finish in one run or split into tickets
-- explicit about non-goals
-- explicit about validation evidence
-
-Use [`templates/spec.template.md`](templates/spec.template.md) for simple runs.
-
-Use [`templates/spec.template.html`](templates/spec.template.html) when visual hierarchy, diagrams, screenshots, state machines, or tables make the spec easier for the human approver to understand. Visual specs are not decoration; they are a way to prevent blindly accepting an agent plan.
-
-See [`docs/visual-specs.md`](docs/visual-specs.md).
-
-## 3. Spec critique
-
-Review the spec before coding. Attack:
-
-- vague requirements
-- contradictions
-- hidden assumptions
-- missing states
-- unsafe defaults
-- privacy or security gaps
-- impossible acceptance criteria
-- missing tests
-- implementation instructions that are too broad
-
-Revise the spec until it is implementable or ask the human to decide.
-
-For lightweight mode, a parent self-review is enough when no serious risk appears. For full mode, use a skeptical critic or independent reviewer when available.
-
-## 4. Approval gate
-
-Do not implement until the spec is approved, unless the human explicitly asked for an uninterrupted end-to-end run.
-
-Approval can be informal, but it should be recorded in `run.json` or `notes.md`.
-
-Examples:
-
-- `approved`
-- `go`
-- `implement this spec`
-- `continue end-to-end`
-
-## 5. Implementation
-
-Give the implementer the approved spec and a focused task.
-
-Implementation rules:
-
-- implement the smallest correct change
-- do not broaden scope
-- do not refactor unrelated code
-- do not clean up, revert, delete, or tidy files outside the approved scope; report unrelated dirty files or artifacts instead
-- do not make product decisions hidden inside code
-- preserve existing behavior unless the spec changes it
-- run relevant validation
-- report changed files, validation, assumptions, and ambiguities
-
-If your harness supports model or agent routing, route implementation explicitly and record it in the model ledger. If it does not, record `runtime-default` and avoid model-specific claims.
-
-## 6. Implementation QA
-
-QA against the approved spec, not against the implementer's summary.
-
-Classify findings:
-
-- blocker
-- high
-- medium
-- low
-- spec ambiguity
-- implementation drift
-- missing validation
-
-A reviewer should be able to answer:
-
-- Did the implementation satisfy every acceptance criterion?
-- Did it avoid every non-goal?
-- Did it preserve required safety/privacy/security constraints?
-- Were tests or validation actually run?
-- Are known gaps explicit?
-
-For lightweight mode, QA can be a parent self-review recorded in `notes.md` when acceptance criteria are clear and risk is low or medium.
-
-Use [`templates/qa-checklist.template.md`](templates/qa-checklist.template.md) when a separate QA artifact helps.
-
-For broad tickets or sensitive changes, also use [`docs/high-risk-qa.md`](docs/high-risk-qa.md).
-
-For dynamic workflows, QA must review the synthesis, rejected findings, verifier/refuter results, and any speculative findings. A workflow finding is not final just because a worker reported it.
-
-## 7. Fix or escalate
-
-A normal fix loop is fine. Repeated correction is a signal.
-
-Escalate when:
-
-- the same issue reappears
-- more than two fix cycles are needed
-- the implementer edits outside scope
-- validation failures reveal spec ambiguity
-- the change is safety/security/architecture critical
-- the reviewer finds unapproved decisions
-- the parent has to revert implementer edits before continuing
-
-Escalation options:
-
-- split the ticket
-- tighten the spec
-- use a stronger planner/reviewer
-- switch implementer
-- stop and ask the human
-
-## 8. Closeout
-
-Close the run with evidence.
-
-For lightweight mode, notes-only evidence is acceptable if it clearly records changed files, validation commands, outcomes, known gaps, and next action.
-
-For full mode, record all required closeout fields:
-
-- final status
-- changed files
-- validation commands and outputs
-- acceptance criteria result
-- review findings
-- fix cycles
-- model/agent ledger, including reasoning intensity when available
-- known gaps
-- next recommended action
-
-Use [`templates/notes.template.md`](templates/notes.template.md) and update `run.json`.
-
-Before closing a serious run, use [`templates/closeout-governance.template.md`](templates/closeout-governance.template.md) to record project-specific checks, warnings, skipped validation, approved exceptions, and observability/ROI data when available.
-
-Telemetry and ROI checks must be portable. Prefer environment/config inputs such as `PI_OBS_DB`; do not commit personal absolute paths into reusable scripts or templates.
-
-## Evidence integrity and legacy runs
-
-Do not invent evidence after the fact.
-
-If a run predates the current workflow, used runtime default routing, skipped a gate, or cannot prove which model or agent did the work, mark it explicitly as a legacy gap or approved exception. Warnings are better than fake precision.
-
-Record:
-
-- what evidence is missing
-- why it is missing
-- whether the human accepted the gap
-- what future runs should do differently
-
-## Implementation model evaluation
-
-When the implementation used an explicitly chosen model or agent, evaluate it after QA.
-
-This is not a benchmark. It is an operational check:
-
-- Did the implementer satisfy the approved spec?
-- Did it keep scope tight?
-- Did it avoid unapproved decisions?
-- How many fix cycles were needed?
-- Did the chosen model or agent seem appropriate for this task size?
-- Was the process weight appropriate for the task, based on cost/tokens/turns when available?
-
-Record the result in `run.json` and `notes.md` so future model routing decisions are based on evidence, not vibes.
-
-## Artifact contract
-
-Direct mode should not create artifacts unless the human asks.
-
-Every non-direct run should produce:
-
-```text
-specs/YYYYMMDD-HHMM-feature-slug/
-  spec.md or spec.html
-  run.json
-  notes.md
-```
-
-Optional artifacts:
-
-```text
-  qa.md
-  closeout-governance.md
-  validation.log
-  workflow-status.md
-  workflow-results.json
-  screenshots/
-  diffs/
-```
-
-## Design stance
-
-This playbook is intentionally not a benchmark and not a model endorsement. It is an operational pattern: give agents clear contracts, route work deliberately when possible, verify against evidence, and stop when the loop shows drift.
+Never claim a test ran, a route was observed, a reviewer was independent, or an outcome was accepted unless the corresponding evidence exists.
