@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "1.0",
+  "mode": "controlled",
+  "status": "in-progress",
+  "contract": {
+    "path": "specs/20260710-gpt-5-6-simplification/contract.md",
+    "sha256": "sha256:b96a244827719de6aad817f01b6a525725919c185b44a0bbdb0a155bb77e0783",
+    "approvalEvidence": "User approval of massive simplification, option 3, and Direct/Controlled delivery"
+  },
+  "source": {
+    "baseCommit": "da250b3",
+    "finalCommit": null,
+    "diffSha256": null
+  },
+  "route": {
+    "policy": "profiles/gpt-5.6.md",
+    "exception": null
+  },
+  "lanes": [
+    {
+      "id": "implementation",
+      "role": "worker",
+      "taskShape": "bounded-controlled-artifacts",
+      "ownership": ["templates/run.json", "test/run-record.test.js", "specs/20260710-gpt-5-6-simplification"],
+      "requested": {
+        "model": "gpt-5.6-terra",
+        "effort": "high",
+        "topology": "single"
+      },
+      "observed": {
+        "model": "unknown",
+        "effort": "unknown",
+        "runtimePreset": null,
+        "threadId": "unknown",
+        "source": "unavailable"
+      },
+      "status": "in-progress",
+      "evidence": ["Task 4 request"]
+    },
+    {
+      "id": "review",
+      "role": "reviewer",
+      "taskShape": "fresh-context-review",
+      "ownership": ["read-only migration diff and evidence"],
+      "requested": {
+        "model": "gpt-5.6-sol",
+        "effort": "high",
+        "topology": "single"
+      },
+      "observed": {
+        "model": "unknown",
+        "effort": "unknown",
+        "runtimePreset": null,
+        "threadId": "unknown",
+        "source": "unavailable"
+      },
+      "status": "planned",
+      "evidence": []
+    }
+  ],
+  "validation": [
+    {
+      "id": "validation-1",
+      "command": "node --test test/kernel.test.js",
+      "exitCode": null,
+      "startedAt": null,
+      "endedAt": null,
+      "outputReference": "Task 8: artifacts/npm-check.log",
+      "outputSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "validation-2",
+      "command": "node --test test/routing-profile.test.js",
+      "exitCode": null,
+      "startedAt": null,
+      "endedAt": null,
+      "outputReference": "Task 8: artifacts/npm-check.log and artifacts/profile-show.md",
+      "outputSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "validation-3",
+      "command": "node --test test/run-record.test.js",
+      "exitCode": null,
+      "startedAt": null,
+      "endedAt": null,
+      "outputReference": "Task 8: artifacts/npm-check.log and active-surface.log",
+      "outputSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "validation-4",
+      "command": "node --test test/adapters.test.js",
+      "exitCode": null,
+      "startedAt": null,
+      "endedAt": null,
+      "outputReference": "Task 8: artifacts/npm-check.log, codex-show.md, and chatgpt-show.md",
+      "outputSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "validation-5",
+      "command": "node --test test/active-surface.test.js; npm pack --dry-run",
+      "exitCode": null,
+      "startedAt": null,
+      "endedAt": null,
+      "outputReference": "Task 8: artifacts/active-surface.log and npm-pack.log",
+      "outputSha256": null,
+      "status": "pending"
+    },
+    {
+      "id": "validation-6",
+      "command": "npm run check; git diff --check",
+      "exitCode": null,
+      "startedAt": null,
+      "endedAt": null,
+      "outputReference": "Task 8: artifacts/npm-check.log and task output",
+      "outputSha256": null,
+      "status": "pending"
+    }
+  ],
+  "acceptance": [
+    { "criterion": "AC-1", "status": "pending", "evidence": ["validation:validation-1"] },
+    { "criterion": "AC-2", "status": "pending", "evidence": ["validation:validation-2"] },
+    { "criterion": "AC-3", "status": "pending", "evidence": ["validation:validation-3"] },
+    { "criterion": "AC-4", "status": "pending", "evidence": ["validation:validation-4"] },
+    { "criterion": "AC-5", "status": "pending", "evidence": ["validation:validation-5"] },
+    { "criterion": "AC-6", "status": "pending", "evidence": ["validation:validation-6"] }
+  ],
+  "review": {
+    "reviewerLaneId": "review",
+    "diffReviewed": false,
+    "evidenceReviewed": false,
+    "decision": "pending",
+    "findings": []
+  },
+  "closeout": {
+    "outcome": "pending",
+    "knownGaps": ["Model, effort, runtime-preset, and thread telemetry are unavailable.", "Final validation and fresh-context review are deferred to Task 8."],
+    "escalation": null
+  }
+}
