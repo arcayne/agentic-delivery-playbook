@@ -643,12 +643,14 @@ Run:
 ```bash
 node --test test/routing-profile.test.js
 npm test
-CODEX_HOME="$PWD/profiles/codex" codex --strict-config features list >/tmp/adp-codex-features.txt
+CODEX_HOME="$PWD/profiles/codex" rtk codex --strict-config --help >/tmp/adp-codex-config-help.txt
 wc -l profiles/gpt-5.6.md
 git diff --check
 ```
 
-Expected: all tests pass; Codex accepts the project example with strict configuration parsing; the profile is no more than 120 lines.
+Expected: all tests pass; Codex accepts the project example through its supported global strict-config parse check; the profile is no more than 120 lines.
+
+The `features` subcommand rejects `--strict-config` before parsing configuration, so it is not a configuration validation command.
 
 Commit:
 
