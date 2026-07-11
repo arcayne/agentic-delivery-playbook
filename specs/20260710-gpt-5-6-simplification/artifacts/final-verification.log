@@ -1,0 +1,91 @@
+# Task 8 final verification
+
+startedAt: 2026-07-10T09:41:48Z
+$ rtk npm run check
+> npm test && npm run validate:policy
+> node --test test/*.test.js
+✔ active policy contains no retired model matrix (1.651541ms)
+✔ active policy respects its line budgets (0.369542ms)
+✔ retired provider adapters are legacy-only (0.294417ms)
+✔ CLI exposes active artifacts without mutating the target project (40.690209ms)
+✔ the breaking package release excludes legacy material (0.12775ms)
+✔ public docs describe the maintained surface honestly (0.378917ms)
+✔ repository contribution and support metadata matches 0.3 (0.13275ms)
+✔ local links in the maintained public docs resolve (0.879709ms)
+✔ controlled guidance matches the active example and migration mapping (0.258625ms)
+✔ first-class adapters translate the same two-mode kernel (0.816583ms)
+✔ the Codex adapter stays thin (0.167708ms)
+✔ the root instructions point only to active policy (0.110666ms)
+✔ the active kernel has exactly Direct and Controlled modes (0.802375ms)
+✔ the kernel defines concise failure handling (0.144ms)
+✔ the controlled contract contains every required decision field (0.20475ms)
+✔ lineCount ignores one terminal newline (0.640875ms)
+✔ readUtf8 resolves repository-relative paths (0.729625ms)
+✔ findForbiddenTerms reports file, term, and line (0.762584ms)
+✔ the maintained profile contains only the GPT-5.6 family (0.818667ms)
+✔ Codex defaults to Terra medium with bounded delegation (0.120792ms)
+✔ project agents map mechanical, work, and review lanes explicitly (0.246792ms)
+✔ the run template is compact and normalized around lanes (1.268ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 108.1645
+> node scripts/validate-active-policy.js
+active policy validation passed
+[exitCode: 0]
+endedAt: 2026-07-10T09:41:48Z
+
+startedAt: 2026-07-10T09:41:48Z
+$ rtk git diff --check
+
+[exitCode: 0]
+endedAt: 2026-07-10T09:41:48Z
+
+startedAt: 2026-07-10T09:41:48Z
+$ rtk proxy npm pack --dry-run
+npm notice
+npm notice 📦  agentic-delivery-playbook@0.3.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 3.9kB README.md
+npm notice 2.8kB adapters/chatgpt/instructions.md
+npm notice 429B adapters/chatgpt/README.md
+npm notice 2.8kB adapters/codex/AGENTS.md
+npm notice 524B adapters/codex/README.md
+npm notice 1.0kB bin/agentic-delivery-playbook.js
+npm notice 971B docs/adapters.md
+npm notice 4.1kB docs/evaluation.md
+npm notice 2.7kB docs/getting-started.md
+npm notice 1.4kB docs/publishing.md
+npm notice 839B lib/policy-helpers.js
+npm notice 1.1kB package.json
+npm notice 4.7kB playbook.md
+npm notice 289B profiles/codex/agents/escalation-reviewer.toml
+npm notice 242B profiles/codex/agents/explorer.toml
+npm notice 238B profiles/codex/agents/mechanical-worker.toml
+npm notice 262B profiles/codex/agents/reviewer.toml
+npm notice 243B profiles/codex/agents/worker.toml
+npm notice 757B profiles/codex/config.toml
+npm notice 3.2kB profiles/gpt-5.6.md
+npm notice 1.5kB scripts/validate-active-policy.js
+npm notice 1.1kB templates/contract.md
+npm notice 1.6kB templates/run.json
+npm notice Tarball Details
+npm notice name: agentic-delivery-playbook
+npm notice version: 0.3.0
+npm notice filename: agentic-delivery-playbook-0.3.0.tgz
+npm notice package size: 12.7 kB
+npm notice unpacked size: 37.7 kB
+npm notice shasum: a9f1621e2e2780e58bf0990e35c0e414aa5b146d
+npm notice integrity: sha512-JylVmD17N+NZH[...]LuhW+nYwOieDA==
+npm notice total files: 24
+npm notice
+agentic-delivery-playbook-0.3.0.tgz
+[exitCode: 0]
+endedAt: 2026-07-10T09:41:48Z
+
+result: passed

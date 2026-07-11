@@ -1,6 +1,6 @@
 ---
 name: Workflow improvement
-description: Suggest a change to the core playbook, gates, templates, or examples.
+description: Suggest a change to the kernel, profile, templates, or active examples.
 title: "Workflow: "
 labels: [workflow]
 body:
@@ -15,13 +15,13 @@ body:
     id: proposal
     attributes:
       label: Proposed improvement
-      description: What should change?
+      description: What should change in the kernel, profile, templates, or active examples?
     validations:
       required: true
   - type: textarea
-    id: context
+    id: evidence
     attributes:
-      label: Context
-      description: Any example workflow, agent harness, or failure mode that motivated this?
+      label: Evidence
+      description: What validation, example, or evaluation evidence supports this change?
     validations:
-      required: false
+      required: true

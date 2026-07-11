@@ -1,21 +1,5 @@
-# ChatGPT adapter
+# ChatGPT Work adapter
 
-ChatGPT does not currently use Claude-style `SKILL.md` folders. Use this adapter as Project instructions, custom GPT instructions, or a pasted session instruction.
+Paste `instructions.md` into the ChatGPT Work project instructions. When durable Controlled artifacts are useful, attach `../../profiles/gpt-5.6.md`, `../../templates/contract.md`, and `../../templates/run.json` to the project.
 
-## Install in a ChatGPT Project
-
-1. Create or open a ChatGPT Project.
-2. Open the Project instructions.
-3. Paste the contents of [`instructions.md`](instructions.md).
-4. Add repository docs or files as Project knowledge only when useful for the task.
-
-## Install in a custom GPT
-
-1. Create or edit a custom GPT.
-2. Paste the contents of [`instructions.md`](instructions.md) into the instruction field.
-3. Optionally upload `playbook.md`, templates, or example specs as knowledge.
-4. Keep the GPT configured to avoid claiming tests or code changes unless it has tool evidence.
-
-## One-off use
-
-Paste [`instructions.md`](instructions.md) at the start of a chat and then describe the task.
+Use the workspace's available GPT-5.6 controls; record `runtime-default` when the selected route is not exposed. The adapter adds no process mode beyond Direct and Controlled.

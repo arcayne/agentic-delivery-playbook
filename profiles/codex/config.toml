@@ -1,0 +1,26 @@
+model = "gpt-5.6-terra"
+model_reasoning_effort = "medium"
+
+[agents]
+max_threads = 4
+max_depth = 1
+
+[agents.mechanical_worker]
+description = "Mechanical, objectively verifiable edits."
+config_file = "agents/mechanical-worker.toml"
+
+[agents.explorer]
+description = "Read-only repository exploration and evidence gathering."
+config_file = "agents/explorer.toml"
+
+[agents.worker]
+description = "Bounded implementation with exclusive ownership."
+config_file = "agents/worker.toml"
+
+[agents.reviewer]
+description = "Fresh-context review of contract, diff, and evidence."
+config_file = "agents/reviewer.toml"
+
+[agents.escalation_reviewer]
+description = "Maximum-depth review for high-risk or repeated-failure work."
+config_file = "agents/escalation-reviewer.toml"

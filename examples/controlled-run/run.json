@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "1.0",
+  "mode": "controlled",
+  "status": "accepted",
+  "fictionalExample": true,
+  "contract": {
+    "path": "examples/controlled-run/contract.md",
+    "sha256": "sha256:0ce67c222857b95e75d6c6d47da3abc15c5404e49b90447c180de8bf52030eda",
+    "approvalEvidence": "Fictional Acme Catalog API product review on 2026-07-10"
+  },
+  "source": {
+    "baseCommit": "fictional:catalog-api-before-v2-version-marker",
+    "finalCommit": "fictional:catalog-api-add-v2-api-version",
+    "diffSha256": "sha256:4d86d076b8d0715128095d43b95d5bb3f25b4a6a45d6b4e44ca0b1df43d4effb"
+  },
+  "route": {
+    "policy": "profiles/gpt-5.6.md",
+    "exception": null
+  },
+  "lanes": [
+    {
+      "id": "implementation",
+      "role": "worker",
+      "taskShape": "bounded-public-contract-change",
+      "ownership": [
+        "fictional v2 handler",
+        "fictional v2 serializer",
+        "fictional contract tests",
+        "fictional v2 API reference"
+      ],
+      "requested": {
+        "model": "gpt-5.6-terra",
+        "effort": "high",
+        "topology": "single"
+      },
+      "observed": {
+        "model": "gpt-5.6-terra",
+        "effort": "high",
+        "runtimePreset": null,
+        "threadId": "fictional-catalog-482-implementation",
+        "source": "fictional-example"
+      },
+      "status": "completed",
+      "evidence": [
+        "Fictional build 482 implementation transcript"
+      ]
+    },
+    {
+      "id": "fresh-context-review",
+      "role": "reviewer",
+      "taskShape": "fresh-context-public-contract-review",
+      "ownership": [
+        "approved contract",
+        "actual diff",
+        "captured validation evidence"
+      ],
+      "requested": {
+        "model": "gpt-5.6-sol",
+        "effort": "high",
+        "topology": "single"
+      },
+      "observed": {
+        "model": "gpt-5.6-sol",
+        "effort": "high",
+        "runtimePreset": null,
+        "threadId": "fictional-catalog-482-review",
+        "source": "fictional-example"
+      },
+      "status": "completed",
+      "evidence": [
+        "Fictional fresh-context review transcript"
+      ]
+    }
+  ],
+  "validation": [
+    {
+      "id": "v2-contract",
+      "command": "npm run test:contract -- api/v2/products",
+      "exitCode": 0,
+      "startedAt": "2026-07-10T09:15:00Z",
+      "endedAt": "2026-07-10T09:15:18Z",
+      "outputReference": "Fictional CI build 482, v2 contract-test section",
+      "outputSha256": "sha256:d7b0b4a8b4e866641b8c285e04f0e334d322abc7380f31c9e839270fb6e9cfc5",
+      "status": "passed"
+    },
+    {
+      "id": "v1-compatibility",
+      "command": "npm run test:contract -- api/v1/products api/v2/products",
+      "exitCode": 0,
+      "startedAt": "2026-07-10T09:16:00Z",
+      "endedAt": "2026-07-10T09:16:24Z",
+      "outputReference": "Fictional CI build 482, v1/v2 compatibility-test section",
+      "outputSha256": "sha256:75d6778b2bb75059ab4ea1f77cd88b10a7437cb3cb5037f0d8aa8976fa3e4090",
+      "status": "passed"
+    },
+    {
+      "id": "v2-reference",
+      "command": "npm run test:docs -- api/v2/products",
+      "exitCode": 0,
+      "startedAt": "2026-07-10T09:17:00Z",
+      "endedAt": "2026-07-10T09:17:12Z",
+      "outputReference": "Fictional CI build 482, v2 API reference-test section",
+      "outputSha256": "sha256:27df9e3bc104e6be9ae7d906c5afbbb2f6926e77d2d31b4ec05d5d5109d93cb8",
+      "status": "passed"
+    }
+  ],
+  "acceptance": [
+    {
+      "criterion": "AC-1: GET /v2/products/{id} returns apiVersion with the string value 2026-07.",
+      "status": "passed",
+      "evidence": [
+        "validation:v2-contract"
+      ]
+    },
+    {
+      "criterion": "AC-2: GET /v1/products/{id} has no apiVersion field and retains its existing response shape.",
+      "status": "passed",
+      "evidence": [
+        "validation:v1-compatibility"
+      ]
+    },
+    {
+      "criterion": "AC-3: The version marker is described in the fictional v2 API reference.",
+      "status": "passed",
+      "evidence": [
+        "validation:v2-reference"
+      ]
+    }
+  ],
+  "review": {
+    "reviewerLaneId": "fresh-context-review",
+    "diffReviewed": true,
+    "evidenceReviewed": true,
+    "decision": "accepted",
+    "findings": []
+  },
+  "closeout": {
+    "outcome": "accepted",
+    "knownGaps": [],
+    "escalation": null
+  }
+}

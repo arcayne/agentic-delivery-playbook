@@ -1,0 +1,43 @@
+
+> agentic-delivery-playbook@0.3.0 check
+> npm test && npm run validate:policy
+
+
+> agentic-delivery-playbook@0.3.0 test
+> node --test test/*.test.js
+
+✔ active policy contains no retired model matrix (1.718916ms)
+✔ active policy respects its line budgets (0.272667ms)
+✔ retired provider adapters are legacy-only (0.403875ms)
+✔ CLI exposes active artifacts without mutating the target project (41.55ms)
+✔ the breaking package release excludes legacy material (0.11725ms)
+✔ public docs describe the maintained surface honestly (0.3455ms)
+✔ repository contribution and support metadata matches 0.3 (0.304125ms)
+✔ local links in the maintained public docs resolve (1.098084ms)
+✔ controlled guidance matches the active example and migration mapping (0.52675ms)
+✔ first-class adapters translate the same two-mode kernel (1.016541ms)
+✔ the Codex adapter stays thin (0.158291ms)
+✔ the root instructions point only to active policy (0.116625ms)
+✔ the active kernel has exactly Direct and Controlled modes (0.812583ms)
+✔ the kernel defines concise failure handling (0.152958ms)
+✔ the controlled contract contains every required decision field (0.361167ms)
+✔ lineCount ignores one terminal newline (0.604541ms)
+✔ readUtf8 resolves repository-relative paths (0.378959ms)
+✔ findForbiddenTerms reports file, term, and line (0.59175ms)
+✔ the maintained profile contains only the GPT-5.6 family (0.854292ms)
+✔ Codex defaults to Terra medium with bounded delegation (0.284166ms)
+✔ project agents map mechanical, work, and review lanes explicitly (1.280792ms)
+✔ the run template is compact and normalized around lanes (1.510375ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 109.764458
+
+> agentic-delivery-playbook@0.3.0 validate:policy
+> node scripts/validate-active-policy.js
+
+active policy validation passed
