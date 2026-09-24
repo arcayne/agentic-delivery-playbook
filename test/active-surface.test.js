@@ -15,7 +15,7 @@ const {
 const root = path.resolve(__dirname, '..');
 const activePolicyFiles = [
   'playbook.md',
-  'profiles/gpt-5.6.md',
+  'profiles/gpt-6.md',
   'adapters/codex/AGENTS.md',
   'adapters/chatgpt/instructions.md',
 ];
@@ -34,7 +34,7 @@ test('active policy contains no retired model matrix', () => {
 test('active policy respects its line budgets', () => {
   const budgets = new Map([
     ['playbook.md', 150],
-    ['profiles/gpt-5.6.md', 120],
+    ['profiles/gpt-6.md', 120],
     ['adapters/codex/AGENTS.md', 180],
     ['templates/run.json', 120],
   ]);
@@ -56,7 +56,7 @@ test('CLI exposes active artifacts without mutating the target project', () => {
     { cwd: root, encoding: 'utf8' },
   );
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /^# GPT-5\.6 routing profile/m);
+  assert.match(result.stdout, /^# GPT-6 routing profile/m);
 });
 
 test('the breaking package release excludes legacy material', () => {
@@ -69,10 +69,18 @@ test('the breaking package release excludes legacy material', () => {
 test('public docs describe the maintained surface honestly', () => {
   const readme = readUtf8(root, 'README.md');
   assert.match(readme, /Direct and Controlled/);
-  assert.match(readme, /GPT-5\.6 Sol, Terra, and Luna/);
+  assert.match(readme, /GPT-6 Luna, Sol, and Astra/);
   assert.match(readme, /Codex and ChatGPT Work/);
   assert.match(readme, /docs\/evaluation\.md/);
   assert.doesNotMatch(readme, /Pi-first|Direct.*Lightweight.*Full/is);
+
+  const businessContext = readUtf8(root, 'BUSINESS-CONTEXT.md');
+  const gettingStarted = readUtf8(root, 'docs/getting-started.md');
+  for (const guidance of [businessContext, gettingStarted]) {
+    assert.match(guidance, /protocol 1\.0.{0,100}frozen historical GPT-5\.6 evidence/i);
+    assert.match(guidance, /does not validate current GPT-6 routing/i);
+    assert.match(guidance, /GPT-6.{0,50}separately versioned protocol/i);
+  }
 
   const evaluation = readUtf8(root, 'docs/evaluation.md');
   for (const arm of [
@@ -92,7 +100,7 @@ test('repository contribution and support metadata matches 0.3', () => {
   assert.match(security, /\| 0\.3\.x \| Yes \|/);
   assert.match(security, /\| 0\.2\.x and earlier \| No \|/);
   assert.match(contributing, /Direct and Controlled/);
-  assert.match(contributing, /GPT-5\.6/);
+  assert.match(contributing, /GPT-6/);
   assert.match(pullRequest, /Direct and Controlled/);
   assert.match(pullRequest, /active profile/i);
 });
@@ -102,7 +110,7 @@ test('local links in the maintained public docs resolve', () => {
     'README.md',
     'BUSINESS-CONTEXT.md',
     'playbook.md',
-    'profiles/gpt-5.6.md',
+    'profiles/gpt-6.md',
     'adapters/codex/README.md',
     'adapters/chatgpt/README.md',
     'docs/getting-started.md',
@@ -132,15 +140,15 @@ test('controlled guidance matches the active example and migration mapping', () 
   const run = JSON.parse(readUtf8(root, 'examples/controlled-run/run.json'));
   const changelog = readUtf8(root, 'CHANGELOG.md');
 
-  assert.match(readme, /\|\s*Terra\s*\|[^\n]*\bdefault\b/i);
-  assert.match(gettingStarted, /Route the bounded implementation to Terra high\./);
+  assert.match(readme, /\|\s*Luna\s*\|[^\n]*High reasoning/i);
+  assert.match(gettingStarted, /Route the bounded implementation to Luna high\./);
   assert.match(gettingStarted, /Sol high in a fresh context to review/);
 
   const implementation = run.lanes.find((lane) => lane.id === 'implementation');
   const review = run.lanes.find((lane) => lane.id === 'fresh-context-review');
-  assert.equal(implementation.requested.model, 'gpt-5.6-terra');
+  assert.equal(implementation.requested.model, 'gpt-6-luna');
   assert.equal(implementation.requested.effort, 'high');
-  assert.equal(review.requested.model, 'gpt-5.6-sol');
+  assert.equal(review.requested.model, 'gpt-6-sol');
   assert.equal(review.requested.effort, 'high');
 
   assert.match(

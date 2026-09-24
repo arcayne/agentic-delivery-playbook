@@ -1,7 +1,7 @@
 {
   "name": "agentic-delivery-playbook",
   "version": "0.3.0",
-  "description": "GPT-5.6-first delivery kernel for Codex and ChatGPT Work: classify risk, route minimally, and verify from evidence.",
+  "description": "GPT-6-first delivery kernel for Codex and ChatGPT Work: classify risk, route minimally, and verify from evidence.",
   "license": "MIT",
   "type": "commonjs",
   "bin": {
@@ -27,7 +27,7 @@
     "coding-agents",
     "codex",
     "chatgpt-work",
-    "gpt-5.6",
+    "gpt-6",
     "agentic-delivery",
     "software-engineering",
     "human-in-the-loop"

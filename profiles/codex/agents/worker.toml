@@ -1,4 +1,4 @@
-model = "gpt-5.6-terra"
+model = "gpt-6-luna"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = "Implement only the approved bounded slice. Respect exclusive ownership, run assigned validation, and report evidence and gaps."

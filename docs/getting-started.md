@@ -1,6 +1,6 @@
 # Getting started
 
-This walkthrough uses one small reversible change and one public-contract change. Process mode is selected from risk and verification quality; the GPT-5.6 route is selected separately.
+This walkthrough uses one small reversible change and one public-contract change. Process mode is selected from risk and verification quality; the GPT-6 route is selected separately.
 
 ## 1. Handle a small reversible change as Direct
 
@@ -23,7 +23,7 @@ Request: add a version field to the fictional Acme Catalog API v2 product respon
 
 This is Controlled because it changes a public contract. Write the compact contract before implementation, including the response field, compatibility boundary, non-goals, acceptance criteria, ownership, and evidence plan. The completed fictional contract is [examples/controlled-run/contract.md](../examples/controlled-run/contract.md).
 
-Mode does not select the model. Route the bounded implementation to Terra high. Because this changes a public contract, use Sol high in a fresh context to review the contract, actual diff, and validation evidence.
+Mode does not select the model. Route the bounded implementation to Luna high. Because this changes a public contract, use Sol high in a fresh context to review the contract, actual diff, and validation evidence.
 
 Capture evidence for every acceptance criterion. One recorded row could be:
 
@@ -39,4 +39,4 @@ Use a durable run record when Controlled work is broad, sensitive, long-running,
 
 ## Next
 
-Use [playbook.md](../playbook.md) for mode selection, [profiles/gpt-5.6.md](../profiles/gpt-5.6.md) for routing, and [docs/evaluation.md](evaluation.md) for the protocol that tests whether the kernel and routing add value.
+Use [playbook.md](../playbook.md) for mode selection and [profiles/gpt-6.md](../profiles/gpt-6.md) for routing. [Protocol 1.0](evaluation.md) is frozen historical GPT-5.6 evidence; it does not validate current GPT-6 routing. Evaluating GPT-6 requires a separately versioned protocol.

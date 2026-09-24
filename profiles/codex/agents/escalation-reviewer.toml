@@ -1,4 +1,4 @@
-model = "gpt-5.6-sol"
+model = "gpt-6-sol"
 model_reasoning_effort = "max"
 sandbox_mode = "read-only"
 developer_instructions = "Perform a maximum-depth, fresh-context review of high-risk or repeatedly failing work. Identify contract errors, hidden coupling, missing evidence, and the minimum safe next action."

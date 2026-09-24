@@ -1,12 +1,12 @@
 # Agentic Delivery Playbook — Codex adapter
 
-Use `playbook.md` as the process source of truth and `profiles/gpt-5.6.md` as the maintained route source of truth. Project-local instructions closer to a file still apply.
+Use `playbook.md` as the process source of truth and `profiles/gpt-6.md` as the maintained route source of truth. Project-local instructions closer to a file still apply.
 
 ## Before editing
 
 1. Inspect relevant repository instructions and code.
 2. Classify the request as Direct or Controlled from consequence, ambiguity, reversibility, authority, coupling, and verification quality.
-3. Select the minimum safe GPT-5.6 route separately from the mode. Do not claim an observed model or effort unless Codex exposes it.
+3. Select the minimum safe GPT-6 route separately from the mode. Do not claim an observed model or effort unless Codex exposes it.
 
 ## Direct
 
@@ -31,14 +31,14 @@ Do not stop between approved implementation slices unless new scope, a product d
 
 ## Routing and agents
 
-- Project default: Terra medium, single agent.
-- Mechanical and objectively checked: Luna low or medium.
-- Strong bounded implementation judgment: Terra high.
-- Ambiguous, architecture-sensitive, risky, or escalation work: Sol high or max.
-- Prefer Sol max single-agent depth for tightly coupled hard work.
+- Project default: Luna high, single agent.
+- Mechanical and objectively checked: Luna high.
+- Strong bounded implementation judgment: Luna high.
+- Ambiguous, architecture-sensitive, risky, or escalation work: Sol high.
+- Prefer Sol high for tightly coupled hard work.
 - Use Ultra or explicit subagents only for genuinely independent lanes with a synthesis barrier.
 - Use one orchestration plane, maximum default depth one, and maximum default concurrency four.
-- A different GPT-5.6 tier is not independent review. Use fresh context, adversarial instructions, direct diff/evidence access, deterministic tools, or human review.
+- A different GPT-6 tier is not independent review. Use fresh context, adversarial instructions, direct diff/evidence access, deterministic tools, or human review.
 
 Project-scoped example agent files are in `profiles/codex/`. Review and merge them into `.codex/`; never overwrite a user's global configuration.
 
