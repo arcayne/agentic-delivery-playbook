@@ -7,7 +7,7 @@ It is not active policy, is not tested against current runtimes, and is not incl
 Active policy lives in:
 
 - `../playbook.md`
-- `../profiles/gpt-5.6.md`
+- `../profiles/gpt-6.md`
 - `../adapters/codex/`
 - `../adapters/chatgpt/`
 - `../templates/contract.md`

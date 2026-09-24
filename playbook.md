@@ -49,7 +49,7 @@ Record a route as:
 model tier + reasoning effort + topology
 ```
 
-Process mode does not imply a model. Use `profiles/gpt-5.6.md` for the maintained mapping. A runtime preset such as Ultra is topology plus effort, not a fourth model tier or process mode.
+Process mode does not imply a model. Use `profiles/gpt-6.md` for the maintained mapping. A runtime preset such as Ultra is topology plus effort, not a fourth model tier or process mode.
 
 Escalate only from evidence: the task stopped being mechanical, interpretation became material, a focused retry failed, hidden coupling appeared, or risk increased. Higher effort is not an unlimited retry loop.
 
@@ -59,7 +59,7 @@ Escalate only from evidence: the task stopped being mechanical, interpretation b
 - Delegate only genuinely independent lanes with explicit inputs, outputs, ownership, and a synthesis barrier.
 - Use one orchestration plane. Do not add recursive fanout on top of native Ultra delegation by default.
 - Default nesting depth is one.
-- A different GPT-5.6 tier is not independent review by itself. Fresh context, adversarial instructions, direct diff access, deterministic checks, and human authority provide stronger separation.
+- Changing model tiers alone does not create independent review. Fresh context, adversarial instructions, direct diff access, deterministic checks, and human authority provide stronger separation.
 
 ## Failure rules
 

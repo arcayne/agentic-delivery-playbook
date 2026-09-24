@@ -20,7 +20,7 @@ test('first-class adapters translate the same two-mode kernel', () => {
     assert.match(text, /contract/i);
     assert.match(text, /actual diff/i);
     assert.match(text, /validation evidence/i);
-    assert.match(text, /profiles\/gpt-5\.6\.md/);
+    assert.match(text, /profiles\/gpt-6\.md/);
     assert.doesNotMatch(text, /\b(?:Lightweight|Full) mode\b/i);
   }
 });
@@ -34,6 +34,6 @@ test('the root instructions point only to active policy', () => {
   const text = readUtf8(root, 'AGENTS.md');
   assert.match(text, /adapters\/codex\/AGENTS\.md/);
   assert.match(text, /Direct and Controlled/);
-  assert.match(text, /profiles\/gpt-5\.6\.md/);
+  assert.match(text, /profiles\/gpt-6\.md/);
   assert.doesNotMatch(text, /docs\/(?:model-routing|dynamic-workflows)\.md/);
 });

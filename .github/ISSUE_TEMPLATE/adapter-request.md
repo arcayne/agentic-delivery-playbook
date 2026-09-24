@@ -15,7 +15,7 @@ body:
     id: mapping
     attributes:
       label: Kernel mapping
-      description: How would Direct and Controlled, evidence, and GPT-5.6 route observability map to this runtime?
+      description: How would Direct and Controlled, evidence, and GPT-6 route observability map to this runtime?
     validations:
       required: true
   - type: textarea

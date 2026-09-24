@@ -1,6 +1,6 @@
 # Agentic Delivery Playbook
 
-Agentic Delivery Playbook is a small, evidence-first delivery kernel for Codex and ChatGPT Work: classify the work by consequence, choose the minimum safe GPT-5.6 route, and close from recorded evidence.
+Agentic Delivery Playbook is a small, evidence-first delivery kernel for Codex and ChatGPT Work: classify the work by consequence, choose the minimum safe GPT-6 route, and close from recorded evidence.
 
 ## Choose the delivery mode
 
@@ -13,13 +13,13 @@ Direct and Controlled are process modes, not model choices. Use the decision con
 
 ## Route separately from the mode
 
-GPT-5.6 Sol, Terra, and Luna are selected for task shape, independently of the delivery mode.
+GPT-6 Luna, Sol, and Astra are selected for task shape, independently of the delivery mode.
 
 | Route | Use for | Topology |
 | --- | --- | --- |
-| Luna | Clear, repeatable mechanical work with objective checks. | Single agent; raise effort only when interpretation appears. |
-| Terra | gpt-5.6-terra with medium reasoning is the default route for everyday bounded implementation; use high effort when stronger implementation judgment is needed. | Single agent or one focused worker. |
-| Sol | Ambiguous, architecture-sensitive, risky, high-value judgment, escalation, and fresh-context review. | Single agent by default. |
+| Luna | Focused, repeatable work; start with High reasoning. | Single agent; increase effort only when needed and supported. |
+| Sol | Complex coding, architecture-sensitive judgment, risk, escalation, and fresh-context review; start with Medium, use High selectively. | Single agent by default. |
+| Astra | Broad code, research, or computer-use work; start with Light/low effort. | Single agent or bounded independent lanes. |
 | Ultra | Broad work with genuinely independent lanes. | Maximum reasoning with one synthesis barrier; it is not another process mode. |
 
 ## Set up Codex in five minutes
@@ -31,7 +31,7 @@ GPT-5.6 Sol, Terra, and Luna are selected for task shape, independently of the d
 ## Set up ChatGPT Work
 
 1. Paste [adapters/chatgpt/instructions.md](adapters/chatgpt/instructions.md) into ChatGPT Work project instructions.
-2. Optionally attach [profiles/gpt-5.6.md](profiles/gpt-5.6.md), [templates/contract.md](templates/contract.md), and [templates/run.json](templates/run.json) for controlled work and handoffs.
+2. Optionally attach [profiles/gpt-6.md](profiles/gpt-6.md), [templates/contract.md](templates/contract.md), and [templates/run.json](templates/run.json) for controlled work and handoffs.
 3. Provide only the sources and authority needed for the current task.
 
 ## Print maintained artifacts
@@ -45,7 +45,7 @@ The CLI only prints maintained artifacts; it does not install or overwrite local
 ## Read the kernel
 
 - [Delivery modes](playbook.md)
-- [GPT-5.6 routing profile](profiles/gpt-5.6.md)
+- [GPT-6 routing profile](profiles/gpt-6.md)
 - [Compact contract template](templates/contract.md)
 - [Durable run-record template](templates/run.json)
 - [Evaluation protocol](docs/evaluation.md)
@@ -55,7 +55,7 @@ The CLI only prints maintained artifacts; it does not install or overwrite local
 
 ## Status and migration
 
-Only the GPT-5.6 profile is maintained. Prior material is unsupported under [legacy/](legacy/README.md) and excluded from the npm package.
+Only the GPT-6 profile is maintained. Prior material is unsupported under [legacy/](legacy/README.md) and excluded from the npm package.
 
 For 0.2 users, the mutating install pi and install claude commands were removed. Existing installations are not updated automatically; review and merge the maintained Codex or ChatGPT Work artifacts yourself.
 

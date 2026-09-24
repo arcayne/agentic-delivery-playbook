@@ -18,7 +18,7 @@ test('the run template is compact and normalized around lanes', () => {
   assert.ok(Array.isArray(run.acceptance));
   assert.ok(run.contract.path);
   assert.ok(run.source.baseCommit);
-  assert.equal(run.lanes[0].requested.model, 'gpt-5.6-terra');
+  assert.equal(run.lanes[0].requested.model, 'gpt-6-luna');
   assert.equal(run.lanes[0].requested.effort, 'high');
   assert.equal(run.lanes[0].requested.topology, 'single');
   assert.ok(Object.hasOwn(run.lanes[0], 'observed'));

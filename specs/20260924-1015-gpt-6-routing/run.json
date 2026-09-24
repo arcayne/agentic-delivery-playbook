@@ -1,0 +1,226 @@
+{
+  "schemaVersion": "1.0",
+  "mode": "controlled",
+  "status": "ready-for-pr",
+  "contract": {
+    "path": "specs/20260924-1015-gpt-6-routing/spec.md",
+    "approvalEvidence": "User requested end-to-end PR creation and approved GPT-6 Luna High implementation plus GPT-6 Sol High review."
+  },
+  "source": {
+    "baseCommit": "35bca0ab04bd9057ff0c2df07525b65456392e71",
+    "finalCommit": null,
+    "diffSha256": null
+  },
+  "route": {
+    "policy": "profiles/gpt-6.md",
+    "exception": null,
+    "enforcement": {
+      "required": true,
+      "reason": "User explicitly approved GPT-6 Luna High implementation and GPT-6 Sol High review; both are explicit routes.",
+      "targets": [
+        {
+          "role": "implementer",
+          "agent": "worker",
+          "model": "openai-codex/gpt-6-luna",
+          "reasoningIntensity": "high",
+          "source": "explicit"
+        },
+        {
+          "role": "reviewer",
+          "agent": "reviewer",
+          "model": "openai-codex/gpt-6-sol",
+          "reasoningIntensity": "high",
+          "source": "explicit"
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "evidence": "Explicit worker and reviewer invocations observed as GPT-6 Luna High and GPT-6 Sol High. Official Codex catalog confirms Luna supports up to Max, including xhigh; this Pi run requested xhigh for a Sol critic and observed High, so actual effort remains client-specific and is recorded honestly."
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "spec-critic",
+      "role": "reviewer",
+      "taskShape": "read-only-contract-critique",
+      "ownership": [],
+      "requested": {
+        "model": "openai-codex/gpt-6-sol",
+        "effort": "xhigh",
+        "topology": "single"
+      },
+      "observed": {
+        "model": "openai-codex/gpt-6-sol",
+        "effort": "high",
+        "runtimePreset": null,
+        "threadId": "52bd6200-a155-4e92-b771-0adc9f3850f5",
+        "source": "explicit-model; requested xhigh was not observed"
+      },
+      "status": "completed-with-findings",
+      "evidence": ["Spec critic returned Verdict: REVISE; findings and dispositions recorded in notes.md"]
+    },
+    {
+      "id": "implementation",
+      "role": "worker",
+      "taskShape": "bounded-profile-migration",
+      "ownership": ["active-profile", "references-and-config", "tests-and-validator"],
+      "requested": {
+        "model": "openai-codex/gpt-6-luna",
+        "effort": "high",
+        "topology": "single"
+      },
+      "observed": {
+        "model": "openai-codex/gpt-6-luna",
+        "effort": "high",
+        "runtimePreset": null,
+        "threadId": "d7b02a3f-0b59-4428-9864-05e3965c0fcb",
+        "source": "explicit"
+      },
+      "status": "completed",
+      "evidence": ["Worker handoff; parent validation npm run check exit 0"]
+    },
+    {
+      "id": "qa-review",
+      "role": "reviewer",
+      "taskShape": "fresh-context-contract-diff-evidence-review",
+      "ownership": [],
+      "requested": {
+        "model": "openai-codex/gpt-6-sol",
+        "effort": "high",
+        "topology": "single"
+      },
+      "observed": {
+        "model": "openai-codex/gpt-6-sol",
+        "effort": "high",
+        "runtimePreset": null,
+        "threadId": "cd712947-ad30-4dca-8b7a-8180fcff5d8d",
+        "source": "explicit"
+      },
+      "status": "completed-with-findings",
+      "evidence": ["Fresh-context review inspected supplied complete diff and validation log; see findings below"]
+    },
+    {
+      "id": "spec-revision-critique",
+      "role": "reviewer",
+      "taskShape": "read-only-revised-contract-critique",
+      "ownership": [],
+      "requested": { "model": "openai-codex/gpt-6-sol", "effort": "high", "topology": "single" },
+      "observed": { "model": "openai-codex/gpt-6-sol", "effort": "high", "runtimePreset": null, "threadId": "1b5bc2a4-ef1b-4b06-a62c-6111964de7df", "source": "explicit" },
+      "status": "completed",
+      "evidence": ["Critic returned Verdict: APPROVE after preserving frozen evaluation and resolving initial P1/P2 scope conflicts."]
+    },
+    {
+      "id": "review-fixes",
+      "role": "worker",
+      "taskShape": "bounded-review-fix",
+      "ownership": ["adapters/codex/README.md", "docs/business-assumptions.md", "test/routing-profile.test.js"],
+      "requested": { "model": "openai-codex/gpt-6-luna", "effort": "high", "topology": "single" },
+      "observed": { "model": "openai-codex/gpt-6-luna", "effort": "high", "runtimePreset": null, "threadId": "0a7777ce-4dd4-46ef-bc88-7dc0efb9f9af", "source": "explicit" },
+      "status": "completed",
+      "evidence": ["Resolved initial final-review P1 and P2; docs/evaluation.md unchanged."]
+    },
+    {
+      "id": "route-fit-fixes",
+      "role": "worker",
+      "taskShape": "bounded-model-effort-alignment",
+      "ownership": ["profiles/gpt-6.md", "profiles/codex/agents", "test/routing-profile.test.js"],
+      "requested": { "model": "openai-codex/gpt-6-luna", "effort": "high", "topology": "single" },
+      "observed": { "model": "openai-codex/gpt-6-luna", "effort": "high", "runtimePreset": null, "threadId": "ffd65563-7300-4fab-b27a-b31ab97f2a9b", "source": "explicit" },
+      "status": "completed",
+      "evidence": ["Codex model/effort table, agent presets, and focused assertions aligned with model capability guidance."]
+    },
+    {
+      "id": "qa-review-final",
+      "role": "reviewer",
+      "taskShape": "final-fresh-context-contract-diff-evidence-review",
+      "ownership": [],
+      "requested": { "model": "openai-codex/gpt-6-sol", "effort": "high", "topology": "single" },
+      "observed": { "model": "openai-codex/gpt-6-sol", "effort": "high", "runtimePreset": null, "threadId": "a83a7ab4-edbe-4af4-8b56-556f0e66747a", "source": "explicit" },
+      "status": "completed-with-finding",
+      "evidence": ["Review found a P2: BUSINESS-CONTEXT.md and docs/getting-started.md still linked to frozen GPT-5.6 protocol without historical/future-version caveat."]
+    },
+    {
+      "id": "review-fix-2",
+      "role": "worker",
+      "taskShape": "bounded-public-evaluation-guidance-fix",
+      "ownership": ["BUSINESS-CONTEXT.md", "docs/getting-started.md", "test/active-surface.test.js"],
+      "requested": { "model": "openai-codex/gpt-6-luna", "effort": "high", "topology": "single" },
+      "observed": { "model": "openai-codex/gpt-6-luna", "effort": "high", "runtimePreset": null, "threadId": "0df632bd-2fd0-4645-93b1-ac4e49007617", "source": "explicit" },
+      "status": "completed",
+      "evidence": ["Both public links now distinguish frozen GPT-5.6 protocol 1.0 from separately versioned GPT-6 evaluation; regression assertions added."]
+    },
+    {
+      "id": "qa-review-rereview",
+      "role": "reviewer",
+      "taskShape": "focused-final-review-finding-verification",
+      "ownership": [],
+      "requested": { "model": "openai-codex/gpt-6-sol", "effort": "high", "topology": "single" },
+      "observed": { "model": "openai-codex/gpt-6-sol", "effort": "high", "runtimePreset": null, "threadId": "b16f7134-0f99-44a0-812a-357b45cdd19d", "source": "explicit" },
+      "status": "completed",
+      "evidence": ["Confirmed public evaluation links are unambiguous and regression-tested; no issues found; Merge verdict: OK."]
+    }
+  ],
+  "validation": [
+    {
+      "id": "npm-check",
+      "command": "npm run check",
+      "exitCode": 0,
+      "startedAt": null,
+      "endedAt": null,
+      "outputReference": "/tmp/agentic-delivery-playbook-gpt-6-final-check.log",
+      "status": "passed"
+    },
+    {
+      "id": "stale-reference-scan",
+      "command": "rg -n -i --hidden -g '!specs/**' -g '!docs/superpowers/**' -g '!docs/evaluation.md' -g '!scripts/validate-active-policy.js' 'profiles/gpt-5\\.6\\.md|gpt-5\\.6-(luna|terra|sol)' .",
+      "exitCode": 1,
+      "startedAt": null,
+      "endedAt": null,
+      "outputReference": "No matches; rg exit 1 is the expected clean-scan result.",
+      "status": "passed"
+    },
+    {
+      "id": "config-syntax",
+      "command": "Parse package.json, templates/run.json, examples/controlled-run/run.json and run.json; parse Codex TOML config and all agent TOML files.",
+      "exitCode": 0,
+      "startedAt": null,
+      "endedAt": null,
+      "outputReference": "4 JSON and 6 TOML files parsed successfully.",
+      "status": "passed"
+    },
+    {
+      "id": "diff-check",
+      "command": "git diff --check",
+      "exitCode": 0,
+      "startedAt": null,
+      "endedAt": null,
+      "outputReference": "No whitespace errors.",
+      "status": "passed"
+    }
+  ],
+  "acceptance": [
+    { "criterion": "AC-1: active GPT-6 profile documents model/effort routing and conditional Luna xhigh support", "status": "implemented", "evidence": ["profiles/gpt-6.md; official Codex model docs"] },
+    { "criterion": "AC-2: active references and package guidance are migrated; kernel remains neutral", "status": "implemented", "evidence": ["Active docs/config/templates and neutral playbook updated"] },
+    { "criterion": "AC-3: executable Codex routes use supported GPT-6 IDs and efforts", "status": "implemented", "evidence": ["6 TOML files parsed; model-focused tests pass"] },
+    { "criterion": "AC-4: focused tests/validator enforce GPT-6 active policy; historical artifacts unchanged", "status": "implemented", "evidence": ["npm run check: 23 pass; frozen docs/evaluation.md unchanged"] },
+    { "criterion": "AC-5: checks pass, independent review closes, and PR is opened", "status": "in-progress", "evidence": ["Checks pass; final GPT-6 Sol High review accepted; commit/push/PR pending."] }
+  ],
+  "review": {
+    "reviewerLaneId": "qa-review-rereview",
+    "diffReviewed": true,
+    "evidenceReviewed": true,
+    "decision": "accept",
+    "findings": [
+      "Resolved P1 adapters/codex/README.md:6 default mismatch; README now matches Luna High config and test asserts alignment.",
+      "Resolved P2 docs/business-assumptions.md:5,10 evaluation ambiguity; it now labels protocol 1.0 as frozen historical GPT-5.6 evidence and requires a new GPT-6 evaluation version.",
+      "Parent audit aligned mechanical low, explorer Luna low, and escalation Sol max with task-fit and official Codex capability guidance.",
+      "Resolved P2 BUSINESS-CONTEXT.md:7 and docs/getting-started.md:43 cross-links; regression assertions now enforce frozen GPT-5.6 evidence versus separately versioned GPT-6 evaluation. Awaiting focused re-review."
+    ]
+  },
+  "closeout": {
+    "outcome": "pending",
+    "knownGaps": [],
+    "escalation": null
+  }
+}

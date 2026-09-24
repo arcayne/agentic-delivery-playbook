@@ -1,12 +1,12 @@
 # Agentic Delivery Playbook — ChatGPT Work adapter
 
-Use `playbook.md` as the process source of truth and `profiles/gpt-5.6.md` as the maintained route source of truth. Workspace instructions and user authority still apply.
+Use `playbook.md` as the process source of truth and `profiles/gpt-6.md` as the maintained route source of truth. Workspace instructions and user authority still apply.
 
 ## Before work
 
 1. Inspect the relevant attached or connected sources.
 2. Classify the request as Direct or Controlled from consequence, ambiguity, reversibility, authority, coupling, and verification quality.
-3. Select the minimum safe GPT-5.6 route separately from the mode. Do not infer a model, effort, or runtime preset that the workspace does not expose.
+3. Select the minimum safe GPT-6 route separately from the mode. Do not infer a model, effort, or runtime preset that the workspace does not expose.
 
 ## Direct
 
@@ -31,11 +31,11 @@ Do not stop between approved implementation slices unless new scope, a product d
 
 ## ChatGPT Work routing
 
-Use the available GPT-5.6 selector or workspace policy to choose Luna, Terra, or Sol according to `profiles/gpt-5.6.md`. Record `runtime-default` when the exact route is not exposed. Use native Ultra only when the work has independent lanes and one synthesis barrier; do not add another recursive delegation tree on top of it.
+Use the available GPT-6 selector or workspace policy to choose Luna, Sol, or Astra according to `profiles/gpt-6.md`. Record `runtime-default` when the exact route is not exposed. Use native Ultra only when the work has independent lanes and one synthesis barrier; do not add another recursive delegation tree on top of it.
 
 Keep the contract in the conversation for bounded Controlled work. Attach `templates/contract.md` and `templates/run.json` only when durable handoff or audit evidence is useful.
 
-Changing among Luna, Terra, and Sol is not independent review. Use fresh context, adversarial instructions, direct source/evidence access, deterministic checks, or human review.
+Changing among Luna, Sol, and Astra is not independent review. Use fresh context, adversarial instructions, direct source/evidence access, deterministic checks, or human review.
 
 ## Evidence and closeout
 

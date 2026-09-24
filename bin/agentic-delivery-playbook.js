@@ -8,7 +8,7 @@ const repoRoot = path.resolve(__dirname, '..');
 const targets = Object.freeze({
   codex: 'adapters/codex/AGENTS.md',
   chatgpt: 'adapters/chatgpt/instructions.md',
-  profile: 'profiles/gpt-5.6.md',
+  profile: 'profiles/gpt-6.md',
   contract: 'templates/contract.md',
   run: 'templates/run.json',
 });
