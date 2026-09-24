@@ -1,14 +1,14 @@
 {
   "schemaVersion": "1.0",
   "mode": "controlled",
-  "status": "ready-for-pr",
+  "status": "completed",
   "contract": {
     "path": "specs/20260924-1015-gpt-6-routing/spec.md",
     "approvalEvidence": "User requested end-to-end PR creation and approved GPT-6 Luna High implementation plus GPT-6 Sol High review."
   },
   "source": {
     "baseCommit": "35bca0ab04bd9057ff0c2df07525b65456392e71",
-    "finalCommit": null,
+    "finalCommit": "0541626c3c47405f254418c212a12bb81c37b31c",
     "diffSha256": null
   },
   "route": {
@@ -204,7 +204,7 @@
     { "criterion": "AC-2: active references and package guidance are migrated; kernel remains neutral", "status": "implemented", "evidence": ["Active docs/config/templates and neutral playbook updated"] },
     { "criterion": "AC-3: executable Codex routes use supported GPT-6 IDs and efforts", "status": "implemented", "evidence": ["6 TOML files parsed; model-focused tests pass"] },
     { "criterion": "AC-4: focused tests/validator enforce GPT-6 active policy; historical artifacts unchanged", "status": "implemented", "evidence": ["npm run check: 23 pass; frozen docs/evaluation.md unchanged"] },
-    { "criterion": "AC-5: checks pass, independent review closes, and PR is opened", "status": "in-progress", "evidence": ["Checks pass; final GPT-6 Sol High review accepted; commit/push/PR pending."] }
+    { "criterion": "AC-5: checks pass, independent review closes, and PR is opened", "status": "complete", "evidence": ["npm run check passed (23/23); GPT-6 Sol High rereview accepted; branch pushed; PR #6 https://github.com/arcayne/agentic-delivery-playbook/pull/6"] }
   ],
   "review": {
     "reviewerLaneId": "qa-review-rereview",
@@ -219,7 +219,7 @@
     ]
   },
   "closeout": {
-    "outcome": "pending",
+    "outcome": "pr-opened",
     "knownGaps": [],
     "escalation": null
   }

@@ -1,12 +1,12 @@
 # Run notes — GPT-6 routing profile update
 
 ## Status dashboard
-- Current phase/slice: final review fix
+- Current phase/slice: PR opened
 - Accepted slices: GPT-6 profile migration; adapter/business-assumption fixes; model-effort route-fit fixes; parent `npm run check` passes (23 tests and policy validator)
 - Blocked slices: none
 - In-flight lanes: none; final GPT-6 Sol High rereview accepted (Merge verdict: OK)
 - Known validation exceptions: reviewer toolset cannot run Git/tests or fetch URLs; parent supplies complete diff, test output, and official-source evidence. Pi did not expose requested xhigh; Codex docs confirm GPT-6 Luna supports up to Max.
-- Next gate: parent closeout, commit/push, and PR creation
+- Next gate: await PR review/CI; caller's main worktree remains untouched
 
 ## Scope decision
 Full-mode provider/model-routing update. Single serialized slice: active profile + references/configuration + focused tests/validator. One writer owns all files; no sibling implementation fanout. Historical GPT-5.6 design material is excluded from editing.
@@ -35,3 +35,4 @@ Feature branch `codex/gpt-6-luna-xhigh` was created from fetched `origin/main` a
 - Preserve evaluation/history; update only the explicitly identified fictional active example.
 - Use official GPT-6 family guidance for task-fit mapping; keep model ID and reasoning effort distinct.
 - User approved GPT-6 Luna High implementation and GPT-6 Sol High review; both explicit routes were observed. Codex GPT-6 Luna xhigh is supported according to the official model catalog (Luna supports up to Max); client-specific observation still applies, and this Pi run only observed High.
+- Commit `0541626c3c47405f254418c212a12bb81c37b31c` pushed on `codex/gpt-6-luna-xhigh`; PR #6 is open: https://github.com/arcayne/agentic-delivery-playbook/pull/6
