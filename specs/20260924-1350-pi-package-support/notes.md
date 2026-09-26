@@ -1,12 +1,12 @@
 # Pi package support — run notes
 
 ## Status dashboard
-- Current phase/slice: PR preparation
-- Accepted slices: revised contract; Pi package/adapter/docs/tests; parent checks; installed package from local feature worktree; fresh GPT-6 Sol Medium review
+- Current phase/slice: PR opened
+- Accepted slices: revised contract; Pi package/adapter/docs/tests; parent checks; installed package from local feature worktree; fresh GPT-6 Sol Medium review; PR #7 opened
 - Blocked slices: none
 - In-flight lanes: none
 - Known validation exceptions: package source is a local worktree path because Pi 0.87.1 help does not document Git ref syntax; retain this worktree until a post-merge Git or npm source install is separately verified.
-- Next gate: commit/push branch and open PR
+- Next gate: external PR review/merge; do not merge without user instruction
 
 ## Scope and isolation
 - Base: `origin/main` at `a35a66f0787c9dca7e615fcbf4b7378983e25f67`; branch `codex/pi-package-integration` in `/Users/dearkane/Documents/dev/.worktrees/agentic-delivery-playbook-pi-package`.
@@ -23,6 +23,7 @@
 - Parent validation: `npm run check` exit 0 (26 passed, active policy validation passed); `npm pack --dry-run` includes the Pi adapter and template; extracted tarball check resolves all 5 skill references.
 - Pi 0.87.1 `pi install --help` documents `./local/path`. Skill inventory found no `agentic-delivery-playbook-pi` collision. Pre-install settings snapshot is `/tmp/pi-agent-settings-before-playbook-package.json` (SHA-256 `81a92bb7fce085017cfc23a8810691246482581d319f5412dade5cc16d3693dd`); `pi list` had no packages. After `pi install .`, `pi list` shows the local feature worktree and structural comparison confirms all other settings and Luna High/Sol Medium role overrides are preserved.
 - Fresh GPT-6 Sol Medium final review found no remaining issues (OK with notes). Its first pass flagged the contract's stale Git-ref installation step; the contract was corrected to the tested local `pi install .` flow, a duplicate AC-6 was removed, and the reviewer verified the correction. Reviewer explicitly did not run shell/tests; parent validation artifacts were supplied and inspected.
+- Committed implementation as `2ca97bbc202a938b34d50364e87e8663866f50f6`; pushed `codex/pi-package-integration` and opened PR #7: https://github.com/arcayne/agentic-delivery-playbook/pull/7. `run.json` records this source/content commit; any subsequent commit only records PR closeout evidence.
 
 ## Decisions
 - Do not publish or merge. Open a PR and install the package from its isolated local worktree into the user's Pi package list while preserving existing user role overrides.

@@ -1,14 +1,14 @@
 {
   "schemaVersion": "1.0",
   "mode": "controlled",
-  "status": "in-progress",
+  "status": "completed",
   "contract": {
     "path": "specs/20260924-1350-pi-package-support/spec.md",
     "approvalEvidence": "User requested a PR and Pi installation of the latest playbook; user set Luna worker and Sol reviewer defaults."
   },
   "source": {
     "baseCommit": "a35a66f0787c9dca7e615fcbf4b7378983e25f67",
-    "finalCommit": null,
+    "finalCommit": "2ca97bbc202a938b34d50364e87e8663866f50f6",
     "diffSha256": null
   },
   "route": {
@@ -81,8 +81,8 @@
     { "criterion": "AC-3: optional Pi worker/reviewer settings template matches approved defaults", "status": "implemented", "evidence": ["JSON template tests assert Luna High worker and Sol Medium reviewer"] },
     { "criterion": "AC-4: install/update/use docs are accurate", "status": "implemented", "evidence": ["README, adapters, getting-started, publishing, business context and contribution claims updated; link tests pass"] },
     { "criterion": "AC-5: tests, packed-artifact paths, Pi CLI syntax, and install/settings-preservation checks pass", "status": "implemented", "evidence": ["26 tests passed; pack extraction resolves 5 links; Pi 0.87.1 local path install confirmed; user settings preserved and package appears in pi list"] },
-    { "criterion": "AC-6: independent review accepts and PR is opened", "status": "in-progress", "evidence": ["Fresh GPT-6 Sol Medium review accepted with notes; PR creation pending."] }
+    { "criterion": "AC-6: independent review accepts and PR is opened", "status": "completed", "evidence": ["Fresh GPT-6 Sol Medium review accepted with notes; PR #7 opened: https://github.com/arcayne/agentic-delivery-playbook/pull/7"] }
   ],
   "review": { "reviewerLaneId": "final-review", "diffReviewed": true, "evidenceReviewed": true, "decision": "accepted", "findings": [{ "severity": "P2", "status": "resolved", "summary": "Contract previously specified unverified Git-ref install while validation used local `pi install .`; corrected contract/notes and verified on fresh review." }, { "severity": "note", "status": "accepted", "summary": "Installed package source is the local worktree; retain it until a post-merge Git or npm source install is separately verified." }] },
-  "closeout": { "outcome": "pending", "knownGaps": [], "escalation": null }
+  "closeout": { "outcome": "pr-opened", "knownGaps": ["The installed Pi package entry points to the local feature worktree; retain it until switching to a separately verified Git/default-branch or npm source."], "escalation": null }
 }
