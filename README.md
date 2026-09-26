@@ -1,6 +1,6 @@
 # Agentic Delivery Playbook
 
-Agentic Delivery Playbook is a small, evidence-first delivery kernel for Codex and ChatGPT Work: classify the work by consequence, choose the minimum safe GPT-6 route, and close from recorded evidence.
+Agentic Delivery Playbook is a small, evidence-first delivery kernel for Codex, ChatGPT Work, and Pi: classify the work by consequence, choose the minimum safe GPT-6 route, and close from recorded evidence.
 
 ## Choose the delivery mode
 
@@ -34,6 +34,10 @@ GPT-6 Luna, Sol, and Astra are selected for task shape, independently of the del
 2. Optionally attach [profiles/gpt-6.md](profiles/gpt-6.md), [templates/contract.md](templates/contract.md), and [templates/run.json](templates/run.json) for controlled work and handoffs.
 3. Provide only the sources and authority needed for the current task.
 
+## Set up Pi
+
+Install the package as a skill resource from a local checkout with `pi install /path/to/agentic-delivery-playbook`. After merge, install the default Git branch with `pi install git:github.com/arcayne/agentic-delivery-playbook`; after publication, use `pi install npm:agentic-delivery-playbook`. Installation adds the `agentic-delivery-playbook-pi` skill; it does not set project/global model defaults or apply [the optional settings template](templates/pi-settings.template.json). See [Pi install, update, and use notes](docs/adapters.md#pi).
+
 ## Print maintained artifacts
 
     npx agentic-delivery-playbook show codex
@@ -57,7 +61,7 @@ The CLI only prints maintained artifacts; it does not install or overwrite local
 
 Only the GPT-6 profile is maintained. Prior material is unsupported under [legacy/](legacy/README.md) and excluded from the npm package.
 
-For 0.2 users, the mutating install pi and install claude commands were removed. Existing installations are not updated automatically; review and merge the maintained Codex or ChatGPT Work artifacts yourself.
+For 0.2 users, the mutating install pi and install claude commands were removed; the current Pi support is a skill-only package resource, not a restored mutating CLI command. Existing installations are not updated automatically. Review the maintained adapter instructions and install the Pi package separately if wanted.
 
 ## Contributing and security
 

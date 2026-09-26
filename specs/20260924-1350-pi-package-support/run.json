@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "1.0",
+  "mode": "controlled",
+  "status": "in-progress",
+  "contract": {
+    "path": "specs/20260924-1350-pi-package-support/spec.md",
+    "approvalEvidence": "User requested a PR and Pi installation of the latest playbook; user set Luna worker and Sol reviewer defaults."
+  },
+  "source": {
+    "baseCommit": "a35a66f0787c9dca7e615fcbf4b7378983e25f67",
+    "finalCommit": null,
+    "diffSha256": null
+  },
+  "route": {
+    "policy": "profiles/gpt-6.md",
+    "exception": null,
+    "enforcement": {
+      "required": true,
+      "reason": "Controlled multi-file package integration with user-approved per-role routes.",
+      "targets": [
+        { "role": "implementer", "agent": "worker", "model": "openai-codex/gpt-6-luna", "reasoningIntensity": "high", "source": "explicit" },
+        { "role": "reviewer", "agent": "reviewer", "model": "openai-codex/gpt-6-sol", "reasoningIntensity": "medium", "source": "explicit" }
+      ],
+      "verification": {
+        "status": "verified",
+        "evidence": "Exact model IDs were used in prior Pi child invocations; user-level subagents.agentOverrides now set worker Luna High and reviewer Sol Medium. This implementation will explicitly pass the same routes."
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "spec-critique",
+      "role": "reviewer",
+      "taskShape": "read-only-package-integration-contract-critique",
+      "ownership": [],
+      "requested": { "model": "openai-codex/gpt-6-sol", "effort": "medium", "topology": "single" },
+      "observed": { "model": "openai-codex/gpt-6-sol", "effort": "medium", "runtimePreset": null, "threadId": "4a552f50-541d-4204-a784-5bcab006c9f2", "source": "explicit" },
+      "status": "completed-with-findings",
+      "evidence": ["Critique required a before/after user settings comparison, updates to existing Pi-absence assertions/surface docs, exact skill-name inventory check, and packed-artifact relative-path validation; contract revised accordingly."]
+    },
+    {
+      "id": "spec-critique-rereview",
+      "role": "reviewer",
+      "taskShape": "read-only-revised-contract-gate",
+      "ownership": [],
+      "requested": { "model": "openai-codex/gpt-6-sol", "effort": "medium", "topology": "single" },
+      "observed": { "model": "openai-codex/gpt-6-sol", "effort": "medium", "runtimePreset": null, "threadId": "a2216faf-6d32-4cb0-889f-74adc90894ab", "source": "explicit" },
+      "status": "completed",
+      "evidence": ["Revised contract approved; all initial package/install safeguards included."]
+    },
+    {
+      "id": "implementation",
+      "role": "worker",
+      "taskShape": "serialized-pi-package-adapter",
+      "ownership": ["package.json", "adapters/pi/SKILL.md", "maintained docs", "templates", "tests"],
+      "requested": { "model": "openai-codex/gpt-6-luna", "effort": "high", "topology": "single" },
+      "observed": { "model": "openai-codex/gpt-6-luna", "effort": "high", "runtimePreset": null, "threadId": "c47e9022-b554-4631-98fc-0ec5e0b4ed41", "source": "explicit" },
+      "status": "completed",
+      "evidence": ["Parent `npm run check` passed 26 tests and active-policy validation; packed artifact contains required resources and all 5 skill links resolve."]
+    },
+    {
+      "id": "final-review",
+      "role": "reviewer",
+      "taskShape": "fresh-context-package-diff-and-install-evidence-review",
+      "ownership": [],
+      "requested": { "model": "openai-codex/gpt-6-sol", "effort": "medium", "topology": "single" },
+      "observed": { "model": "openai-codex/gpt-6-sol", "effort": "medium", "runtimePreset": null, "threadId": "4ad2fe87-3d27-4705-9dd8-d600d40dc7b6", "source": "explicit" },
+      "status": "completed",
+      "evidence": ["First review found a P2 stale Git-ref verification step; contract aligned to verified local path, duplicate AC-6 removed, and fresh re-review found no issues (Merge verdict: OK with notes). Reviewer did not run commands/tests."]
+    }
+  ],
+  "validation": [
+    { "id": "npm-check", "command": "npm run check", "exitCode": 0, "startedAt": null, "endedAt": null, "outputReference": "/tmp/agentic-delivery-playbook-pi-package-check.log (26 tests passed; active policy validation passed)", "status": "passed" },
+    { "id": "npm-pack", "command": "npm pack --dry-run plus extract archive and resolve Pi skill relative references", "exitCode": 0, "startedAt": null, "endedAt": null, "outputReference": "/tmp/agentic-delivery-playbook-pi-package-pack.log; extracted tarball verified 5 links and required resources", "status": "passed" },
+    { "id": "pi-cli-syntax", "command": "pi --version; pi install --help local path", "exitCode": 0, "startedAt": null, "endedAt": null, "outputReference": "Pi 0.87.1; install help confirms ./local/path source", "status": "passed" },
+    { "id": "pi-install-settings-preservation", "command": "Snapshot ~/.pi/agent/settings.json and package inventory; install local PR worktree path with `pi install .`; compare existing settings and verify package/skill discovery", "exitCode": 0, "startedAt": null, "endedAt": null, "outputReference": "Before settings: /tmp/pi-agent-settings-before-playbook-package.json (SHA-256 81a92bb7fce085017cfc23a8810691246482581d319f5412dade5cc16d3693dd); pi list before/after in /tmp; structural comparison confirms only expected package declaration added and Luna/Sol overrides preserved.", "status": "passed" }
+  ],
+  "acceptance": [
+    { "criterion": "AC-1: package declares and ships Pi skill resources", "status": "implemented", "evidence": ["Pi manifest and extracted package verified"] },
+    { "criterion": "AC-2: non-colliding skill reads canonical package sources and verifies Pi routing", "status": "implemented", "evidence": ["Distinct frontmatter name; 5 packaged relative links resolve"] },
+    { "criterion": "AC-3: optional Pi worker/reviewer settings template matches approved defaults", "status": "implemented", "evidence": ["JSON template tests assert Luna High worker and Sol Medium reviewer"] },
+    { "criterion": "AC-4: install/update/use docs are accurate", "status": "implemented", "evidence": ["README, adapters, getting-started, publishing, business context and contribution claims updated; link tests pass"] },
+    { "criterion": "AC-5: tests, packed-artifact paths, Pi CLI syntax, and install/settings-preservation checks pass", "status": "implemented", "evidence": ["26 tests passed; pack extraction resolves 5 links; Pi 0.87.1 local path install confirmed; user settings preserved and package appears in pi list"] },
+    { "criterion": "AC-6: independent review accepts and PR is opened", "status": "in-progress", "evidence": ["Fresh GPT-6 Sol Medium review accepted with notes; PR creation pending."] }
+  ],
+  "review": { "reviewerLaneId": "final-review", "diffReviewed": true, "evidenceReviewed": true, "decision": "accepted", "findings": [{ "severity": "P2", "status": "resolved", "summary": "Contract previously specified unverified Git-ref install while validation used local `pi install .`; corrected contract/notes and verified on fresh review." }, { "severity": "note", "status": "accepted", "summary": "Installed package source is the local worktree; retain it until a post-merge Git or npm source install is separately verified." }] },
+  "closeout": { "outcome": "pending", "knownGaps": [], "escalation": null }
+}

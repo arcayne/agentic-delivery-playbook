@@ -1,0 +1,14 @@
+{
+  "subagents": {
+    "agentOverrides": {
+      "worker": {
+        "model": "openai-codex/gpt-6-luna",
+        "thinking": "high"
+      },
+      "reviewer": {
+        "model": "openai-codex/gpt-6-sol",
+        "thinking": "medium"
+      }
+    }
+  }
+}

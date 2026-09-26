@@ -13,7 +13,7 @@ Contributions must keep the maintained surface small, capability-based, and repr
 
 ## Adapter proposals
 
-Codex and ChatGPT Work are the maintained adapters. New provider adapters are community proposals unless the project explicitly accepts a maintenance and evaluation commitment. A proposal must identify the maintainer, supported runtime, route observability limits, deterministic validation, and how it will stay aligned with the kernel and GPT-6 profile.
+Codex, ChatGPT Work, and the skill-only Pi package are maintained surfaces. New provider or runtime adapters are community proposals unless the project explicitly accepts a maintenance and evaluation commitment. A proposal must identify the maintainer, supported runtime, route observability limits, deterministic validation, and how it will stay aligned with the kernel and GPT-6 profile.
 
 ## Pull requests
 

@@ -2,7 +2,7 @@
 
 ## Current thesis
 
-Agentic Delivery Playbook is a small, evidence-first kernel for teams using Codex and ChatGPT Work on consequential repository changes. It may help people constrain scope, select a minimum safe GPT-6 route, and evaluate work from evidence rather than narration.
+Agentic Delivery Playbook is a small, evidence-first kernel for teams using Codex, ChatGPT Work, and Pi on consequential repository changes. It may help people constrain scope, select a minimum safe GPT-6 route, and evaluate work from evidence rather than narration.
 
 The kernel is the product hypothesis, not a promise of improved speed, cost, or quality. Routing may add value, or a consistent Sol baseline may be enough. [Protocol 1.0](docs/evaluation.md) is frozen historical GPT-5.6 evidence; it does not validate current GPT-6 routing. Evaluating GPT-6 requires a separately versioned protocol.
 
@@ -15,7 +15,7 @@ A senior or lead developer who already uses coding agents on real codebases and 
 In scope:
 
 - Direct and Controlled delivery guidance
-- Codex and ChatGPT Work adapters
+- Codex and ChatGPT Work adapters, plus a skill-only Pi package adapter
 - GPT-6 routing guidance and separately versioned evaluation
 - evidence-backed claims
 
