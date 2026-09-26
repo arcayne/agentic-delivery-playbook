@@ -4,6 +4,7 @@
 
 - Made GPT-6 the maintained profile while preserving frozen GPT-5.6 evaluation and historical evidence.
 - Added a skill-only Pi package adapter that loads the packaged canonical kernel and GPT-6 profile.
+- Consolidated the Pi command under `agentic-delivery-playbook`, evolving the existing skill instead of introducing a second product identity.
 - Added optional Pi worker/reviewer settings reference and Pi installation/use guidance.
 
 ## 0.3.0 - 2026-07-10

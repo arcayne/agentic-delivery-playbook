@@ -36,7 +36,7 @@ GPT-6 Luna, Sol, and Astra are selected for task shape, independently of the del
 
 ## Set up Pi
 
-Install the package as a skill resource from a local checkout with `pi install /path/to/agentic-delivery-playbook`. After merge, install the default Git branch with `pi install git:github.com/arcayne/agentic-delivery-playbook`; after publication, use `pi install npm:agentic-delivery-playbook`. Installation adds the `agentic-delivery-playbook-pi` skill; it does not set project/global model defaults or apply [the optional settings template](templates/pi-settings.template.json). See [Pi install, update, and use notes](docs/adapters.md#pi).
+Install the package as a skill resource from a local checkout with `pi install /path/to/agentic-delivery-playbook`. After merge, install the default Git branch with `pi install git:github.com/arcayne/agentic-delivery-playbook`; after publication, use `pi install npm:agentic-delivery-playbook`. Installation adds the canonical `agentic-delivery-playbook` skill; it does not set project/global model defaults or apply [the optional settings template](templates/pi-settings.template.json). See [Pi install, update, and use notes](docs/adapters.md#pi).
 
 ## Print maintained artifacts
 

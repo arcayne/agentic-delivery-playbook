@@ -24,13 +24,13 @@ test('Pi package declares and includes the skill resource', () => {
   assert.ok(manifest.files.includes('templates'));
 });
 
-test('Pi skill has the non-colliding name and resolves all packaged references', () => {
+test('Pi skill uses the canonical product name and resolves all packaged references', () => {
   const skillPath = 'adapters/pi/SKILL.md';
   const skill = read(skillPath);
   const frontmatter = skill.match(/^---\n([\s\S]*?)\n---/);
   assert.ok(frontmatter, 'skill has YAML frontmatter');
-  assert.match(frontmatter[1], /^name: agentic-delivery-playbook-pi$/m);
-  assert.doesNotMatch(frontmatter[1], /^name: agentic-delivery-playbook$/m);
+  assert.match(frontmatter[1], /^name: agentic-delivery-playbook$/m);
+  assert.doesNotMatch(frontmatter[1], /^name: agentic-delivery-playbook-pi$/m);
 
   const manifest = JSON.parse(read('package.json'));
   for (const reference of localMarkdownTargets(skill)) {
@@ -41,7 +41,9 @@ test('Pi skill has the non-colliding name and resolves all packaged references',
     assert.ok(manifest.files.some((entry) => relative === entry || relative.startsWith(`${entry}/`)),
       `${relative} is included in npm package`);
   }
-  assert.match(skill, /Pi is a supported skill-package surface, not proof of any particular runtime capability/);
+  assert.match(skill, /A Pi package install makes this skill available; it does not set model, effort, worker, or reviewer defaults/);
+  assert.match(read('docs/adapters.md'), /\/skill:agentic-delivery-playbook/);
+  assert.match(skill, /Do not introduce a separate Pi-only process mode/);
 });
 
 test('optional Pi settings template declares the documented role routes', () => {
