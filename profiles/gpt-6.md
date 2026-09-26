@@ -3,7 +3,7 @@
 Status: maintained
 Profile version: 1.0
 Verified: 2026-09-24
-Surfaces: Codex and ChatGPT Work
+Surfaces: Codex, ChatGPT Work, and Pi (skill package; runtime capabilities must be verified independently)
 Recheck trigger: any GPT-6 or Codex routing/configuration change
 
 This profile maps delivery capabilities to GPT-6. The kernel in `playbook.md` remains capability-based; model and reasoning effort are separate choices.

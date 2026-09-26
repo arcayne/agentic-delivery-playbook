@@ -16,6 +16,7 @@ const active = [
   'profiles/gpt-6.md',
   'adapters/codex/AGENTS.md',
   'adapters/chatgpt/instructions.md',
+  'adapters/pi/SKILL.md',
   'README.md',
   'CONTRIBUTING.md',
   'templates/run.json',
@@ -76,7 +77,7 @@ for (const file of ['templates/run.json']) {
   }
 }
 
-for (const retired of ['adapters/pi', 'adapters/claude']) {
+for (const retired of ['adapters/claude']) {
   if (fs.existsSync(path.join(root, retired))) errors.push(`${retired}: must be under legacy/`);
 }
 

@@ -37,6 +37,10 @@ Before closeout, review the approved contract, the actual diff, and the captured
 
 Use a durable run record when Controlled work is broad, sensitive, long-running, delegated, handed off, or audit-relevant. The completed example at [examples/controlled-run/run.json](../examples/controlled-run/run.json) shows the required route, validation, review, and closeout fields.
 
+## 3. Use the packaged skill in Pi
+
+Install an unmerged checkout from its local path with `pi install /path/to/agentic-delivery-playbook`. After merge, install the default branch with `pi install git:github.com/arcayne/agentic-delivery-playbook`; after publication, use `pi install npm:agentic-delivery-playbook`. Then invoke `/skill:agentic-delivery-playbook-pi`. The skill reads the packaged [kernel](../playbook.md) and [profile](../profiles/gpt-6.md), and does not set project/global model defaults. Pi runtime model and effort support must be verified independently. The optional [settings template](../templates/pi-settings.template.json) documents Luna High worker and Sol Medium reviewer defaults but is not automatically applied; higher-precedence overrides may change the effective route.
+
 ## Next
 
 Use [playbook.md](../playbook.md) for mode selection and [profiles/gpt-6.md](../profiles/gpt-6.md) for routing. [Protocol 1.0](evaluation.md) is frozen historical GPT-5.6 evidence; it does not validate current GPT-6 routing. Evaluating GPT-6 requires a separately versioned protocol.

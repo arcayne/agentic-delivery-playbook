@@ -18,6 +18,7 @@ const activePolicyFiles = [
   'profiles/gpt-6.md',
   'adapters/codex/AGENTS.md',
   'adapters/chatgpt/instructions.md',
+  'adapters/pi/SKILL.md',
 ];
 
 test('active policy contains no retired model matrix', () => {
@@ -43,8 +44,8 @@ test('active policy respects its line budgets', () => {
   }
 });
 
-test('retired provider adapters are legacy-only', () => {
-  assert.throws(() => readUtf8(root, 'adapters/pi/SKILL.md'), /ENOENT/);
+test('Pi is maintained as a skill-only package adapter; retired adapters remain legacy-only', () => {
+  assert.ok(fs.existsSync(path.join(root, 'adapters/pi/SKILL.md')));
   assert.throws(() => readUtf8(root, 'adapters/claude/SKILL.md'), /ENOENT/);
   assert.match(readUtf8(root, 'legacy/README.md'), /unsupported/i);
 });
@@ -70,7 +71,7 @@ test('public docs describe the maintained surface honestly', () => {
   const readme = readUtf8(root, 'README.md');
   assert.match(readme, /Direct and Controlled/);
   assert.match(readme, /GPT-6 Luna, Sol, and Astra/);
-  assert.match(readme, /Codex and ChatGPT Work/);
+  assert.match(readme, /Codex, ChatGPT Work, and Pi/);
   assert.match(readme, /docs\/evaluation\.md/);
   assert.doesNotMatch(readme, /Pi-first|Direct.*Lightweight.*Full/is);
 
@@ -97,10 +98,15 @@ test('repository contribution and support metadata matches 0.3', () => {
   const security = readUtf8(root, 'SECURITY.md');
   const contributing = readUtf8(root, 'CONTRIBUTING.md');
   const pullRequest = readUtf8(root, '.github/pull_request_template.md');
+  const businessContext = readUtf8(root, 'BUSINESS-CONTEXT.md');
+  const publishing = readUtf8(root, 'docs/publishing.md');
   assert.match(security, /\| 0\.3\.x \| Yes \|/);
   assert.match(security, /\| 0\.2\.x and earlier \| No \|/);
   assert.match(contributing, /Direct and Controlled/);
   assert.match(contributing, /GPT-6/);
+  assert.match(contributing, /Codex, ChatGPT Work, and the skill-only Pi package/);
+  assert.match(businessContext, /Codex, ChatGPT Work, and Pi/);
+  assert.match(publishing, /Codex, ChatGPT Work, and Pi/);
   assert.match(pullRequest, /Direct and Controlled/);
   assert.match(pullRequest, /active profile/i);
 });
@@ -113,6 +119,7 @@ test('local links in the maintained public docs resolve', () => {
     'profiles/gpt-6.md',
     'adapters/codex/README.md',
     'adapters/chatgpt/README.md',
+    'adapters/pi/SKILL.md',
     'docs/getting-started.md',
     'docs/adapters.md',
     'docs/business-assumptions.md',
