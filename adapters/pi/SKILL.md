@@ -1,20 +1,25 @@
 ---
-name: agentic-delivery-playbook-pi
-description: "Apply the maintained Agentic Delivery Playbook in Pi: classify delivery as Direct or Controlled, select a route from the canonical GPT-6 profile, and close from evidence. Use for coding work when scope, risk, or verification benefits from explicit delivery guidance."
+name: agentic-delivery-playbook
+description: "Apply the maintained Agentic Delivery Playbook in Pi: classify work as Direct or Controlled, choose the minimum safe route, and close from evidence. Use for coding work when explicit scope, risk, route, or validation guidance will improve the next action."
 ---
 
 # Agentic Delivery Playbook for Pi
 
-Use the packaged canonical sources; do not treat this skill as a copy of the policy:
+## Canonical policy
 
-- Read [`../../playbook.md`](../../playbook.md) for Direct and Controlled process rules.
-- Read [`../../profiles/gpt-6.md`](../../profiles/gpt-6.md) for maintained model/effort routes and client limitations.
-- For a compact contract or durable evidence record, use [`../../templates/contract.md`](../../templates/contract.md) or [`../../templates/run.json`](../../templates/run.json) when the work warrants them.
+- Read [`../../playbook.md`](../../playbook.md) for the Direct and Controlled process rules.
+- Read [`../../profiles/gpt-6.md`](../../profiles/gpt-6.md) for task-fit routes and client limits.
+- Use [`../../templates/contract.md`](../../templates/contract.md) and [`../../templates/run.json`](../../templates/run.json) when the task warrants durable evidence; do not add ceremony to clear, low-risk work.
+- Keep Pi as an adapter to the same product. Do not introduce a separate Pi-only process mode such as Lightweight or Full.
 
-## Apply the playbook
+## Pi-specific route verification
 
-Classify process mode from the kernel and select a route separately from mode using the maintained profile. Make the smallest change that meets the approved scope, then validate and report changed files, evidence, assumptions, and gaps. Do not add ceremony to clear, low-risk work.
+A Pi package install makes this skill available; it does not set model, effort, worker, or reviewer defaults. Verify the current Pi version, visible tools, effective model/effort, and any required agent route independently. User-global settings may supply defaults; a missing project `.pi/settings.json` alone is not a package or route failure.
 
-Pi is a supported skill-package surface, not proof of any particular runtime capability or model route. Verify the Pi version, configured model, effort controls, and agent behavior independently before relying on them. Record `runtime-default` or `unknown` when a route is not exposed; do not claim that installing this package changes project/global model defaults.
+Use only capabilities exposed in the current session. If a required worker/reviewer or model route is unavailable, record it as `unknown`/`runtime-default`; do not claim delegation or independent review. Choose another route only when it still meets the task's safety floor, otherwise narrow the task or ask the user to approve an exception.
 
-For workspaces that choose to set Pi worker/reviewer defaults, the optional [`../../templates/pi-settings.template.json`](../../templates/pi-settings.template.json) shows GPT-6 Luna High for worker and GPT-6 Sol Medium for reviewer. Review and merge it deliberately into the appropriate settings; installation does not apply it or overwrite user settings.
+Pi goals are a durability wrapper, not a process mode. Create one only when the user explicitly asks for a persistent goal. Package installation does not apply the optional [`../../templates/pi-settings.template.json`](../../templates/pi-settings.template.json); review settings changes deliberately.
+
+## Workspace safety
+
+Inspect `git status` before editing. Do not clean, reset, overwrite, or include pre-existing user changes. When unrelated dirty work makes the target unclear, use an isolated worktree or ask before proceeding.
