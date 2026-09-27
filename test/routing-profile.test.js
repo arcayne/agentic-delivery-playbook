@@ -23,6 +23,11 @@ test('the maintained profile contains only the GPT-6 family', () => {
   assert.match(profile, /ChatGPT Work, Pi, or another client/);
   assert.match(profile, /Luna xhigh is optional and conditional/i);
   assert.match(profile, /GPT-5\.6 may be used as an explicitly named fallback/i);
+  assert.match(profile, /bounded Pi project role profile/i);
+  assert.match(profile, /GPT-6 Sol Medium parent\/orchestrator, sole GPT-6 Luna High implementation writer, and fresh-context read-only GPT-6 Sol Medium reviewer/);
+  assert.match(profile, /not a change to the model-neutral kernel, general task-fit table, or Codex defaults/);
+  assert.match(profile, /Distinguish requested, configured and observed routes/);
+  assert.match(profile, /stop rather than silently substitute/);
   assert.doesNotMatch(profile, /gpt-6-terra/i);
   assert.doesNotMatch(profile, /DeepSeek|Hermes|GPT-5\.[2-5]/i);
   assert.ok(lineCount(profile) <= 120, `profile has ${lineCount(profile)} lines`);

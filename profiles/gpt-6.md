@@ -25,6 +25,10 @@ Choose the model for task shape, then choose an effort available for that exact 
 
 For ordinary project work, start with the task-fit model rather than using maximum effort by default. The implementation route approved for this repository migration is GPT-6 Luna High; the fresh-context review route is GPT-6 Sol High.
 
+## Bounded Pi project role profile
+
+This repository's optional Pi project settings configure a fresh trusted-session profile: GPT-6 Sol Medium parent/orchestrator, sole GPT-6 Luna High implementation writer, and fresh-context read-only GPT-6 Sol Medium reviewer. The parent owns planning, launch, sequencing, validation, synthesis and continuation; the Luna worker makes every implementation edit, including small edits; the reviewer examines the actual diff and evidence. This is a bounded project exception, not a change to the model-neutral kernel, general task-fit table, or Codex defaults. Distinguish requested, configured and observed routes; startup settings do not prove effective runtime routing. Trust, overrides and route availability require verification; stop rather than silently substitute when a required route is unavailable.
+
 ## Effort and route verification
 
 Model IDs and reasoning effort are independent: for example, `gpt-6-luna` is the model and `high` is its effort setting. The official Codex model catalog and configuration reference advertise effort values by model; Luna supports up to Max, and Sol Max is available for the hardest problems. Luna xhigh is optional and conditional: use it for difficult tasks in Codex when configured and available, and use Sol max when maximum depth is needed on the Sol route. These upper effort levels are model- and client-specific: do not infer that ChatGPT Work, Pi, or another client exposes the same level. Keep Luna High as the normal focused starting route.

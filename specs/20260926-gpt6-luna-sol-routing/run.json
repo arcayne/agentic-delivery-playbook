@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0",
+  "mode": "controlled",
+  "planningDepth": "Full",
+  "status": "approved-with-notes-ready-for-pr",
+  "contract": {
+    "path": "specs/20260926-gpt6-luna-sol-routing/spec.md",
+    "approvalEvidence": "User explicitly approved contract-only gate, fresh-session Sol Medium orchestration default, sole Luna High implementation worker, and fresh read-only Sol Medium final reviewer."
+  },
+  "source": {
+    "baseCommit": "e857e2bd3d600186ef1df82565c43a01f02f6bff",
+    "origin": "origin/main",
+    "finalCommit": null
+  },
+  "route": {
+    "policy": "profiles/gpt-6.md",
+    "sourceEvidence": [
+      "/opt/homebrew/lib/node_modules/@earendil-works/pi-coding-agent/docs/settings.md: project overrides agent-directory settings; defaultProvider, defaultModel and defaultThinkingLevel are startup settings",
+      "/opt/homebrew/lib/node_modules/@earendil-works/pi-coding-agent/docs/configuration.md: trusted project .pi/settings.json is project settings"
+    ],
+    "intendedFreshParent": { "provider": "openai-codex", "model": "gpt-6-sol", "thinking": "medium", "source": "project settings", "actual": "openai-codex/gpt-6-sol observed in a fresh trusted project Pi JSON-mode probe with no model override; thinking level was not exposed in message metadata; configured default is medium" },
+    "currentRootSession": { "model": "openai-codex/gpt-6-luna", "source": "Pi subagent model registry", "notes": "Already running; project startup defaults do not change it live." },
+    "exception": null
+  },
+  "launchTree": {
+    "orchestrationPlanes": 1,
+    "maxDelegationDepth": 1,
+    "maxConcurrency": 1,
+    "writerOwnership": "One explicitly routed Luna High worker owns all implementation edits; parent owns only run artifacts.",
+    "synthesisOwner": "Sol Medium parent in intended fresh session",
+    "stopRules": ["unverified required effective route", "unapproved scope or architecture choice", "contradictory validation after bounded fixes"]
+  },
+  "lanes": [
+    {
+      "id": "contract-planning",
+      "role": "Sol Medium planning/orchestration invocation",
+      "agent": "assigned child subagent",
+      "requested": { "model": "openai-codex/gpt-6-sol", "effort": "medium", "source": "explicit" },
+      "observed": { "model": "openai-codex/gpt-6-sol", "effort": "not exposed by runtime status", "source": "workflow child status; explicit medium requested", "notes": "Distinct from already-running Luna root session." },
+      "status": "completed",
+      "ownership": ["specs/20260926-gpt6-luna-sol-routing/spec.md", "specs/20260926-gpt6-luna-sol-routing/run.json", "specs/20260926-gpt6-luna-sol-routing/notes.md"]
+    },
+    {
+      "id": "fresh-parent",
+      "role": "orchestrator",
+      "requested": { "model": "openai-codex/gpt-6-sol", "effort": "medium", "source": "explicit" },
+      "observed": { "provider": "openai-codex", "model": "gpt-6-sol", "effort": "configured medium; not exposed by probe message metadata", "source": "fresh trusted project Pi JSON-mode process", "evidence": "pi --mode json --approve --no-session --print (no --model/--thinking override)" },
+      "status": "model-verified-effort-configured"
+    },
+    {
+      "id": "implementation",
+      "role": "sole implementation worker",
+      "agent": "worker",
+      "requested": { "model": "openai-codex/gpt-6-luna", "effort": "high", "source": "explicit" },
+      "observed": { "model": "openai-codex/gpt-6-luna", "effort": "high", "source": "workflow runtime child status" },
+      "status": "completed"
+    },
+    {
+      "id": "independent-review",
+      "role": "fresh-context read-only reviewer",
+      "agent": "reviewer",
+      "requested": { "model": "openai-codex/gpt-6-sol", "effort": "medium", "source": "explicit" },
+      "observed": { "model": "openai-codex/gpt-6-sol", "effort": "medium", "source": "workflow runtime child status" },
+      "status": "approve-with-notes"
+    }
+  ],
+  "validation": [
+    { "id": "docs-precedence", "command": "sed -n '1,35p' /opt/homebrew/lib/node_modules/@earendil-works/pi-coding-agent/docs/settings.md; sed -n '1,53p' /opt/homebrew/lib/node_modules/@earendil-works/pi-coding-agent/docs/configuration.md", "status": "passed", "evidence": "Project precedence, startup keys, trusted project path verified." },
+    { "id": "contract-json", "command": "node -e \"JSON.parse(require('fs').readFileSync('specs/20260926-gpt6-luna-sol-routing/run.json','utf8'))\"", "status": "passed", "evidence": "run.json valid JSON." },
+    { "id": "focused-tests", "command": "node --test test/pi-adapter.test.js test/routing-profile.test.js", "status": "passed", "evidence": "7 tests passed after implementation." },
+    { "id": "implementation-check", "command": "npm run check", "status": "passed", "evidence": "26 tests passed; active policy validation passed." },
+    { "id": "settings-json", "command": "parse .pi/settings.json and templates/pi-settings.template.json", "status": "passed", "evidence": "Both files parsed as valid JSON." },
+    { "id": "diff-check", "command": "git diff --check", "status": "passed", "evidence": "No whitespace errors." },
+    { "id": "maintained-route-scan", "command": "rg -n 'defaultProvider|defaultModel|defaultThinkingLevel|gpt-6-(luna|sol)|agentOverrides|implementation worker|orchestrat|read-only reviewer' .pi/settings.json templates/pi-settings.template.json adapters/pi/SKILL.md profiles/gpt-6.md test/pi-adapter.test.js test/routing-profile.test.js", "status": "passed", "evidence": "42 matches across route/config/test files." },
+    { "id": "fresh-project-route-probe", "command": "pi --mode json --approve --no-session --print 'Reply exactly with READY.' (no model/thinking CLI override)", "status": "passed-with-effort-metadata-gap", "evidence": "Assistant event reported provider=openai-codex, model=gpt-6-sol. Project settings configure defaultThinkingLevel=medium; JSON message metadata did not expose effective thinking level." },
+    { "id": "worktree-scope", "command": "git status --short; git diff --cached --name-only; git diff --stat origin/main; inspect original checkout git status", "status": "passed", "evidence": "No staged files. Five tracked implementation files, .pi/settings.json, and three run artifacts; original checkout retains its same 15 modified files and was not edited." },
+    { "id": "review-packet", "command": "inspect complete tracked diff from origin/main plus new .pi/settings.json", "status": "reviewed", "evidence": "Complete 133-line patch was supplied from /tmp/agentic-delivery-playbook-gpt6-luna-sol.patch and read by the fresh Sol reviewer; duplicate patch file was removed after review to avoid committing source twice." },
+    { "id": "route-attestation", "command": "inspect workflow child runtime status", "status": "passed", "evidence": "Luna worker resolved gpt-6-luna/high; Sol reviewer resolved gpt-6-sol/medium. Sol orchestration invocation resolved gpt-6-sol; effort not exposed in its runtime status." }
+  ],
+  "review": {
+    "priorReview": { "model": "openai-codex/gpt-6-sol", "effort": "medium", "decision": "request-changes", "finding": "P1 evidence gate: run.json was still contract-only and reviewer lacked complete diff/Git/test evidence; no source defect alleged." },
+    "finalReview": { "model": "openai-codex/gpt-6-sol", "effort": "medium", "verdict": "approve-with-notes", "findings": "No issues found; prior P1 evidence gap resolved." },
+    "diffReviewed": true,
+    "evidenceReviewed": true,
+    "decision": "approve-with-notes",
+    "findings": [],
+    "residualRisk": "Fresh Pi probe exposed provider/model but not effective thinking level; medium is configured in project settings."
+  },
+  "closeout": { "outcome": "approved-with-notes-ready-for-pr", "knownGaps": ["Fresh project process verified the Sol model, but effective thinking level was not exposed in JSON message metadata; medium is configured in project settings."], "escalation": null }
+}

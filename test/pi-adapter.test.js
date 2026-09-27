@@ -44,16 +44,34 @@ test('Pi skill uses the canonical product name and resolves all packaged referen
   assert.match(skill, /A Pi package install makes this skill available; it does not set model, effort, worker, or reviewer defaults/);
   assert.match(read('docs/adapters.md'), /\/skill:agentic-delivery-playbook/);
   assert.match(skill, /Do not introduce a separate Pi-only process mode/);
+  assert.match(skill, /Sol Medium parent owns planning, contract and task launch, sequencing, validation, synthesis, and continuation/);
+  assert.match(skill, /Luna High worker is the sole writer for every implementation edit, including small edits/);
+  assert.match(skill, /fresh-context Sol Medium reviewer is read-only and checks the actual diff and evidence/);
+  assert.match(skill, /requested.*configured.*observed/s);
+  assert.match(skill, /settings establish configuration capability, not route attestation/);
+  assert.match(skill, /stop that affected lane and ask for approval; do not silently substitute/);
 });
 
-test('optional Pi settings template declares the documented role routes', () => {
-  const settings = JSON.parse(read('templates/pi-settings.template.json'));
-  assert.deepEqual(settings.subagents.agentOverrides.worker, {
-    model: 'openai-codex/gpt-6-luna',
-    thinking: 'high',
-  });
-  assert.deepEqual(settings.subagents.agentOverrides.reviewer, {
-    model: 'openai-codex/gpt-6-sol',
-    thinking: 'medium',
-  });
+test('project Pi settings and optional template declare matching startup and role routes', () => {
+  const project = JSON.parse(read('.pi/settings.json'));
+  const template = JSON.parse(read('templates/pi-settings.template.json'));
+  for (const settings of [project, template]) {
+    assert.deepEqual({
+      defaultProvider: settings.defaultProvider,
+      defaultModel: settings.defaultModel,
+      defaultThinkingLevel: settings.defaultThinkingLevel,
+    }, {
+      defaultProvider: 'openai-codex',
+      defaultModel: 'gpt-6-sol',
+      defaultThinkingLevel: 'medium',
+    });
+    assert.deepEqual(settings.subagents.agentOverrides.worker, {
+      model: 'openai-codex/gpt-6-luna',
+      thinking: 'high',
+    });
+    assert.deepEqual(settings.subagents.agentOverrides.reviewer, {
+      model: 'openai-codex/gpt-6-sol',
+      thinking: 'medium',
+    });
+  }
 });
