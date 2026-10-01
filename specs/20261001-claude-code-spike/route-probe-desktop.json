@@ -1,0 +1,26 @@
+{
+  "session": "4e7df366-e26b-4ae5-9d00-d2669cbaad38.jsonl",
+  "main": {
+    "claude-opus-5-5 | medium | claude-desktop": 64
+  },
+  "subagents": [
+    {
+      "agentId": "a945a32d00095e246",
+      "agentType": "general-purpose",
+      "requestedModel": "sonnet",
+      "spawnDepth": 1,
+      "observed": {
+        "claude-sonnet-5-5 | medium | claude-desktop": 3
+      }
+    },
+    {
+      "agentId": "ae04c3c0695582eda",
+      "agentType": "claude-code-guide",
+      "requestedModel": "unknown",
+      "spawnDepth": 1,
+      "observed": {
+        "claude-haiku-4-5-20251001 | unknown | claude-desktop": 21
+      }
+    }
+  ]
+}

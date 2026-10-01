@@ -1,0 +1,26 @@
+{
+  "session": "75e2ec1d-0de8-41d0-a001-1aac52ab54ec.jsonl",
+  "main": {
+    "claude-opus-5-5 | medium | claude-desktop": 4
+  },
+  "subagents": [
+    {
+      "agentId": "a5707d2b6980dc3e0",
+      "agentType": "worker-fullid",
+      "requestedModel": "unknown",
+      "spawnDepth": 1,
+      "observed": {
+        "claude-sonnet-5-5 | low | claude-desktop": 1
+      }
+    },
+    {
+      "agentId": "a64ae50a2fdc26259",
+      "agentType": "worker-alias",
+      "requestedModel": "unknown",
+      "spawnDepth": 1,
+      "observed": {
+        "claude-sonnet-5-5 | low | claude-desktop": 1
+      }
+    }
+  ]
+}

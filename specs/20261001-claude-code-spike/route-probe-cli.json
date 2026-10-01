@@ -1,0 +1,26 @@
+{
+  "session": "fa32db88-8925-40a8-8e1a-72d432f88a37.jsonl",
+  "main": {
+    "claude-opus-5-5 | medium | sdk-cli": 4
+  },
+  "subagents": [
+    {
+      "agentId": "a99bd7dc1fcc4f27b",
+      "agentType": "worker-fullid",
+      "requestedModel": "unknown",
+      "spawnDepth": 1,
+      "observed": {
+        "claude-sonnet-5-5 | low | sdk-cli": 1
+      }
+    },
+    {
+      "agentId": "ab34bee98cb662bca",
+      "agentType": "worker-alias",
+      "requestedModel": "unknown",
+      "spawnDepth": 1,
+      "observed": {
+        "claude-sonnet-5-5 | low | sdk-cli": 1
+      }
+    }
+  ]
+}
