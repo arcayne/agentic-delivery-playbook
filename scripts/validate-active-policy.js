@@ -17,6 +17,18 @@ const active = [
   'adapters/codex/AGENTS.md',
   'adapters/chatgpt/instructions.md',
   'adapters/pi/SKILL.md',
+  'profiles/claude-5.md',
+  'adapters/claude-code/README.md',
+  'adapters/claude-code/skills/deliver/SKILL.md',
+  'adapters/claude-code/agents/adp-worker.md',
+  'adapters/claude-code/agents/adp-worker-high.md',
+  'adapters/claude-code/agents/adp-reviewer.md',
+  'adapters/claude-code/agents/adp-reviewer-high.md',
+  'adapters/claude-code/agents/adp-explorer.md',
+  'templates/claude-settings.template.json',
+  '.claude-plugin/plugin.json',
+  '.claude-plugin/marketplace.json',
+  'lib/claude-route-probe.js',
   'README.md',
   'CONTRIBUTING.md',
   'templates/run.json',
@@ -45,6 +57,8 @@ const budgets = new Map([
   ['profiles/gpt-6.md', 120],
   ['adapters/codex/AGENTS.md', 180],
   ['templates/run.json', 120],
+  ['profiles/claude-5.md', 120],
+  ['adapters/claude-code/skills/deliver/SKILL.md', 80],
 ]);
 const errors = [];
 
@@ -69,7 +83,12 @@ for (const match of findForbiddenTerms(files, [
   errors.push(`${match.file}:${match.line}: retired active term ${match.term}`);
 }
 
-for (const file of ['templates/run.json']) {
+for (const file of [
+  'templates/run.json',
+  'templates/claude-settings.template.json',
+  '.claude-plugin/plugin.json',
+  '.claude-plugin/marketplace.json',
+]) {
   try {
     JSON.parse(readUtf8(root, file));
   } catch (error) {

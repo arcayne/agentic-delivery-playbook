@@ -1,0 +1,5 @@
+{"type":"user","message":{"role":"user","content":"hello"}}
+{"type":"assistant","message":{"model":"claude-opus-5-5"},"perTurnEffort":"medium","entrypoint":"cli"}
+{"type":"assistant","message":{"model":"claude-opus-5-5"},"perTurnEffort":"medium","entrypoint":"cli"}
+{"type":"assistant","message":{"model":"<synthetic>"},"entrypoint":"cli"}
+not json

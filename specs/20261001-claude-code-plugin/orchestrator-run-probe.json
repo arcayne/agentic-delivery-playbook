@@ -1,0 +1,92 @@
+{
+  "session": "4e7df366-e26b-4ae5-9d00-d2669cbaad38.jsonl",
+  "agentsDir": "adapters/claude-code/agents",
+  "main": {
+    "observed": [
+      {
+        "model": "claude-opus-5-5",
+        "effort": "medium",
+        "entrypoint": "claude-desktop",
+        "count": 155
+      }
+    ]
+  },
+  "subagents": [
+    {
+      "agentId": "a0704a03269c4c455",
+      "agentType": "general-purpose",
+      "spawnDepth": 1,
+      "requested": {
+        "model": "opus",
+        "effort": "unknown",
+        "source": "invocation",
+        "definitionPath": null
+      },
+      "observed": [
+        {
+          "model": "claude-opus-5-5",
+          "effort": "medium",
+          "entrypoint": "claude-desktop",
+          "count": 30
+        }
+      ]
+    },
+    {
+      "agentId": "a945a32d00095e246",
+      "agentType": "general-purpose",
+      "spawnDepth": 1,
+      "requested": {
+        "model": "sonnet",
+        "effort": "unknown",
+        "source": "invocation",
+        "definitionPath": null
+      },
+      "observed": [
+        {
+          "model": "claude-sonnet-5-5",
+          "effort": "medium",
+          "entrypoint": "claude-desktop",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "agentId": "aa2d7bee37d41ac63",
+      "agentType": "general-purpose",
+      "spawnDepth": 1,
+      "requested": {
+        "model": "sonnet",
+        "effort": "unknown",
+        "source": "invocation",
+        "definitionPath": null
+      },
+      "observed": [
+        {
+          "model": "claude-sonnet-5-5",
+          "effort": "medium",
+          "entrypoint": "claude-desktop",
+          "count": 41
+        }
+      ]
+    },
+    {
+      "agentId": "ae04c3c0695582eda",
+      "agentType": "claude-code-guide",
+      "spawnDepth": 1,
+      "requested": {
+        "model": "unknown",
+        "effort": "unknown",
+        "source": "unmatched",
+        "definitionPath": null
+      },
+      "observed": [
+        {
+          "model": "claude-haiku-4-5-20251001",
+          "effort": "unknown",
+          "entrypoint": "claude-desktop",
+          "count": 21
+        }
+      ]
+    }
+  ]
+}

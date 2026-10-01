@@ -1,0 +1,18 @@
+{
+  "name": "agentic-delivery-playbook",
+  "version": "0.3.0",
+  "description": "Direct/Controlled delivery kernel for Claude Code: explicit-invoke skill plus Sonnet worker, Opus reviewer, and read-only explorer agents.",
+  "author": { "name": "arcayne" },
+  "homepage": "https://github.com/arcayne/agentic-delivery-playbook",
+  "repository": "https://github.com/arcayne/agentic-delivery-playbook",
+  "license": "MIT",
+  "keywords": ["coding-agents", "agentic-delivery", "claude-code", "human-in-the-loop"],
+  "skills": ["./adapters/claude-code/skills/"],
+  "agents": [
+    "./adapters/claude-code/agents/adp-worker.md",
+    "./adapters/claude-code/agents/adp-worker-high.md",
+    "./adapters/claude-code/agents/adp-reviewer.md",
+    "./adapters/claude-code/agents/adp-reviewer-high.md",
+    "./adapters/claude-code/agents/adp-explorer.md"
+  ]
+}
