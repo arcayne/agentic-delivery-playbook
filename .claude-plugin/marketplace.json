@@ -1,0 +1,12 @@
+{
+  "name": "agentic-delivery-playbook",
+  "description": "Agentic Delivery Playbook plugins for Claude Code",
+  "owner": { "name": "arcayne" },
+  "plugins": [
+    {
+      "name": "agentic-delivery-playbook",
+      "source": "./",
+      "description": "Direct/Controlled delivery kernel with routed worker, reviewer, and explorer agents."
+    }
+  ]
+}

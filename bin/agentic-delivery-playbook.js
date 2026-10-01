@@ -19,14 +19,30 @@ function usage(exitCode = 0) {
 
 Usage:
   agentic-delivery-playbook show <codex|chatgpt|profile|contract|run>
+  agentic-delivery-playbook probe claude <session.jsonl> [--agents-dir <dir>]
   agentic-delivery-playbook --help
 
-The show command prints a maintained artifact to stdout. It never changes local or global configuration.`);
+The show command prints a maintained artifact to stdout. The probe command reads a Claude Code session transcript and prints requested and observed routes as JSON. Neither changes local or global configuration.`);
   process.exit(exitCode);
 }
 
 const args = process.argv.slice(2);
-if (args.includes('-h') || args.includes('--help')) usage(0);
-if (args.length !== 2 || args[0] !== 'show' || !targets[args[1]]) usage(1);
+if (args[0] === '-h' || args[0] === '--help') usage(0);
 
-process.stdout.write(fs.readFileSync(path.join(repoRoot, targets[args[1]]), 'utf8'));
+if (args[0] === 'probe') {
+  const [, kind, sessionFile, ...rest] = args;
+  let agentsDir;
+  if (rest.length === 2 && rest[0] === '--agents-dir') agentsDir = rest[1];
+  else if (rest.length !== 0) usage(1);
+  if (kind !== 'claude' || !sessionFile) usage(1);
+  try {
+    const { probeClaude } = require('../lib/claude-route-probe');
+    console.log(JSON.stringify(probeClaude(sessionFile, { agentsDir }), null, 2));
+  } catch (error) {
+    console.error(`error: ${error.message}`);
+    usage(1);
+  }
+} else {
+  if (args.length !== 2 || args[0] !== 'show' || !targets[args[1]]) usage(1);
+  process.stdout.write(fs.readFileSync(path.join(repoRoot, targets[args[1]]), 'utf8'));
+}
