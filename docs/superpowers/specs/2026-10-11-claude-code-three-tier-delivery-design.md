@@ -1,6 +1,6 @@
 # Claude Code Three-Tier Controlled Delivery
 
-Status: direction approved in session; written design awaiting review
+Status: direction approved in session; written design under review
 Date: 2026-10-11
 Supersedes: the route table and delegation limits in `profiles/claude-5.md` version 1.1
 
@@ -8,7 +8,7 @@ Supersedes: the route table and delegation limits in `profiles/claude-5.md` vers
 
 Make Claude Code desktop the maintained surface of the Agentic Delivery Playbook, and replace the single-hop Controlled route (orchestrator delegates to one worker) with a three-tier route: a Fable 5.1 orchestrator that owns the goal, an Opus 5.5 lead that plans the technical work into bounded tasks, and Sonnet 5.5 workers that implement one task each. The Controlled implementation and review steps run as one shipped Workflow script so that serialization, fix-cycle limits, the review gate, and evidence capture are deterministic instead of followed by hand across hundreds of orchestrator turns.
 
-The kernel in `playbook.md` does not change in substance. Direct and Controlled, contract before delegation, one writer per file cluster, fresh-context review of the actual diff, and requested versus observed route evidence all stay. Only the Claude 5 profile and the Claude Code adapter change, plus a repositioning of the repository's front matter.
+The kernel in `playbook.md` does not change in substance. Direct and Controlled, contract before delegation, one writer per file cluster, fresh-context review of the actual diff, depth one, one orchestration plane, and requested versus observed route evidence all stay. Only the Claude 5 profile and the Claude Code adapter change, plus a repositioning of the repository's front matter.
 
 ## Evidence that motivates the change
 
@@ -18,17 +18,17 @@ Collected from the local Claude Code transcripts on 2026-10-11, covering August 
 - Main-session turns: 4373 on Opus 5.5, 1760 on Fable 5.1, 5 on Sonnet 5.5. Subagent turns: 3281 on Opus 5.5, 513 on Sonnet 5.5. The cheapest capable tier is almost unused, because the most-used subagent type (`general-purpose`) inherits the parent model.
 - Fable main sessions run 100 to 650 turns at high or max effort with zero or near-zero delegation. When they delegate, it is to Explore and Plan agents, not to implementation workers.
 - The five Controlled runs made with the current `deliver` skill are 580 to 750 assistant turns and 6 to 8 MB each. Three sessions begin with pasted context from a previous session, which is manual context carry-over.
-- The current profile's delegation limits state that subagents cannot spawn subagents and forbid the Workflow tool. Current Claude Code documentation (checked 2026-10-11) allows nested subagents three levels deep by default, and the Workflow tool accepts a per-agent `model`, `effort`, `isolation`, and `agentType`. The skill's mandatory preflight stops Controlled work when the main session is not Opus 5.5, which is the opposite of the user's preferred Fable orchestrator.
+- The current profile forbids the Workflow tool and the skill's mandatory preflight stops Controlled work when the main session is not Opus 5.5, which is the opposite of the user's preferred Fable orchestrator. Current Claude Code documentation (checked 2026-10-11) gives the Workflow tool a per-agent `model`, `effort`, `isolation`, and `agentType`, and makes a skill instruction a valid opt-in.
 
 ## Decision summary
 
 1. Claude Code desktop is the maintained surface. Pi, Codex, and ChatGPT Work stay maintained adapters on the GPT-6 profile but stop leading the README.
-2. The Claude 5 profile moves to version 2 with a three-tier route table and permits the Workflow tool. Agent teams remain excluded because they are CLI-only.
-3. Controlled mode in Claude Code runs as: inception grill, classify, contract and approval, then one shipped Workflow script with Plan, Implement, Review, and Goal-fit phases, then closeout by the orchestrator.
-4. Two review gates: an Opus defect review against the contract, the actual diff, and validation evidence, followed by a fresh-context Fable goal-fit review that uses the deliverable and judges it against the intent brief.
-5. The goal-fit reviewer model is configurable through the agent definition and the workflow `args`. The maintained default is Fable 5.1.
+2. The Claude 5 profile moves to version 2 with a three-tier route table and permits the Workflow tool as the scheduler of the single orchestration plane. Agent teams remain excluded because they are CLI-only.
+3. Controlled mode in Claude Code runs as: inception grill, classify, contract and approval, then one shipped Workflow script with Plan, Implement, Review, and Goal-fit phases, then closeout by the orchestrator, who re-runs the contract's verification plan itself.
+4. Two review gates: an Opus defect review against the contract, the actual diff, and validation evidence, followed by a fresh-context Fable goal-fit review that uses the deliverable within stated bounds and judges it against the intent brief.
+5. The goal-fit reviewer model is configurable through the workflow `args`. The maintained default is Fable 5.1.
 6. Headless runs (`claude -p`, Agent SDK), where the Workflow tool is unavailable, execute the same phases by hand with the same agents. There is no second lead agent.
-7. Delivery is two pull requests: PR 1 ships the mechanism and its dogfood evidence; PR 2 repositions the repository.
+7. Delivery is two pull requests: PR 1 ships the mechanism, bumps the version to 0.4.0, and records dogfood evidence; PR 2 repositions the repository.
 
 ## Non-goals
 
@@ -38,19 +38,20 @@ Collected from the local Claude Code transcripts on 2026-10-11, covering August 
 - Changing the user's global Claude settings, or auto-applying any settings template.
 - Moving the plugin root out of the repository root. The known gap about `bin/` and `legacy/` shipping in the plugin cache stays recorded.
 - A general orchestrator, queue, dashboard, or hooks-based enforcement. Read-only roles stay enforced by tool allowlists plus the worktree fingerprint.
+- An automatic fix loop on goal-fit verdicts. Fitness is a product judgment, so a non-fit verdict goes back to the user.
 - Cost claims. The run records will show cost per completed task; the design does not promise savings.
 
 ## Route table (profile version 2)
 
 | Role | Model ID | Effort | Agent | Topology |
 | --- | --- | --- | --- | --- |
-| Orchestrator | `claude-fable-5-1` (economy: `claude-opus-5-5`) | high (economy: medium) | main session | one plane |
+| Orchestrator | `claude-fable-5-1` (economy: `claude-opus-5-5`) | high (economy: medium) | main session | one plane, depth one |
 | Lead | `claude-opus-5-5` | xhigh | `adp-lead`, read-only tools | workflow Plan phase |
-| Worker | `claude-sonnet-5-5` | medium | `adp-worker` | workflow Implement phase, serialized |
-| Worker escalation 1 | `claude-sonnet-5-5` | high | `adp-worker-high` | same |
-| Worker escalation 2 | `claude-opus-5-5` | high | `adp-worker` with workflow `model` override | same |
-| Validator | `claude-sonnet-5-5` | low | `adp-validator`, Bash and Read only | after each task and around review |
-| Defect reviewer | `claude-opus-5-5` | medium (high for `risk: high`) | `adp-reviewer` / `adp-reviewer-high` | workflow Review phase, fresh context |
+| Worker, attempt 1 | `claude-sonnet-5-5` | medium | `adp-worker` | workflow Implement phase, serialized |
+| Worker, retry 1 | `claude-sonnet-5-5` | high | `adp-worker-high` | same |
+| Worker, retry 2 | `claude-opus-5-5` | high | `adp-worker` with workflow `model` and `effort` overrides | same |
+| Validator | `claude-sonnet-5-5` | low | `adp-validator`, Bash and Read only | before and after each task, around each review |
+| Defect reviewer | `claude-opus-5-5` | medium (`adp-reviewer-high` at high for `risk: high`) | `adp-reviewer` / `adp-reviewer-high` | workflow Review phase, fresh context |
 | Goal-fit reviewer | `claude-fable-5-1` (configurable) | high | `adp-goal-reviewer` | workflow Goal-fit phase, fresh context |
 | Explorer | `claude-sonnet-5-5` | low | `adp-explorer` | ad hoc read-only lookups |
 
@@ -58,28 +59,30 @@ Rules:
 
 - Direct mode is unchanged. The orchestrator edits directly.
 - Preflight accepts `claude-fable-5-1` or `claude-opus-5-5` as the main session and stops on any other model. Effort is verified as configured and confirmed as observed at closeout, as today.
-- Worker escalation 2 uses an explicit full model ID in the workflow call, so the alias route and its probe caveat are removed from the profile.
-- Depth is two: main session, workflow agents. Workflow agents do not spawn subagents. The orchestrator is the only synthesis owner.
+- Worker retry 2 uses an explicit full model ID in the workflow call. The alias escalation route is removed. The alias-drift section stays, because per-invocation aliases and user settings still exist.
+- Depth is one. The main session is the only spawner; the Workflow tool schedules its agents. Workflow agents do not spawn subagents. The orchestrator is the only synthesis owner.
 - One writer at a time. The Implement phase is a sequential loop.
+- Workers never commit. `HEAD` stays at the base commit for the whole run; the validator checks this at every fingerprint.
+- Fix cycles are fixed at two, the kernel limit, for both validation retries and review fix cycles. This is not configurable.
 - The orchestrator settings template changes to `{"model": "claude-fable-5-1", "effortLevel": "high"}`. `effortLevel` cannot express `max`, and the template stays a reviewed manual merge.
 
 ## Deliver skill (Claude Code adapter)
 
-Invoked explicitly as `/agentic-delivery-playbook:deliver <task>`. Stays at most 80 lines. Steps:
+Invoked explicitly as `/agentic-delivery-playbook:deliver <task>`. Stays at most 80 lines. The `args` example, the run-record mapping table, and the fingerprint command move to `adapters/claude-code/README.md` under a "Reference" heading; the skill cites them. Steps:
 
-1. **Inception grill.** Ask one question at a time until the orchestrator can state: the outcome, who it serves, how success is observed, what must not change, and what was already tried. Write the answers as an intent brief of at most 20 lines in the run's `specs/<run>/brief.md`. The user may skip by saying so; then the brief records `inception: skipped, risk accepted by user` and the plan pause in step 5 becomes mandatory. Direct work may skip the grill without recording anything.
+1. **Inception grill.** Ask one question at a time until the orchestrator can state: the outcome, who it serves, how success is observed, what must not change, and what was already tried. Write the answers as an intent brief of at most 20 lines in `specs/<run>/brief.md` under those five headings. The user may skip by saying so; then the brief records `inception: skipped, risk accepted by user`. Direct work may skip the grill without recording anything.
 2. **Classify.** Direct or Controlled, by the kernel's conditions. Inspect `git status`, repository instructions, and relevant code.
 3. **Direct.** Edit, validate, report. No further steps.
-4. **Controlled: preflight and contract.** Verify the main-session model against the profile. Write `contract.md` from the template, with the objective and acceptance criteria derived from the brief, exclusive file ownership per lane, non-goal files, a verification plan, and a `risk` level of `normal` or `high`. Obtain approval for unresolved product choices, authority, or material boundaries. Record the base commit.
-5. **Controlled: run the workflow.** Call the Workflow tool with `scriptPath` set to `${CLAUDE_PLUGIN_ROOT}/adapters/claude-code/workflows/deliver-controlled.js` and `args` as defined below. The skill instruction is the opt-in; no keyword is needed. The script pauses after Plan by returning the plan when `args.pauseAfterPlan` is true; the orchestrator shows the task list, asks for approval if the grill was skipped or `risk` is `high`, and resumes with the run id. Otherwise the script continues without a pause.
-6. **Controlled: closeout.** From the workflow's returned record, write `run.json` and `notes.md`, run the probe on the session transcript to fill observed routes, and close as accepted, partially accepted, escalated, or blocked. Accepted requires the defect review decision `accept` and the goal-fit verdict `fit`. One of the two alone is partially accepted.
-7. **Headless fallback.** If the Workflow tool is unavailable, the orchestrator runs the same phases by hand: `adp-lead` for the plan, then for each task `adp-worker` followed by `adp-validator`, then `adp-reviewer`, then `adp-goal-reviewer`, applying the same limits. The run record notes `workflow: manual`.
+4. **Controlled: preflight and contract.** Verify the main-session model against the profile. Write `contract.md` from the template, with the objective and acceptance criteria derived from the brief, exclusive file ownership per lane (concrete paths or `*`/`**` globs), non-goal files, a verification plan, and a `risk` line of `normal` or `high`. Obtain approval for unresolved product choices, authority, or material boundaries. Record the base commit. Workers do not commit, so the contract's authority line says so.
+5. **Controlled: plan.** Call the Workflow tool with `scriptPath` set to `${CLAUDE_PLUGIN_ROOT}/adapters/claude-code/workflows/deliver-controlled.js` and `args` as defined below, setting `pauseAfterPlan` to `true` when the grill was skipped or `risk` is `high`, otherwise `false`. The skill instruction is the opt-in; no keyword is needed. On `plan-ready`, show the task list to the user, obtain approval, then start a second run with `resumePlan` set to the approved plan and `pauseAfterPlan` `false`. On `blocked` with `openQuestions`, ask the user, append the answers to the brief under a heading "Answers", and start a new run from Plan.
+6. **Controlled: closeout.** From the workflow's returned record, write `run.json` and `notes.md` using the mapping table. Re-run every command in the contract's verification plan yourself and record command, exit status, and result; the workflow's validator records are gate evidence inside the run, the orchestrator's own run is the closeout evidence. Run the probe on the session transcript to fill observed routes. Close by the closeout table below.
+7. **Headless fallback.** If the Workflow tool is unavailable, run the same phases by hand: `adp-lead` for the plan, apply the plan rules yourself, then for each task `adp-validator`, `adp-worker`, `adp-validator`, then the review and goal-fit phases with their fingerprints, applying the same limits. The run record notes `workflow.mode: manual`.
 
 Stop and failure rules carry over from the current skill unchanged: no repeated slice approvals after an approved end-to-end outcome; stop for new scope, an unresolved product decision, new authority, an unmet safe route, or contradictory evidence after two focused fix cycles; a timed-out or unusable lane is failed and its edits untrusted.
 
 ## Workflow script `deliver-controlled.js`
 
-Location: `adapters/claude-code/workflows/deliver-controlled.js`, shipped in the plugin and the npm package. Plain JavaScript with a literal `meta` block naming four phases: Plan, Implement, Review, Goal-fit.
+Location: `adapters/claude-code/workflows/deliver-controlled.js`, shipped in the plugin and the npm package. Plain JavaScript with a literal `meta` block naming four phases: Plan, Implement, Review, Goal-fit. The script cannot read files; it passes paths and the base commit to agents, and agents read the contract, the brief, and the diff themselves. Every `agent()` call passes the namespaced `agentType` (`agentic-delivery-playbook:adp-…`) and a `label` from the label scheme below.
 
 ### Inputs (`args`)
 
@@ -88,26 +91,30 @@ Location: `adapters/claude-code/workflows/deliver-controlled.js`, shipped in the
   "contractPath": "specs/<run>/contract.md",
   "briefPath": "specs/<run>/brief.md",
   "baseCommit": "<sha>",
-  "risk": "normal | high",
+  "risk": "normal",
   "pauseAfterPlan": false,
-  "nonGoalFiles": ["path", "glob"],
-  "lanes": [{ "id": "worker", "ownedFiles": ["path", "glob"] }],
+  "nonGoalFiles": ["README.md", "legacy/**"],
+  "lanes": [{ "id": "worker", "ownedFiles": ["src/**", "test/x.test.js"] }],
   "goalReviewer": { "agentType": "agentic-delivery-playbook:adp-goal-reviewer", "model": "claude-fable-5-1", "effort": "high" },
-  "maxFixCycles": 2,
   "resumePlan": null
 }
 ```
 
-`goalReviewer` defaults to the values shown when omitted. `resumePlan` carries an approved plan object when the orchestrator resumes after a pause; when present, the Plan phase is skipped.
+`goalReviewer` defaults to the values shown when omitted. `resumePlan` carries an approved plan object; when present, the Plan phase is skipped and the plan is re-validated by the same rules, because the user may have edited it. `resumeFromRunId` is reserved for crash recovery of an identical invocation and is not used for the pause.
+
+### Path matching
+
+Task `ownedFiles` are concrete repository-relative paths, no globs. Lane `ownedFiles` and `nonGoalFiles` are patterns where `*` matches within one path segment and `**` matches zero or more segments; anything else is literal. A path matches a pattern list when it matches any entry. The matcher is implemented in the script's helper block, since the script cannot import.
 
 ### Phase Plan
 
-One `adp-lead` agent (`agentType`, effort xhigh) receives the contract, the brief, the lanes, and the non-goal files, and returns a plan validated against this schema:
+One `adp-lead` agent (effort xhigh, label `plan`) receives the contract path, the brief path, the base commit, the lanes, and the non-goal files, and returns a plan validated against this schema:
 
 ```text
 plan = {
   tasks: [{
     id: string,
+    lane: string,
     title: string,
     ownedFiles: string[],
     instructions: string,
@@ -120,134 +127,212 @@ plan = {
 }
 ```
 
-The script rejects the plan and returns `{ status: "blocked", reason, plan }` without any edit when: two tasks share a file; a task owns a file outside its lane's `ownedFiles`; a task touches a `nonGoalFiles` entry; `dependsOn` has a cycle or names an unknown task; or `openQuestions` is non-empty. Open questions are the lead's channel back to the user, because workflow agents cannot ask the user directly.
+Plan rules. The script returns `{ status: "blocked", reason: "plan-rule-<n>", plan }` without any edit when any rule fails:
 
-If `args.pauseAfterPlan` is true, the script returns `{ status: "plan-ready", plan }` and the orchestrator resumes with `resumePlan` set.
+- R1: `tasks` is non-empty and task ids are unique.
+- R2: every task has non-empty `ownedFiles`, a non-empty `check.command`, and an integer `check.expectedExit`.
+- R3: every `lane` names an `args.lanes[].id`.
+- R4: every task path matches its lane's `ownedFiles` patterns.
+- R5: no task path matches `nonGoalFiles`.
+- R6: no path appears in two tasks.
+- R7: every `dependsOn` entry names an existing task id, and the dependency graph has no cycle.
+- R8: `openQuestions` is empty. Open questions are the lead's channel back to the user, because workflow agents cannot ask the user directly.
+
+If `args.pauseAfterPlan` is true, the script returns `{ status: "plan-ready", plan }` after validation.
 
 ### Phase Implement
 
-Tasks run one at a time in a topological order of `dependsOn`. For each task:
+Tasks run one at a time in a topological order of `dependsOn`. For task `t` and attempt `a` (1 to 3):
 
-1. `adp-worker` receives the contract, the brief, the task, and the owned files, and returns `{ changedFiles, commandsRun, assumptions, gaps, stopped: boolean, stopReason }`. A `stopped: true` result marks the task blocked and ends the loop.
-2. `adp-validator` runs `task.check.command` and returns `{ command, exitCode, outputExcerpt, fingerprint, head }`. The fingerprint is the temp-index `write-tree` hash used today, so untracked files are covered and gitignored files are not.
-3. Pass means `exitCode === task.check.expectedExit`. On failure, the task is re-sent with the validator output: the first retry uses `adp-worker-high`, the second uses `adp-worker` with `model: 'claude-opus-5-5'` and `effort: 'high'`. After `maxFixCycles` failed retries the task is marked blocked and the loop ends.
-4. The validator also confirms that `changedFiles` is a subset of the task's `ownedFiles` by inspecting `git status --porcelain` against the base commit. A file outside ownership marks the task blocked.
+1. `adp-validator` (label `t<id>-pre-<a>`) returns `{ changedFiles, fingerprint, head }`, where `changedFiles` is the `git status --porcelain` path list including untracked files, and `head` is `git rev-parse HEAD`.
+2. The worker for attempt `a` (label `t<id>-implement-<a>`; attempt 1 `adp-worker`, attempt 2 `adp-worker-high`, attempt 3 `adp-worker` with `model: 'claude-opus-5-5'` and `effort: 'high'`) receives the contract path, the brief path, the task, and on retries the previous validator output. It returns `{ changedFiles, commandsRun, assumptions, gaps, stopped, stopReason }`. `stopped: true` marks the task blocked and ends the loop.
+3. `adp-validator` (label `t<id>-validate-<a>`) runs `task.check.command` and returns `{ command, exitCode, outputExcerpt, changedFiles, fingerprint, head }`.
+4. Gates, in order: `head` must equal `baseCommit` in both validator results, else the task is blocked with `reason: "head-moved"`; the set difference of post minus pre `changedFiles` must be a subset of `task.ownedFiles`, else blocked with `reason: "ownership"`; `exitCode` must equal `task.check.expectedExit`, else the attempt failed.
+5. A failed attempt 1 or 2 proceeds to the next attempt. A failed attempt 3 marks the task blocked with `reason: "fix-cycles-exhausted"` and ends the loop.
 
-A null return from any agent (skipped by the user or terminated) marks the task failed, its edits untrusted, and ends the loop. The record notes which task and which agent.
+A null return from any agent (skipped by the user or terminated) marks the task `failed`, its edits untrusted, and ends the loop. The record notes the label.
 
 ### Phase Review
 
 Skipped when any task is blocked or failed; the run returns `escalated` with the records so far.
 
-1. `adp-validator` returns the pre-review fingerprint and `HEAD`.
-2. `adp-reviewer` (or `adp-reviewer-high` when `risk` is `high`) receives the contract, the brief, the diff against `baseCommit` including untracked files, and all validation records. It returns `{ decision: "accept" | "accept-with-fixes" | "reject", findings: [{ severity, acceptanceCriterion, file, line, summary }], unprovenCriteria: string[] }`.
-3. `adp-validator` returns the post-review fingerprint. A mismatch fails the gate and the run returns `escalated` with `reason: "review-gate-fingerprint"`.
-4. `accept-with-fixes` sends the findings to the worker owning each affected file (same escalation ladder), re-validates affected tasks, and re-reviews. At most `maxFixCycles` review cycles; then the run returns `escalated`.
-5. `reject` returns `escalated` with the findings.
+For review cycle `c` (1 to 3):
+
+1. `adp-validator` (label `review-pre-<c>`) returns the fingerprint, `head`, and `changedFiles`.
+2. The defect reviewer (label `review-<c>`; `adp-reviewer`, or `adp-reviewer-high` when `risk` is `high`) receives the contract path, the brief path, the base commit, and all validation records so far, computes the diff against the base commit including untracked files itself, and returns `{ decision, findings: [{ severity, acceptanceCriterion, file, line, summary }], unprovenCriteria }` with `decision` one of `accept`, `accept-with-fixes`, `reject`.
+3. `adp-validator` (label `review-post-<c>`) returns the fingerprint and `head`. A mismatch with `review-pre-<c>` returns `escalated` with `reason: "review-gate-fingerprint"`.
+4. `reject` returns `escalated` with the findings.
+5. `accept-with-fixes` on cycle 3 returns `escalated` with `reason: "review-cycles-exhausted"`. Otherwise each finding is grouped by the task owning its file; a finding on a file no task owns returns `escalated` with `reason: "finding-outside-ownership"`. Each affected task is re-run through steps 1 to 4 of Implement for one more attempt, continuing from that task's last rung and never going down; a task already at attempt 3 returns `escalated` with `reason: "fix-cycles-exhausted"`. Then the next review cycle starts.
+6. `accept` proceeds to Goal-fit.
 
 ### Phase Goal-fit
 
 Runs only after `decision === "accept"`.
 
-`adp-goal-reviewer` (model and effort from `args.goalReviewer`) receives the brief, the contract, the diff, the validation records, and the defect review result. Its instruction is to use the deliverable where possible (run the command, open the page, invoke the skill) and to judge fitness against the brief, not against the acceptance criteria. It returns `{ verdict: "fit" | "partially-fit" | "not-fit", reasons: string[], usedDeliverable: boolean, howUsed: string }`.
-
-The reviewer is read-only by instruction with Bash available. `adp-validator` fingerprints before and after; a mismatch sets `verdict` to `invalid` and the run returns `escalated`.
+1. `adp-validator` (label `goal-fit-pre`) returns the fingerprint and `head`.
+2. `adp-goal-reviewer` (label `goal-fit`; `agentType`, `model`, and `effort` from `args.goalReviewer`) receives the brief path, the contract path, the base commit, the validation records, and the defect review result. It judges fitness against the brief, not against the acceptance criteria. It may run only: commands listed in the contract's verification plan, commands named in the brief's "how success is observed" section, and read-only inspection. Anything that would reach the network, a database, or an external service is reported as "would need to run X", not run. It returns `{ verdict, reasons, usedDeliverable, howUsed }` with `verdict` one of `fit`, `partially-fit`, `not-fit`.
+3. `adp-validator` (label `goal-fit-post`) returns the fingerprint and `head`. A mismatch sets `verdict` to `invalid` and the run returns `escalated` with `reason: "goal-fit-gate-fingerprint"`.
 
 ### Return value
 
 ```text
 {
   status: "completed" | "plan-ready" | "blocked" | "escalated",
+  reason: string | null,
   plan,
-  tasks: [{ id, status: "passed" | "blocked" | "failed", attempts: [{ agentType, model, effort, result }], validation }],
-  review: { decision, findings, unprovenCriteria, fingerprintBefore, fingerprintAfter, cycles },
-  goalFit: { verdict, reasons, usedDeliverable, howUsed, fingerprintBefore, fingerprintAfter },
-  requestedRoutes: [{ lane, agentType, model, effort }],
-  finalHead
+  tasks: [{
+    id, status: "passed" | "blocked" | "failed",
+    attempts: [{ label, agentType, model, effort, worker, preValidation, postValidation, passed }]
+  }],
+  review: { cycles: [{ label, agentType, model, effort, decision, findings, unprovenCriteria, fingerprintBefore, fingerprintAfter }], finalDecision },
+  goalFit: { label, agentType, model, effort, verdict, reasons, usedDeliverable, howUsed, fingerprintBefore, fingerprintAfter } | null,
+  requestedRoutes: [{ label, agentType, model, effort }]
 }
 ```
 
-The orchestrator maps this onto `templates/run.json`: `tasks` to `lanes` and `validation`, `review` to `review`, `goalFit` to a new `closeout.goalFit` object, and `requestedRoutes` to each lane's `requested`. Observed routes come from the probe.
+`requestedRoutes` lists every `agent()` call in order with the model and effort the script requested. For agents whose `model` or `effort` the script did not override, the script records the agent definition's values, which the orchestrator passes in through a constant table in the script that a test keeps equal to the agent frontmatter.
+
+### Closeout table
+
+| Workflow `status` | Goal-fit `verdict` | Closeout outcome |
+| --- | --- | --- |
+| `completed` | `fit` | accepted |
+| `completed` | `partially-fit` | partially accepted; `knownGaps` gets the reasons |
+| `completed` | `not-fit` | escalated to the user with the reasons |
+| `escalated` | any or `invalid` | escalated with `reason` |
+| `blocked` | none | blocked with `reason` |
+| `plan-ready` | none | not a closeout; the run continues |
+
+Accepted additionally requires the orchestrator's own re-run of the verification plan to pass. A failure there is contradictory evidence and closes as escalated.
+
+### Mapping to `run.json`
+
+| `run.json` field | Source |
+| --- | --- |
+| `schemaVersion` | `"1.1"` |
+| `mode`, `status` | `"controlled"`; from the closeout table |
+| `contract.*` | as today |
+| `brief` | `{ path: args.briefPath, inception: "completed" | "skipped" }` from the brief file |
+| `workflow` | `{ mode: "workflow" | "manual", runId, scriptPath }` from the tool result |
+| `source.baseCommit` | `args.baseCommit`; `finalCommit` is `null` because workers do not commit; `diffSha256` computed by the orchestrator at closeout |
+| `route.policy` | `"profiles/claude-5.md"`; `route.exception` `null` |
+| `lanes[]` | one lane per `requestedRoutes` entry: `id` = label, `role` from the agent type (`lead`, `worker`, `validator`, `reviewer`, `goal-reviewer`), `ownership` = the task's `ownedFiles` for worker lanes, else `[]`, `requested` = `{ model, effort, topology: "workflow-agent" | "single", agentType }`, `observed` from the probe (below), `status` from the task or phase result |
+| `validation[]` | one entry per `postValidation` and per orchestrator closeout check: `id` = label or `closeout-<n>`, `command`, `exitCode`, `startedAt`/`endedAt` `null` for workflow entries (not captured) and real for closeout entries, `outputReference` = `specs/<run>/workflow-result.json#<label>` or the closeout log path, `outputSha256` `null` for workflow entries, `status` passed/failed |
+| `acceptance[]` | one entry per contract criterion: `passed` when every task listing it has status `passed`, it is absent from the final review's `unprovenCriteria`, and the orchestrator's closeout check for it passed; else `failed` or `unproven`; `evidence` lists the validation ids |
+| `review` | `reviewerLaneId` = final cycle label; `diffReviewed` and `evidenceReviewed` `true` (the script supplied both; the reviewer's return would be rejected by schema otherwise); `decision` = `finalDecision`; `findings` = final cycle findings; plus `cycles`, `unprovenCriteria`, `fingerprintBefore`, `fingerprintAfter` |
+| `closeout.outcome` | from the closeout table |
+| `closeout.goalFit` | `{ verdict, reviewerModel, reviewerEffort, usedDeliverable, howUsed, reasons }` from `goalFit` |
+| `closeout.knownGaps`, `closeout.escalation` | as today, plus the `reason` |
+
+The workflow return value is saved verbatim as `specs/<run>/workflow-result.json`.
+
+### Requested versus observed
+
+The workflow return is authoritative for requested routes. The probe is authoritative for observed routes. The match rule for closeout and for AC-9: for every `requestedRoutes` entry there is exactly one probe subagent with the same `agentType` and an observed model equal to the requested model and an observed effort equal to the requested effort, and the count of probe subagents per `agentType` equals the count of `requestedRoutes` entries per `agentType`. If the dogfood run shows that subagent metadata carries the workflow `label`, the probe joins on label instead and the rule becomes per-label.
 
 ### Constraints of the script runtime
 
-No filesystem, Node, `Date.now()`, or `Math.random()` in the script; the orchestrator passes the base commit and paths through `args`, and timestamps are added at closeout. The script uses a sequential loop, not `pipeline()`, so writers never overlap. Concurrent agents are therefore at most one, well under any plan's size guideline. Resume after a kill is `Workflow({ scriptPath, resumeFromRunId })`; completed agents return cached results.
+No filesystem, Node, `Date.now()`, or `Math.random()` in the script. The script uses a sequential loop, not `pipeline()`, so writers never overlap and at most one agent runs at a time. Resume after a kill is `Workflow({ scriptPath, resumeFromRunId })` with identical `args`; completed agents return cached results.
 
 ## New and changed agents
 
 | Agent | Model | Effort | Tools | Purpose |
 | --- | --- | --- | --- | --- |
-| `adp-lead` (new) | `claude-opus-5-5` | xhigh | Read, Grep, Glob, Bash | Reads contract, brief, and code; returns the plan object. Never edits. Bash for read-only inspection such as `git log` and test discovery. |
-| `adp-validator` (new) | `claude-sonnet-5-5` | low | Bash, Read | Runs one given command, reports exit code and excerpt, computes the fingerprint and `HEAD`, lists changed files. Never edits. |
-| `adp-goal-reviewer` (new) | `claude-fable-5-1` | high | Read, Grep, Glob, Bash | Fresh-context fitness review against the brief. Uses the deliverable. Never edits. `disallowedTools: Edit, Write, NotebookEdit`. |
-| `adp-worker`, `adp-worker-high` | unchanged | | | Gains one line: return the structured result fields listed above. |
-| `adp-reviewer`, `adp-reviewer-high` | unchanged | | | Gains one line: return the structured decision fields listed above. |
+| `adp-lead` (new) | `claude-opus-5-5` | xhigh | Read, Grep, Glob, Bash | Reads contract, brief, and code; returns the plan object with concrete file paths. Never edits. Bash for read-only inspection such as `git log` and test discovery. |
+| `adp-validator` (new) | `claude-sonnet-5-5` | low | Bash, Read | Runs exactly the one command it is given, reports exit code and excerpt, lists `git status --porcelain` paths including untracked, computes the fingerprint with the exact command below, and reports `HEAD`. Never edits. |
+| `adp-goal-reviewer` (new) | `claude-fable-5-1` | high | Read, Grep, Glob, Bash | Fresh-context fitness review against the brief, within the run bounds above. Never edits. `disallowedTools: Edit, Write, NotebookEdit`. |
+| `adp-worker`, `adp-worker-high` | unchanged route | | | Body gains: return the structured result fields; never commit. |
+| `adp-reviewer`, `adp-reviewer-high` | unchanged route | | | Body gains: compute the diff against the given base commit yourself; return the structured decision fields. |
 | `adp-explorer` | unchanged | | | |
 
-All read-only agents carry the existing disclosure sentence: read-only by instruction, Bash available for diff and checks, enforced by the fingerprint.
+Fingerprint command, carried verbatim in `adp-validator`, the skill's manual fallback, and the adapter README:
+
+```bash
+T=$(mktemp) && cp "$(git rev-parse --git-path index)" "$T" && GIT_INDEX_FILE="$T" git add -A && GIT_INDEX_FILE="$T" git write-tree; rm -f "$T"
+```
+
+Gitignored files are not covered. All read-only agents carry the existing disclosure sentence: read-only by instruction, Bash available for diff and checks, enforced by the fingerprint.
+
+## Plan rules as a testable unit
+
+The path matcher, the topological sort, and rules R1 to R8 live in `lib/deliver-plan-rules.js` and are copied verbatim into the script between the marker comments `// BEGIN plan-rules` and `// END plan-rules`. The lib file ends with `module.exports` after its `// END plan-rules` marker. A test extracts both marked blocks and asserts they are byte-identical, and unit tests exercise each rule and the matcher through the lib file.
 
 ## Run record changes
 
-`templates/run.json` and `examples/controlled-run/run.json` gain:
-
-- `brief`: `{ path, inception: "completed" | "skipped" }`
-- `workflow`: `{ mode: "workflow" | "manual", runId: string | null, scriptPath }`
-- `closeout.goalFit`: `{ verdict, reviewerModel, reviewerEffort, usedDeliverable }`
-- lane `requested.agentType`
-
-`schemaVersion` becomes `1.1`. The GPT-6 adapters do not use the new fields; they stay optional for the Pi and Codex routes.
+`templates/run.json` keeps its GPT-6 example lane and gains the optional fields `brief`, `workflow`, `closeout.goalFit`, and lane `requested.agentType`, with `schemaVersion` `"1.1"`. `examples/controlled-run/run.json` gains the same fields filled for the Claude route. The GPT-6 adapters leave the new fields `null`.
 
 ## Probe changes
 
 `lib/claude-route-probe.js` learns:
 
-- Workflow agents appear in `subagents/agent-*.meta.json` with `agentType` of the custom agent name when one was passed, or `workflow-subagent` otherwise. Custom names resolve through the existing definition lookup. `workflow-subagent` records `requested.source: "workflow"` and `model: unknown` unless the meta carries one.
-- A per-invocation `model` in the meta (the Opus worker escalation) takes precedence over the definition, as today.
-- Nested transcript directories: `subagents/` under a subagent directory are walked one level, for the headless fallback where depth may be two.
+- Requested effort follows the same precedence as model: a per-invocation value in `meta.json` when present, else the agent definition, else `unknown`. The spike showed `meta.model` is recorded only when passed per invocation; whether `effort` and `label` are recorded is confirmed by the dogfood run and documented in the profile.
+- An `agentType` of `workflow-subagent` records `requested.source: "workflow"` with model and effort `unknown` unless the meta carries them. The script always passes a custom `agentType`, so this is a fallback only.
+- No nested directory walk. Depth is one.
 
-Fixtures: one workflow transcript with Plan, Implement, Review, and Goal-fit agents, including one escalated worker with a per-invocation model and one `workflow-subagent` without a custom type.
+Fixtures: one synthetic workflow transcript with Plan, Implement, Review, and Goal-fit agents, including one retry-2 worker with a per-invocation model and one `workflow-subagent`. AC-9 replaces the synthetic fixture with a sanitized copy of the dogfood transcript's metadata and transcripts, or records the differences and corrects the fixture.
+
+## Test changes
+
+In `test/claude-code-adapter.test.js`: the skill assertions `/depth one/i`, `/one orchestration plane/i`, `/preflight/i`, `/sole writer/i`, `/serialized/i`, and the read-only disclosure stay. The assertions for `GIT_INDEX_FILE`, `git rev-parse --git-path index`, `Gitignored files are not covered`, and the probe command path move from the skill to the adapter README and `adp-validator`. The settings template assertion becomes `{ model: 'claude-fable-5-1', effortLevel: 'high' }`. The profile assertions `/Depth: one/` and `/alias drift/i` stay; a new assertion requires `/Workflow/` and `/agent teams/i`. The plugin version assertion becomes `0.4.0`. New assertions cover the three new agents, the workflow script's `node --check`, its `meta` phases, the forbidden tokens, and the marker-block equality.
+
+In `test/run-record.test.js`: `schemaVersion` `"1.1"`; the template lane stays `gpt-6-luna`; new fields are asserted present and `null`-able.
+
+In `test/active-surface.test.js` (PR 2): the README assertion changes from "Codex, ChatGPT Work, and Pi" to the Claude Code first wording.
 
 ## Repository repositioning (PR 2)
 
-- `README.md`: lead with Claude Code desktop install and the three-tier route; move Codex, ChatGPT Work, and Pi to a "Other adapters" section; keep the GPT-6 route table there.
+- `README.md`: lead with Claude Code desktop install and the three-tier route; move Codex, ChatGPT Work, and Pi to an "Other adapters" section; keep the GPT-6 route table there.
 - `playbook.md`: "Use `profiles/gpt-6.md` for the maintained mapping" becomes "Use the active profile for the surface: `profiles/claude-5.md` for Claude Code, `profiles/gpt-6.md` for Codex, ChatGPT Work, and Pi." No other kernel change.
 - `docs/getting-started.md`: the Controlled walkthrough uses the Claude Code route; the Pi section stays.
 - `docs/adapters.md`: Claude Code row first.
 - `AGENTS.md` at the root stays the Codex pointer. Add `CLAUDE.md` at the root pointing to the Claude Code adapter and the Claude 5 profile.
-- `package.json`: description, keywords, and `files` gain `adapters/claude-code` and `.claude-plugin`. Version `0.4.0`. `.claude-plugin/plugin.json` version `0.4.0`.
-- `CHANGELOG.md`: a `0.4.0` entry.
-- `scripts/validate-active-policy.js`: add the new agents, the workflow script, and `CLAUDE.md` to the active file list, and run `node --check` on the workflow script. The script has no line budget. The 120-line budget for the profile and the 80-line budget for the skill stay.
+- `package.json`: description and keywords updated. `CHANGELOG.md`: the `0.4.0` entry is completed with the repositioning items.
+- `scripts/validate-active-policy.js`: add `CLAUDE.md` to the active file list.
+
+PR 1 already bumps `package.json` and `plugin.json` to `0.4.0`, adds `adapters/claude-code` and `.claude-plugin` to `files`, starts the `0.4.0` changelog entry, and adds the new agents and the workflow script to the validator with `node --check`. The 120-line profile budget and the 80-line skill budget stay; the script has no line budget.
 
 ## Acceptance criteria
 
 PR 1 (mechanism):
 
-- AC-1: Agents `adp-lead`, `adp-validator`, `adp-goal-reviewer` exist with the models, efforts, and tools in the table, are listed in `plugin.json`, and pass the frontmatter test.
-- AC-2: `adapters/claude-code/workflows/deliver-controlled.js` passes `node --check`, its `meta` is a pure literal with the four phase titles, it contains no `Date.now`, `Math.random`, `require`, or `import`, and its plan validation helpers reject the five invalid plan shapes listed above (tested by extracting the helpers into `lib/deliver-plan-rules.js`, which the script duplicates verbatim and a test asserts the two copies match).
-- AC-3: The `deliver` skill is at most 80 lines, explicit-invoke, references the brief, the workflow script path, the pause rule, the two review gates, and the manual fallback, and all `${CLAUDE_PLUGIN_ROOT}` references resolve.
-- AC-4: `profiles/claude-5.md` version 2 holds the route table above, permits the Workflow tool, excludes agent teams with the CLI-only reason, states depth two, and removes the alias escalation. At most 120 lines.
+- AC-1: Agents `adp-lead`, `adp-validator`, `adp-goal-reviewer` exist with the models, efforts, and tools in the table, are listed in `plugin.json`, and pass the frontmatter test. The existing agents carry the body additions.
+- AC-2: `adapters/claude-code/workflows/deliver-controlled.js` passes `node --check`; its `meta` is a pure literal with the four phase titles; it contains no `Date.now`, `Math.random`, `require`, or `import`; its plan-rules block is byte-identical to `lib/deliver-plan-rules.js`; unit tests cover R1 to R8, the matcher, and the topological sort.
+- AC-3: The `deliver` skill is at most 80 lines, explicit-invoke, references the brief, the workflow script path, the pause rule, the two review gates, the orchestrator's closeout re-run, and the manual fallback, and all `${CLAUDE_PLUGIN_ROOT}` references resolve. The adapter README holds the `args` example, the mapping table, and the fingerprint command.
+- AC-4: `profiles/claude-5.md` version 2 holds the route table above, permits the Workflow tool, excludes agent teams with the CLI-only reason, states depth one, and removes the alias escalation. At most 120 lines.
 - AC-5: The settings template is `{"model": "claude-fable-5-1", "effortLevel": "high"}` and the README documents it as a manual merge.
-- AC-6: The probe handles workflow agents and nested directories with the new fixtures; existing fixtures still pass.
-- AC-7: `templates/run.json` and the example run carry the new fields and parse.
-- AC-8: `npm run check` passes.
-- AC-9 (dogfood): one Controlled run on a real task in a non-playbook repository through the new skill, with `pauseAfterPlan` exercised once, recorded under `specs/<date>-three-tier-dogfood/` with `brief.md`, `contract.md`, `run.json`, the workflow return record, and the probe output showing requested equals observed for lead, worker, validator, defect reviewer, and goal-fit reviewer. The goal-fit verdict on that run must be `fit` or the PR does not merge; a `partially-fit` verdict with recorded reasons blocks merge until addressed.
-- AC-10: The plugin's own change is run through the goal-fit reviewer with the intent brief from the 2026-10-11 design session, and the verdict is recorded in the dogfood directory.
+- AC-6: The probe handles the effort precedence and `workflow-subagent` with the new fixture; existing fixtures still pass.
+- AC-7: `templates/run.json` and the example run carry the new fields at `schemaVersion` `"1.1"` and parse.
+- AC-8: `npm run check` passes; `package.json` and `plugin.json` are `0.4.0`; `npm pack --dry-run` lists the workflow script and agents.
+- AC-9 (dogfood): one Controlled run on a real task in a non-playbook repository through the new skill, with `pauseAfterPlan` exercised once, recorded under `specs/<date>-three-tier-dogfood/` with `brief.md`, `contract.md`, `run.json`, `workflow-result.json`, and the probe output. The requested-versus-observed match rule holds for every `requestedRoutes` entry. The recorded artifacts contain no personal absolute paths and nothing private from the other repository. The goal-fit verdict must be `fit`; `partially-fit` or `not-fit` blocks merge until the reasons are addressed and the run repeated.
+- AC-10: The plugin change itself is reviewed by `adp-goal-reviewer` against `specs/<date>-three-tier-dogfood/design-brief.md`, which PR 1 creates from the appendix below, and the verdict is recorded next to it. The same merge rule as AC-9 applies.
 
 PR 2 (repositioning):
 
 - AC-11: README, getting-started, adapters doc, and the kernel's profile sentence match the repositioning section. `CLAUDE.md` exists at the root.
-- AC-12: `package.json` and `plugin.json` are at `0.4.0`, `files` includes the Claude Code adapter, `npm pack --dry-run` lists the workflow script and agents, and the changelog has the entry.
-- AC-13: `npm run check` passes and the active-policy validator covers the new files.
+- AC-12: `package.json` description and keywords are updated and the changelog `0.4.0` entry is complete.
+- AC-13: `npm run check` passes and the active-policy validator covers `CLAUDE.md`.
 
 ## Risks and mitigations
 
-- **Workflow agents cannot ask the user.** Mitigated by the inception grill, the lead's `openQuestions` channel that blocks before any edit, and the plan pause for skipped grills and high-risk contracts.
-- **Workflow behaviour is documented but not yet exercised here.** Mitigated by AC-9: the profile claims nothing until a probe over a real workflow run confirms the routes.
-- **Sonnet medium may be too weak for some codebases.** Mitigated by the escalation ladder inside the loop and by the run records, which will show where escalation happens so task granularity can be tuned.
+- **Workflow agents cannot ask the user.** Mitigated by the inception grill, the lead's `openQuestions` rule that blocks before any edit, and the plan pause for skipped grills and high-risk contracts.
+- **Workflow transcript layout is documented but not yet observed here.** Mitigated by AC-9: the profile claims nothing about `label` or `effort` metadata until the dogfood probe confirms it, and the fixture is corrected from the real run.
+- **Validator output is an agent's report.** The validator records gate each task inside the run; the orchestrator re-runs the contract's verification plan itself at closeout and that is the closeout evidence, as the current skill already requires.
+- **Sonnet medium may be too weak for some codebases.** Mitigated by the three-rung ladder inside the loop and by the run records, which show where escalation happens so task granularity can be tuned.
 - **The orchestrator may still do the work itself.** The design only helps when Controlled work goes through the skill. The success measure after a month is orchestrator turns per Controlled task, visible in transcripts.
-- **Plugin subagents ignore frontmatter hooks and permission modes.** Enforcement stays tool allowlists plus the fingerprint, as today, and the disclosure stays in every read-only agent.
-- **Fable reviewer cost.** One fresh Fable read per Controlled run, only after a defect-review accept. Configurable through `args.goalReviewer` for users who prefer Opus.
+- **Plugin subagents ignore frontmatter hooks and permission modes.** Enforcement stays tool allowlists plus the fingerprint, and the disclosure stays in every read-only agent.
+- **Goal-fit reviewer side effects.** Bounded to verification-plan commands, brief-named commands, and read-only inspection; everything else is reported, not run; the fingerprint covers tracked and untracked files.
+- **Fable reviewer cost.** One fresh Fable read per Controlled run, only after a defect-review accept. Configurable through `args.goalReviewer`.
 
 ## Open decisions
 
-None. The goal reviewer default (Fable 5.1, configurable), the skippable grill, and the two-PR slicing were decided in session on 2026-10-11.
+None. The goal reviewer default (Fable 5.1, configurable), the skippable grill, fixed fix cycles at two, and the two-PR slicing were decided in session on 2026-10-11.
+
+## Appendix: design intent brief
+
+Written from the 2026-10-11 session; PR 1 copies it to `specs/<date>-three-tier-dogfood/design-brief.md` for AC-10.
+
+- Outcome: Controlled work in Claude Code desktop runs as Fable goal owner, Opus planner, Sonnet implementers, with deterministic serialization, fix limits, review gates, and evidence, so the orchestrator spends tens of turns per task instead of hundreds.
+- Who it serves: a single developer on a Max subscription who orchestrates from the desktop app and wants to stay at goal level while implementation happens below.
+- How success is observed: a real Controlled run completes through the shipped workflow with requested routes equal to observed routes for every agent; the orchestrator session for that run is well under 100 assistant turns; the goal-fit reviewer, given this brief, returns `fit`.
+- What must not change: the Direct and Controlled kernel, contract-before-delegation, one writer per file cluster, fresh-context review of the actual diff, depth one, the probe's requested-versus-observed evidence, and the Pi and Codex adapters.
+- Already tried: a single-hop Opus orchestrator with a Sonnet worker and an Opus reviewer (profile 1.1), which produced 600 to 750 turn orchestrator sessions and was abandoned in practice in favour of Fable doing the work itself.
