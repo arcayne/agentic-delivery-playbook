@@ -55,7 +55,9 @@
 cd /path/to/agentic-delivery-playbook
 git fetch origin
 git checkout -b feat/three-tier-pr1 origin/design/three-tier-delivery
+test -f docs/superpowers/plans/2026-10-11-three-tier-delivery-pr1.md && echo plan-present
 ```
+Expected: `plan-present`. If the file is missing, the remote branch is stale; stop and ask for it to be pushed.
 
 - [ ] **Step 2: Confirm the baseline is green**
 
@@ -506,8 +508,8 @@ Expected: all adapter tests pass; `active policy validation passed`.
 
 - [ ] **Step 9: Validate the plugin manifest**
 
-Run: `claude plugin validate .`
-Expected: `Validation passed`. If the `claude` CLI is unavailable, record that in the task notes and continue; AC-8's smoke test covers it later.
+Run: `claude plugin validate .claude-plugin/plugin.json && claude plugin validate .`
+Expected: both exit 0 (`Validation passed`). The first checks the plugin manifest with the new agent registrations; the bare `.` validates only the marketplace manifest. If the `claude` CLI is unavailable, record that in the task notes and continue; AC-8's smoke test covers it later.
 
 - [ ] **Step 10: Commit**
 
@@ -552,6 +554,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ### Task 5: Workflow script tests first
 
 **Files:**
+- Create: `lib/workflow-syntax-check.js`
 - Test: `test/deliver-workflow.test.js`
 
 The script cannot be executed under Node (it uses ESM `export`, Workflow globals, and top-level `return`), so the tests are static: a syntax check that wraps the body in an async function the way the Workflow runtime does, `meta` shape, forbidden tokens, marker-block equality with the library, and agent table equality with the frontmatter. Tasks 5 and 6 are committed together at the end of Task 6; `npm run check` is red in between, which is the intended TDD state.
@@ -861,7 +864,7 @@ const validatorPrompt = (command) => [
   context(),
   'You are the validator. Never modify any file. Perform these steps in order and record each result:',
   '1. head: run `git rev-parse HEAD`.',
-  `2. fileStates: run exactly: ${FILE_STATES_COMMAND} . Each output line is a path, a tab, and its content hash or the literal "deleted". Return an object keyed by path; an empty object means a clean tree.`,
+  `2. fileStates: run exactly the command between the backticks: \`${FILE_STATES_COMMAND}\` Each output line is a path, a tab, and its content hash or the literal "deleted". Return an object keyed by path; an empty object means a clean tree.`,
   `3. fingerprint: run exactly: ${FINGERPRINT_COMMAND}`,
   command
     ? `4. Then run exactly this command and record command, exitCode, and the last 40 lines of combined output as outputExcerpt: ${command}`
@@ -1256,7 +1259,7 @@ test('CLI probe accepts repeated --requested and prints the comparison', () => {
 });
 ```
 
-Add `const fs = require('node:fs');` to the top of the test file if it is not already imported.
+Add `const fs = require('node:fs');` after the `node:assert/strict` import at the top of the test file. The file does not import it today; the string `require('node:fs')` that appears inside a template literal further down is not an import.
 
 - [ ] **Step 3: Run the probe tests to verify the new ones fail**
 
@@ -1947,7 +1950,8 @@ Mapping from the workflow result to `run.json` (schema 1.1):
 | `validation[]` | one per task `postValidation` and per closeout check: `id` = label or `closeout-<n>`; `command`, `exitCode`, `status` from the record; workflow entries have `startedAt`, `endedAt`, `outputSha256` `null` and `outputReference` = `specs/<run>/workflow-result.json#<label>`; closeout entries have real timestamps and `outputReference` = the saved log path |
 | `acceptance[]` | one per contract criterion: `passed` when a task or closeout check covers it, every covering task passed, it is absent from the final review's `unprovenCriteria`, and every closeout check covering it passed; `unproven` when nothing covers it; else `failed`; `evidence` uses `validation:<id>` |
 | `review` | `reviewerLaneId` = final cycle lane; `diffReviewed` true only when the reviewer's `diffSha256` equals the orchestrator's; `evidenceReviewed` true; `decision` = `finalDecision`; `findings` from the final cycle; plus `cycles`, `unprovenCriteria`, fingerprints |
-| `closeout` | `outcome` from the table; `goalFit` = `{ verdict, reviewerModel, reviewerEffort, usedDeliverable, howUsed, reasons }`; `knownGaps` includes `unknownEffort` entries, crash-resume orphans, and goal-fit reasons for `partially-fit`; `escalation` carries the `reason` and `detail` |
+| `closeout` | `outcome` from the table; `knownGaps` includes `unknownEffort` entries, crash-resume orphans, and goal-fit reasons for `partially-fit`; `escalation` carries the `reason` and `detail` |
+| `closeout.goalFit` | `{ verdict, reviewerModel, reviewerEffort, usedDeliverable, howUsed, reasons }` from the workflow's `goalFit`; `null` when the run ended before Goal-fit |
 
 Save each workflow return verbatim as `specs/<run>/workflow-result.json` (suffix `-2`, `-3` for later runs).
 

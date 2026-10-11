@@ -280,7 +280,7 @@ The path matcher, the topological sort, and rules R1 to R8 live in `lib/deliver-
 
 ## Run record changes
 
-`templates/run.json` and `examples/controlled-run/run.json` keep their GPT-6 lanes and gain the optional fields `brief`, `workflow`, `closeout.goalFit`, and lane `requested.agentType`, all `null`, with `schemaVersion` `"1.1"`. The filled Claude-route example is the dogfood run record under `specs/`, which PR 2's getting-started links to. The GPT-6 adapters leave the new fields `null`.
+`templates/run.json` and `examples/controlled-run/run.json` keep their GPT-6 lanes and gain the optional fields `brief` (`{ path: null, inception: null }`), `workflow` (`{ mode: null, scriptPath: null, runs: [] }`), `closeout.goalFit` (`null`), and lane `requested.agentType` (`null`), with `schemaVersion` `"1.1"`. The filled Claude-route example is the dogfood run record under `specs/`, which PR 2's getting-started links to. The GPT-6 adapters leave the new fields `null`.
 
 ## Probe changes
 
