@@ -154,3 +154,34 @@ test('active Claude Code files have no personal absolute paths', () => {
     assert.doesNotMatch(readUtf8(root, file), /\/Users\/|\/home\/|C:\\Users/);
   }
 });
+
+test('the three-tier agents exist with the contracted routes and tools', () => {
+  const lead = frontmatter('adapters/claude-code/agents/adp-lead.md');
+  const validator = frontmatter('adapters/claude-code/agents/adp-validator.md');
+  const goal = frontmatter('adapters/claude-code/agents/adp-goal-reviewer.md');
+  assert.deepEqual([lead.name, lead.model, lead.effort, lead.tools], ['adp-lead', 'claude-opus-5-5', 'xhigh', 'Read, Grep, Glob, Bash']);
+  assert.deepEqual([validator.name, validator.model, validator.effort, validator.tools], ['adp-validator', 'claude-sonnet-5-5', 'low', 'Bash, Read']);
+  assert.deepEqual([goal.name, goal.model, goal.effort, goal.tools], ['adp-goal-reviewer', 'claude-fable-5-1', 'high', 'Read, Grep, Glob, Bash']);
+  for (const agent of [lead, validator, goal]) assert.equal(agent.disallowedTools, 'Edit, Write, NotebookEdit');
+  const disclosure = /read-only by instruction; Bash is available for diff and checks/;
+  for (const name of ['adp-lead', 'adp-validator', 'adp-goal-reviewer']) {
+    assert.match(readUtf8(root, `adapters/claude-code/agents/${name}.md`), disclosure, name);
+  }
+  assert.match(readUtf8(root, 'adapters/claude-code/agents/adp-validator.md'), /GIT_INDEX_FILE/);
+  assert.match(readUtf8(root, 'adapters/claude-code/agents/adp-validator.md'), /git rev-parse --git-path index/);
+  assert.match(readUtf8(root, 'adapters/claude-code/agents/adp-validator.md'), /git rev-parse HEAD/);
+  assert.match(readUtf8(root, 'adapters/claude-code/agents/adp-validator.md'), /Gitignored files are not covered/);
+  assert.match(readUtf8(root, 'adapters/claude-code/agents/adp-validator.md'), /--porcelain=v1 -uall -z --no-renames/);
+  for (const name of ['adp-worker', 'adp-worker-high']) {
+    assert.match(readUtf8(root, `adapters/claude-code/agents/${name}.md`), /Never commit/);
+    assert.match(readUtf8(root, `adapters/claude-code/agents/${name}.md`), /stopped/);
+  }
+  for (const name of ['adp-reviewer', 'adp-reviewer-high']) {
+    assert.match(readUtf8(root, `adapters/claude-code/agents/${name}.md`), /diffSha256/);
+    assert.match(readUtf8(root, `adapters/claude-code/agents/${name}.md`), /git ls-files --others --exclude-standard -z/);
+  }
+  const plugin = json('.claude-plugin/plugin.json');
+  for (const name of ['adp-lead', 'adp-validator', 'adp-goal-reviewer']) {
+    assert.ok(plugin.agents.includes(`./adapters/claude-code/agents/${name}.md`), name);
+  }
+});
