@@ -59,24 +59,24 @@ test('agents use full model IDs and the contracted efforts and tools', () => {
   assert.doesNotMatch(explorer.tools, /\b(?:Edit|Write|NotebookEdit|Bash)\b/);
 });
 
-test('the deliver skill is explicit-invoke and translates the same two-mode kernel', () => {
+test('the deliver skill is explicit-invoke and translates the three-tier Controlled route', () => {
   const file = 'adapters/claude-code/skills/deliver/SKILL.md';
   const text = readUtf8(root, file);
   const meta = frontmatter(file);
   assert.equal(meta.name, 'deliver');
   assert.equal(meta['disable-model-invocation'], 'true');
-  assert.match(text, /Direct/);
-  assert.match(text, /Controlled/);
-  assert.match(text, /contract/i);
-  assert.match(text, /actual diff/i);
-  assert.match(text, /validation evidence/i);
-  assert.match(text, /profiles\/claude-5\.md/);
-  assert.match(text, /sole writer/i);
-  assert.match(text, /preflight/i);
-  assert.match(text, /one orchestration plane/i);
-  assert.match(text, /depth one/i);
-  assert.match(text, /serialized/i);
+  for (const pattern of [
+    /Direct/, /Controlled/, /contract/i, /actual diff/i, /validation evidence/i, /profiles\/claude-5\.md/,
+    /sole writer/i, /preflight/i, /one orchestration plane/i, /depth one/i, /serialized/i,
+    /brief/i, /grill/i, /deliver-controlled\.js/, /pauseAfterPlan/, /resumePlan/, /openQuestions/,
+    /goal-fit/i, /re-run/i, /manual/i, /workflow-result\.json/,
+    /read-only by instruction; Bash is available for diff and checks/,
+    /\$\{CLAUDE_PLUGIN_ROOT\}\/bin\/agentic-delivery-playbook\.js/, /~\/\.claude\/projects\//, /--requested/,
+  ]) {
+    assert.match(text, pattern, String(pattern));
+  }
   assert.doesNotMatch(text, /\b(?:Lightweight|Full) mode\b/i);
+  assert.doesNotMatch(text, /GIT_INDEX_FILE/, 'fingerprint command lives in the README and the validator');
   assert.ok(lineCount(text) <= 80, `skill has ${lineCount(text)} lines`);
 });
 
@@ -144,12 +144,8 @@ test('the reviewer read-only disclosure and fingerprint rule are stated plainly'
     assert.match(readUtf8(root, file), disclosure, file);
   }
   const skill = readUtf8(root, 'adapters/claude-code/skills/deliver/SKILL.md');
-  assert.match(skill, /GIT_INDEX_FILE/);
-  assert.match(skill, /git rev-parse HEAD/);
   assert.match(skill, /\$\{CLAUDE_PLUGIN_ROOT\}\/bin\/agentic-delivery-playbook\.js/);
   assert.match(skill, /~\/\.claude\/projects\//);
-  assert.match(skill, /git rev-parse --git-path index/);
-  assert.match(skill, /Gitignored files are not covered/);
   assert.doesNotMatch(readUtf8(root, 'adapters/claude-code/README.md'), /```[^`]*CLAUDE_PLUGIN_ROOT/);
   assert.doesNotMatch(readUtf8(root, 'profiles/claude-5.md'), /probe claude/);
   const plugin = json('.claude-plugin/plugin.json');
