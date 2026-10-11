@@ -47,6 +47,16 @@ test('matchPattern: literal, single-segment star, and double star', () => {
   assert.equal(matchesAny([], 'y.md'), false);
 });
 
+test('matchPattern: adjacent ** segments do not backtrack exponentially', () => {
+  const pattern = 'a/' + Array(30).fill('**').join('/') + '/b';
+  const deep = 'a/' + Array(40).fill('x').join('/');
+  const start = process.hrtime.bigint();
+  assert.equal(matchPattern(pattern, deep + '/b'), true);
+  assert.equal(matchPattern(pattern, deep + '/c'), false);
+  const elapsed = process.hrtime.bigint() - start;
+  assert.ok(elapsed < 1000000000n, `took ${elapsed} ns`);
+});
+
 test('topologicalOrder: dependency order, unknown dependency, cycle', () => {
   const ordered = topologicalOrder([
     task({ id: 'b', dependsOn: ['a'] }),
@@ -77,6 +87,8 @@ test('R1 and R2 guard malformed input instead of throwing', () => {
   assert.equal(validatePlan(plan([task({ ownedFiles: 'src/a.js' })]), lanes, nonGoalFiles).reason, 'plan-rule-R2');
   assert.equal(validatePlan(plan([task({ ownedFiles: [42] })]), lanes, nonGoalFiles).reason, 'plan-rule-R2');
   assert.equal(validatePlan(plan([task({ dependsOn: 'a' })]), lanes, nonGoalFiles).reason, 'plan-rule-R2');
+  assert.equal(validatePlan(plan([task({ check: 'npm test' })]), lanes, nonGoalFiles).reason, 'plan-rule-R2');
+  assert.equal(validatePlan(plan([task({ check: null })]), lanes, nonGoalFiles).reason, 'plan-rule-R2');
 });
 
 test('R2: empty ownedFiles, glob or unsafe paths, missing command, non-integer expectedExit are rejected', () => {
@@ -103,6 +115,8 @@ test('R7 and R8: dependency problems and open questions are rejected, in rule or
   assert.equal(validatePlan(plan([task({ dependsOn: ['zzz'] })]), lanes, nonGoalFiles).reason, 'plan-rule-R7');
   assert.equal(validatePlan(plan([task({ id: 'a', dependsOn: ['b'] }), task({ id: 'b', ownedFiles: ['src/b.js'], dependsOn: ['a'] })]), lanes, nonGoalFiles).reason, 'plan-rule-R7');
   assert.equal(validatePlan(plan([task()], { openQuestions: ['which API?'] }), lanes, nonGoalFiles).reason, 'plan-rule-R8');
+  assert.equal(validatePlan(plan([task()], { openQuestions: 'which API?' }), lanes, nonGoalFiles).reason, 'plan-rule-R8');
+  assert.equal(validatePlan(plan([task()], { openQuestions: null }), lanes, nonGoalFiles).reason, 'plan-rule-R8');
   const both = validatePlan(plan([task({ ownedFiles: [] })], { openQuestions: ['q'] }), lanes, nonGoalFiles);
   assert.equal(both.reason, 'plan-rule-R2', 'earlier rules win');
 });
