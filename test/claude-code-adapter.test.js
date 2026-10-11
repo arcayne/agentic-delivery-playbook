@@ -87,17 +87,29 @@ test('skill references to packaged files resolve', () => {
   for (const ref of refs) assert.ok(fs.existsSync(path.join(root, ref)), `${ref} exists`);
 });
 
-test('the Claude 5 profile holds routes, escalation, and attestation caveats', () => {
+test('the Claude 5 profile holds the three-tier routes, escalation, delegation limits, and attestation caveats', () => {
   const text = readUtf8(root, 'profiles/claude-5.md');
-  for (const term of ['claude-opus-5-5', 'claude-sonnet-5-5', 'adp-worker', 'adp-reviewer', 'adp-explorer']) {
+  for (const term of [
+    'claude-fable-5-1', 'claude-opus-5-5', 'claude-sonnet-5-5',
+    'adp-lead', 'adp-worker', 'adp-worker-high', 'adp-validator', 'adp-reviewer', 'adp-reviewer-high', 'adp-goal-reviewer', 'adp-explorer',
+    'deliver-controlled.js',
+  ]) {
     assert.ok(text.includes(term), term);
   }
+  assert.match(text, /Profile version: 2/);
   assert.match(text, /Escalation/);
   assert.match(text, /requested.*configured.*observed/is);
   assert.match(text, /alias drift/i);
   assert.match(text, /not attestation/i);
   assert.match(text, /Depth: one/);
-  assert.ok(lineCount(text) <= 120);
+  assert.match(text, /Workflow/);
+  assert.match(text, /agent teams/i);
+  assert.match(text, /CLI-only/i);
+  assert.match(text, /read-only by instruction; Bash is available for diff and checks/);
+  assert.match(text, /Known gaps/);
+  assert.doesNotMatch(text, /model: opus/, 'alias escalation route removed');
+  assert.doesNotMatch(text, /probe claude/);
+  assert.ok(lineCount(text) <= 120, `profile has ${lineCount(text)} lines`);
 });
 
 test('the settings template sets the orchestrator route and the README documents install', () => {
