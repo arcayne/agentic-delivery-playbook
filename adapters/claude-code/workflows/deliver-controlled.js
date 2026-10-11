@@ -295,7 +295,7 @@ const leadPrompt = () => [
 
 const workerPrompt = (task, extra) => [
   context(),
-  'You are the sole writer for this task. Edit only the files it owns. Never commit. Run only this task\'s check. Leave no untracked files behind.',
+  'You are the sole writer for this task. Edit only the files it owns. Never commit. Run only this task\'s check. Leave no untracked files behind other than files this task owns.',
   `Task: ${JSON.stringify(task)}`,
   extra && extra.previousValidation ? `Previous attempt failed its check. Validator output: ${JSON.stringify(extra.previousValidation)}` : '',
   extra && extra.findings ? `Review findings to fix: ${JSON.stringify(extra.findings)}` : '',
