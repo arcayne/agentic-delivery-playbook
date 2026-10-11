@@ -215,3 +215,75 @@ test('CLI probe accepts repeated --requested and prints the comparison', () => {
   assert.notEqual(cli('probe', 'claude', session2, '--requested').status, 0);
   assert.notEqual(cli('probe', 'claude', session2, '--requested', path.join(fixtures, 'nope.json')).status, 0);
 });
+
+test('compareRoutes pairs repeated labels in order per label and yields null when none remain', () => {
+  const type = 'agentic-delivery-playbook:adp-reviewer';
+  const observed = (agentId, effort) => ({ agentId, agentType: type, label: 'review-1', observed: [{ model: 'm', effort, entrypoint: 'cli', count: 1 }] });
+  const report = { subagents: [observed('a', 'low'), observed('b', 'high')] };
+  const requested = [
+    { label: 'review-1', agentType: type, model: 'm', effort: 'low' },
+    { label: 'review-1', agentType: type, model: 'm', effort: 'high' },
+    { label: 'review-1', agentType: type, model: 'm', effort: 'high' },
+    { label: 'ghost', agentType: type, model: 'm', effort: 'low' },
+  ];
+  const { labelPairs } = compareRoutes(report, requested);
+  assert.equal(labelPairs.length, 4);
+  assert.equal(labelPairs[0].observed.effort, 'low');
+  assert.equal(labelPairs[1].observed.effort, 'high');
+  assert.equal(labelPairs[2].observed, null);
+  assert.equal(labelPairs[3].label, 'ghost');
+  assert.equal(labelPairs[3].observed, null);
+});
+
+test('CLI probe reports malformed --requested files by basename without raw paths', () => {
+  const os = require('node:os');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'adp-requested-'));
+  try {
+    const cases = {
+      'null.json': 'null',
+      'badentry.json': '{"requestedRoutes":[null]}',
+      'badfields.json': '{"requestedRoutes":[{"agentType":"a","model":"m"}]}',
+      'invalid.json': '{not json',
+    };
+    for (const [name, content] of Object.entries(cases)) {
+      const file = path.join(dir, name);
+      fs.writeFileSync(file, content);
+      const result = cli('probe', 'claude', session2, '--requested', file);
+      assert.notEqual(result.status, 0, name);
+      assert.ok(result.stderr.includes(name), `${name}: ${result.stderr}`);
+      assert.match(result.stderr, /^error: /m);
+      assert.ok(!result.stderr.includes('/Users/') && !result.stderr.includes('/home/'), `${name}: ${result.stderr}`);
+    }
+    assert.match(cli('probe', 'claude', session2, '--requested', path.join(dir, 'invalid.json')).stderr, /invalid\.json: invalid JSON/);
+    assert.match(cli('probe', 'claude', session2, '--requested', path.join(dir, 'null.json')).stderr, /null\.json: no requestedRoutes array/);
+    assert.match(cli('probe', 'claude', session2, '--requested', path.join(dir, 'badentry.json')).stderr, /badentry\.json: requestedRoutes\[0\] is malformed/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('compareRoutes reports a subagent with no observed entries as unknown, not mixed', () => {
+  const type = 'agentic-delivery-playbook:adp-reviewer';
+  const report = { subagents: [{ agentId: 'x', agentType: type, label: 'r', observed: [] }] };
+  const outcome = compareRoutes(report, []);
+  assert.deepEqual(outcome.unexpected, [{ agentType: type, model: 'unknown', effort: 'unknown' }]);
+});
+
+test('probe skips stray entries under subagents without throwing', () => {
+  const os = require('node:os');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'adp-stray-'));
+  try {
+    const file = path.join(dir, 's.jsonl');
+    fs.writeFileSync(file, '');
+    const sub = path.join(dir, 's', 'subagents');
+    fs.mkdirSync(path.join(sub, 'workflows'), { recursive: true });
+    fs.mkdirSync(path.join(sub, 'bogus.jsonl'));
+    fs.writeFileSync(path.join(sub, 'workflows', 'plain-file'), 'x');
+    fs.symlinkSync(path.join(dir, 'does-not-exist'), path.join(sub, 'workflows', 'dangling'));
+    fs.symlinkSync(path.join(dir, 'does-not-exist'), path.join(sub, 'dangling.jsonl'));
+    const report = probeClaude(file, { agentsDir });
+    assert.deepEqual(report.subagents, []);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

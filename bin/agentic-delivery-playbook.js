@@ -26,6 +26,31 @@ The show command prints a maintained artifact to stdout. The probe command reads
   process.exit(exitCode);
 }
 
+function readRequestedRoutes(file) {
+  const name = path.basename(file);
+  let text;
+  try {
+    text = fs.readFileSync(file, 'utf8');
+  } catch {
+    throw new Error(`${name}: requested file not found`);
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    throw new Error(`${name}: invalid JSON`);
+  }
+  if (parsed === null || typeof parsed !== 'object' || !Array.isArray(parsed.requestedRoutes)) {
+    throw new Error(`${name}: no requestedRoutes array`);
+  }
+  parsed.requestedRoutes.forEach((entry, i) => {
+    const ok = entry !== null && typeof entry === 'object'
+      && ['agentType', 'model', 'effort'].every((field) => typeof entry[field] === 'string');
+    if (!ok) throw new Error(`${name}: requestedRoutes[${i}] is malformed`);
+  });
+  return parsed.requestedRoutes;
+}
+
 const args = process.argv.slice(2);
 if (args[0] === '-h' || args[0] === '--help') usage(0);
 
@@ -43,12 +68,7 @@ if (args[0] === 'probe') {
     const { probeClaude, compareRoutes } = require('../lib/claude-route-probe');
     const report = probeClaude(sessionFile, { agentsDir });
     if (requestedFiles.length > 0) {
-      const requested = requestedFiles.flatMap((file) => {
-        if (!fs.existsSync(file)) throw new Error(`requested file not found: ${path.basename(file)}`);
-        const parsed = JSON.parse(fs.readFileSync(file, 'utf8'));
-        if (!Array.isArray(parsed.requestedRoutes)) throw new Error(`${path.basename(file)}: no requestedRoutes array`);
-        return parsed.requestedRoutes;
-      });
+      const requested = requestedFiles.flatMap(readRequestedRoutes);
       report.comparison = compareRoutes(report, requested);
     }
     console.log(JSON.stringify(report, null, 2));
