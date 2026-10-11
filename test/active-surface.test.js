@@ -62,7 +62,9 @@ test('CLI exposes active artifacts without mutating the target project', () => {
 
 test('the breaking package release excludes legacy material', () => {
   const manifest = JSON.parse(readUtf8(root, 'package.json'));
-  assert.equal(manifest.version, '0.3.0');
+  assert.equal(manifest.version, '0.4.0');
+  assert.ok(manifest.files.includes('adapters/claude-code'));
+  assert.ok(manifest.files.includes('.claude-plugin'));
   assert.equal(manifest.files.includes('legacy'), false);
   assert.equal(manifest.files.includes('test'), false);
 });
@@ -94,14 +96,14 @@ test('public docs describe the maintained surface honestly', () => {
   }
 });
 
-test('repository contribution and support metadata matches 0.3', () => {
+test('repository contribution and support metadata matches the current release', () => {
   const security = readUtf8(root, 'SECURITY.md');
   const contributing = readUtf8(root, 'CONTRIBUTING.md');
   const pullRequest = readUtf8(root, '.github/pull_request_template.md');
   const businessContext = readUtf8(root, 'BUSINESS-CONTEXT.md');
   const publishing = readUtf8(root, 'docs/publishing.md');
-  assert.match(security, /\| 0\.3\.x \| Yes \|/);
-  assert.match(security, /\| 0\.2\.x and earlier \| No \|/);
+  assert.match(security, /\| 0\.4\.x \| Yes \|/);
+  assert.match(security, /\| 0\.3\.x and earlier \| No \|/);
   assert.match(contributing, /Direct and Controlled/);
   assert.match(contributing, /GPT-6/);
   assert.match(contributing, /Codex, ChatGPT Work, and the skill-only Pi package/);

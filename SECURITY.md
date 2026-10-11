@@ -12,8 +12,8 @@ If private advisories are not enabled, open an issue with a minimal description 
 
 | Version | Supported |
 | --- | --- |
-| 0.3.x | Yes |
-| 0.2.x and earlier | No |
+| 0.4.x | Yes |
+| 0.3.x and earlier | No |
 
 ## Scope
 

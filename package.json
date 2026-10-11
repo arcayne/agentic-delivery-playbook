@@ -1,6 +1,6 @@
 {
   "name": "agentic-delivery-playbook",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "GPT-6-first delivery kernel for Codex, ChatGPT Work, and Pi: classify risk, route minimally, and verify from evidence.",
   "license": "MIT",
   "type": "commonjs",
@@ -8,7 +8,9 @@
     "agentic-delivery-playbook": "bin/agentic-delivery-playbook.js"
   },
   "files": [
+    ".claude-plugin",
     "adapters/chatgpt",
+    "adapters/claude-code",
     "adapters/codex",
     "adapters/pi",
     "bin",

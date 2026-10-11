@@ -1,6 +1,6 @@
 {
   "name": "agentic-delivery-playbook",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Direct/Controlled delivery kernel for Claude Code: explicit-invoke skill, a shipped Controlled workflow, and routed lead, worker, validator, reviewer, goal-fit reviewer, and explorer agents.",
   "author": { "name": "arcayne" },
   "homepage": "https://github.com/arcayne/agentic-delivery-playbook",

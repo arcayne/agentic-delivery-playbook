@@ -19,7 +19,7 @@ const frontmatter = (file) => parseFrontmatter(readUtf8(root, file));
 test('plugin manifest paths resolve inside the repository', () => {
   const plugin = json('.claude-plugin/plugin.json');
   assert.equal(plugin.name, 'agentic-delivery-playbook');
-  assert.equal(plugin.version, '0.3.0');
+  assert.equal(plugin.version, '0.4.0');
   for (const target of [].concat(plugin.skills, plugin.agents)) {
     assert.match(target, /^\.\//);
     const resolved = path.resolve(root, target);

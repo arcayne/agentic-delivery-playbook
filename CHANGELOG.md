@@ -1,7 +1,13 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 - Unreleased
 
+- Added a three-tier Controlled route for Claude Code: Fable 5.1 or Opus 5.5 orchestrator, Opus 5.5 lead, Sonnet 5.5 workers, low-effort validator, Opus defect reviewer, and a configurable goal-fit reviewer defaulting to Fable 5.1.
+- Added the shipped `deliver-controlled` Workflow script with Plan, Implement, Review, and Goal-fit phases, serialized writers, content-hash ownership gates, and fixed fix-cycle limits.
+- Added `adp-lead`, `adp-validator`, and `adp-goal-reviewer` agents; the `deliver` skill now starts with an inception grill and ends with an orchestrator re-run of the verification plan.
+- Probe reads workflow transcripts and compares requested with observed routes (`--requested`).
+- Run record schema 1.1 adds `brief`, `workflow`, lane `requested.agentType`, and `closeout.goalFit`.
+- Claude Code adapter and plugin manifest are included in the npm package.
 - Made GPT-6 the maintained profile while preserving frozen GPT-5.6 evaluation and historical evidence.
 - Added a skill-only Pi package adapter that loads the packaged canonical kernel and GPT-6 profile.
 - Consolidated the Pi command under `agentic-delivery-playbook`, evolving the existing skill instead of introducing a second product identity.
