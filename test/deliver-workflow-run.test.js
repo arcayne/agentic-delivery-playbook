@@ -14,7 +14,7 @@ const body = scriptText.slice(scriptText.indexOf('\n}\n', metaStart) + 3);
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
 const runScript = new AsyncFunction('agent', 'phase', 'log', 'args', body);
 
-const BASE = 'base0000';
+const BASE = '0123456789abcdef0123456789abcdef01234567';
 const SONNET = 'claude-sonnet-5-5';
 const OPUS = 'claude-opus-5-5';
 const WORKER = 'agentic-delivery-playbook:adp-worker';
@@ -214,6 +214,8 @@ test('malformed args reject with an error naming the argument', async () => {
     [{ goalReviewer: { model: null } }, 'args.goalReviewer'],
     [{ pauseAfterPlan: 'yes' }, 'args.pauseAfterPlan'],
     [{ resumePlan: [] }, 'args.resumePlan'],
+    [{ baseCommit: '0123456' }, 'args.baseCommit must be a full commit hash'],
+    [{ lanes: [{ id: 'src', ownedFiles: ['src/**'] }, { id: 'src', ownedFiles: ['test/**'] }] }, 'args.lanes has duplicate id src'],
   ];
   for (const [patch, name] of malformed) {
     await assert.rejects(simulate({ ...ARGS, ...patch }), (err) => err.message.includes(name), name);

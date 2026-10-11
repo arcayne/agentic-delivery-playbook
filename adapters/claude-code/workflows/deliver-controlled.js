@@ -249,8 +249,10 @@ const isObject = (value) => value !== null && typeof value === 'object' && !Arra
 requireArg('contractPath', isText(a.contractPath))
 requireArg('briefPath', isText(a.briefPath))
 requireArg('baseCommit', isText(a.baseCommit))
+requireArg('baseCommit', /^[0-9a-f]{40}([0-9a-f]{24})?$/.test(a.baseCommit), 'must be a full commit hash')
 requireArg('lanes', Array.isArray(a.lanes) && a.lanes.length > 0)
 a.lanes.forEach((lane, i) => requireArg(`lanes[${i}]`, isObject(lane) && isText(lane.id) && isTextArray(lane.ownedFiles), 'must be an object with a non-empty string id and an array of strings ownedFiles'))
+a.lanes.forEach((lane, i) => requireArg('lanes', a.lanes.findIndex((other) => other.id === lane.id) === i, `has duplicate id ${lane.id}`))
 requireArg('nonGoalFiles', a.nonGoalFiles === undefined || isTextArray(a.nonGoalFiles), 'must be an array of strings')
 requireArg('risk', a.risk === undefined || a.risk === 'normal' || a.risk === 'high', "must be 'normal' or 'high'")
 requireArg('goalReviewer', a.goalReviewer === undefined || (isObject(a.goalReviewer) && ['agentType', 'model', 'effort'].every((key) => a.goalReviewer[key] === undefined || isText(a.goalReviewer[key]))), 'must be an object whose agentType, model, and effort are non-empty strings when present')
@@ -263,10 +265,12 @@ const goalReviewerDef = Object.assign({}, AGENTS.goalReviewer, a.goalReviewer ||
 // ---- prompts ---------------------------------------------------------------
 
 const context = () => [
-  `Repository root: the current working directory. Base commit: ${a.baseCommit}. HEAD must stay at the base commit; nobody commits during this run.`,
+  `Repository root: the current working directory, which is the git top level; run every command from it. Base commit: ${a.baseCommit}. HEAD must stay at the base commit; nobody commits during this run.`,
   `Delivery contract: ${a.contractPath}. Intent brief: ${a.briefPath}. Read both files yourself.`,
   'Your final output is data for a script, not a message to a person. Return only the structured result requested.',
 ].join('\n')
+
+const ARTIFACTS_RULE = 'Files under the directory containing the brief and contract are orchestrator artifacts, not part of the change under review, and are never findings.'
 
 const validatorPrompt = (command) => [
   context(),
@@ -286,12 +290,12 @@ const leadPrompt = () => [
   `Lanes (ownership patterns; "*" matches within one path segment, "**" matches any depth): ${JSON.stringify(a.lanes)}`,
   `Non-goal files (must not be touched): ${JSON.stringify(nonGoalFiles)}`,
   'Rules the script enforces before any edit: tasks non-empty with unique ids; each task has non-empty ownedFiles as concrete paths (no globs), a non-empty check.command and an integer check.expectedExit; each task names an existing lane and every path matches that lane; no path matches a non-goal pattern; no path appears in two tasks; dependsOn names existing tasks without cycles; openQuestions is empty.',
-  'Checks must not modify tracked files or create untracked files. Put anything you cannot decide from the contract and the brief into openQuestions instead of guessing.',
+  'Checks must not modify tracked files or create untracked files. Put anything you cannot decide from the contract and the brief into openQuestions instead of guessing. Always return your best task list even when you have open questions.',
 ].join('\n')
 
 const workerPrompt = (task, extra) => [
   context(),
-  'You are the sole writer for this task. Edit only the files it owns. Never commit.',
+  'You are the sole writer for this task. Edit only the files it owns. Never commit. Run only this task\'s check. Leave no untracked files behind.',
   `Task: ${JSON.stringify(task)}`,
   extra && extra.previousValidation ? `Previous attempt failed its check. Validator output: ${JSON.stringify(extra.previousValidation)}` : '',
   extra && extra.findings ? `Review findings to fix: ${JSON.stringify(extra.findings)}` : '',
@@ -303,7 +307,8 @@ const reviewerPrompt = (plan, taskRecords, cycle) => [
   `You are the fresh-context defect reviewer (cycle ${cycle}). Compute the diff against the base commit yourself, including untracked files.`,
   `Plan: ${JSON.stringify(plan)}`,
   `Validation records: ${JSON.stringify([...taskRecords.values()])}`,
-  `Compute diffSha256 with exactly this command: \`${DIFF_HASH_COMMAND.replace('BASE', () => a.baseCommit)}\``,
+  `Compute diffSha256 with exactly this command: \`${DIFF_HASH_COMMAND.replace('BASE', () => a.baseCommit)}\` Report only the 64-character hex digest, not the trailing \` -\`.`,
+  ARTIFACTS_RULE,
   'Lead with defects ordered by severity, each tied to an acceptance criterion and a file and line. For each finding, file must be the repository-relative path exactly as it appears in a task\'s ownedFiles; put the line number only in line. Flag scope creep, files outside task ownership, unrun or contradictory checks, and unsupported claims. List criteria that lack evidence in unprovenCriteria. Decide accept, accept-with-fixes, or reject.',
 ].join('\n')
 
@@ -313,6 +318,7 @@ const goalFitPrompt = (taskRecords, review) => [
   `Validation records: ${JSON.stringify([...taskRecords.values()])}`,
   `Defect review result: ${JSON.stringify(review)}`,
   'You may run only commands listed in the contract\'s verification plan, commands named in the brief\'s "how success is observed" section, and read-only inspection. Report anything else as "would need to run X" instead of running it. Never write files.',
+  ARTIFACTS_RULE,
   'Return verdict (fit, partially-fit, not-fit), reasons tied to lines of the brief, usedDeliverable, and howUsed.',
 ].join('\n')
 

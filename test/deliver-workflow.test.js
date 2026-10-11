@@ -99,3 +99,27 @@ test('the script carries every reason string and label pattern from the spec', (
   assert.ok(text.includes('git diff --no-color --no-ext-diff'));
   assert.ok(text.includes('git ls-files --others --exclude-standard -z'));
 });
+
+test('the fingerprint, fileStates, and diff-hash commands are identical in the script, the agents, and the README', () => {
+  const text = script();
+  const constant = (name) => {
+    const line = text.split('\n').find((l) => l.startsWith(`const ${name} = '`));
+    assert.ok(line, `${name} found`);
+    // eslint-disable-next-line no-new-func
+    return new Function(`return ${line.slice(`const ${name} = `.length)};`)();
+  };
+  const fingerprint = constant('FINGERPRINT_COMMAND');
+  const diffHash = constant('DIFF_HASH_COMMAND');
+  const fileStates = constant('FILE_STATES_COMMAND');
+  const doc = (file) => readUtf8(root, file);
+  const validator = doc('adapters/claude-code/agents/adp-validator.md');
+  const readme = doc('adapters/claude-code/README.md');
+  assert.ok(validator.includes(fingerprint), 'fingerprint in adp-validator.md');
+  assert.ok(readme.includes(fingerprint), 'fingerprint in README');
+  assert.ok(validator.includes(fileStates), 'fileStates in adp-validator.md');
+  assert.ok(diffHash.includes('BASE'));
+  for (const name of ['adp-reviewer', 'adp-reviewer-high']) {
+    assert.ok(doc(`adapters/claude-code/agents/${name}.md`).includes(diffHash.replace('BASE', '<base>')), `diff hash in ${name}.md`);
+  }
+  assert.ok(readme.includes(diffHash), 'diff hash in README');
+});

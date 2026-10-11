@@ -17,12 +17,12 @@ This profile maps delivery capabilities to Claude 5 models in Claude Code. It re
 | Worker, attempt 1 | `claude-sonnet-5-5` | medium | `adp-worker` | workflow Implement phase, serialized |
 | Worker, retry 1 | `claude-sonnet-5-5` | high | `adp-worker-high` | same |
 | Worker, retry 2 | `claude-opus-5-5` | high | `adp-worker` with explicit workflow `model` and `effort` | same |
-| Validator | `claude-sonnet-5-5` | low | `adp-validator`, Bash and Read | around every task and review |
+| Validator | `claude-sonnet-5-5` | low | `adp-validator`, Bash and Read | around the plan, every task, each review, and goal-fit |
 | Defect reviewer | `claude-opus-5-5` | medium (high via `adp-reviewer-high` when risk is high) | `adp-reviewer` | workflow Review phase, fresh context |
 | Goal-fit reviewer | `claude-fable-5-1` (configurable in workflow `args`) | high | `adp-goal-reviewer` | workflow Goal-fit phase, fresh context |
 | Explorer | `claude-sonnet-5-5` | low | `adp-explorer`, read-only tools | ad hoc lookups |
 
-Direct mode: the orchestrator edits directly. Controlled mode: the shipped Workflow script `adapters/claude-code/workflows/deliver-controlled.js` runs Plan, Implement, Review, and Goal-fit; the orchestrator writes only the brief, the contract, and the run record, and re-runs the contract's verification plan itself at closeout.
+Direct mode: the orchestrator edits directly. Controlled mode: the shipped Workflow script `adapters/claude-code/workflows/deliver-controlled.js` runs Plan, Implement, Review, and Goal-fit; the orchestrator writes only the brief, the contract, notes, the run record, and the saved workflow results, and re-runs the contract's verification plan itself at closeout.
 
 ## Escalation
 
@@ -33,7 +33,7 @@ Direct mode: the orchestrator edits directly. Controlled mode: the shipped Workf
 
 ## Review independence
 
-A different model tier is not independent review. Lead, validator, both reviewers, and the explorer are read-only by instruction; Bash is available for diff and checks; enforcement is a before/after worktree fingerprint (temp-index tree including untracked files, plus `HEAD`) taken by the validator around every read-only phase. Workers never commit; `HEAD` must equal the base commit at every fingerprint. Fresh context, the fingerprint, deterministic checks, and the orchestrator's own closeout re-run provide the separation, not tool restrictions.
+A different model tier is not independent review. Lead, validator, defect reviewers, goal reviewer, and the explorer are read-only by instruction; Bash is available for diff and checks; enforcement is a before/after worktree fingerprint (temp-index tree including untracked files, plus `HEAD`) taken by the validator around the plan, every task, each review, and goal-fit. Workers never commit; `HEAD` must equal the base commit at every fingerprint. Fresh context, the fingerprint, deterministic checks, and the orchestrator's own closeout re-run provide the separation, not tool restrictions.
 
 ## Requested, configured, observed
 

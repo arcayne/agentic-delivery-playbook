@@ -45,7 +45,7 @@ The skill passes these to the Workflow tool with `scriptPath` set to the plugin'
 }
 ```
 
-Set `pauseAfterPlan` to `true` when the grill was skipped or `risk` is `high`; the run returns `plan-ready`, you approve the plan, then start a second run with `resumePlan` set to the approved plan and `pauseAfterPlan` `false`. A `blocked` run with `openQuestions` means: answer them, append the answers to the brief under "Answers", and start a new run. Other plan failures may be retried once the same way; a second failure goes to the user. Lane `ownedFiles` and `nonGoalFiles` are patterns where `*` matches within one path segment and `**` matches any depth; task paths in the plan are concrete. `goalReviewer` is optional and defaults to the values shown. Missing or malformed `args` surface as a Workflow tool error, not as an `escalated` record.
+Set `pauseAfterPlan` to `true` when the grill was skipped or `risk` is `high`; the run returns `plan-ready`, you approve the plan, then start a second run with `resumePlan` set to the approved plan and `pauseAfterPlan` `false`. For a `blocked` run: if the returned `plan.openQuestions` is non-empty, whatever the `reason`, ask the user, append the answers to the brief under "Answers", and start a new run. For any other plan failure, append the failure detail to the brief under "Answers", fix the cause, retry once, then stop and ask. Lane `ownedFiles` and `nonGoalFiles` are patterns where `*` matches within one path segment and `**` matches any depth; task paths in the plan are concrete. `goalReviewer` is optional and defaults to the values shown. Missing or malformed `args` surface as a Workflow tool error, not as an `escalated` record.
 
 ### Fingerprint and diff hash
 
@@ -55,13 +55,15 @@ Worktree fingerprint (temp-index tree including untracked files; Gitignored file
 T=$(mktemp) && cp "$(git rev-parse --git-path index)" "$T" && GIT_INDEX_FILE="$T" git add -A && GIT_INDEX_FILE="$T" git write-tree; rm -f "$T"
 ```
 
-Diff hash, computed by the reviewer and again by the orchestrator at closeout before re-running the verification plan (replace `BASE`; use `sha256sum` where `shasum` is absent):
+Diff hash, computed by the reviewer and again by the orchestrator at closeout (replace `BASE`; use `sha256sum` where `shasum` is absent). Report only the 64-character hex digest, not the trailing ` -`. When the final workflow run returns, the orchestrator computes the diff hash before saving that run's result file, then saves it, then re-runs the verification plan. The hash covers untracked files, so saving the result file first would change it:
 
 ```bash
 { git diff --no-color --no-ext-diff BASE; git ls-files --others --exclude-standard -z | while IFS= read -r -d '' f; do printf '%s\0' "$f"; cat "$f"; done; } | shasum -a 256
 ```
 
 ### Closeout
+
+When the final workflow run returns, the orchestrator computes the diff hash before saving that run's result file, then saves it, then re-runs the verification plan.
 
 | Workflow `status` | Goal-fit `verdict` | Outcome |
 | --- | --- | --- |
@@ -79,7 +81,7 @@ Mapping from the workflow result to `run.json` (schema 1.1):
 | `schemaVersion`, `mode`, `status` | `"1.1"`, `"controlled"`, the outcome above |
 | `brief` | `{ path, inception: "completed" or "skipped" }` from the brief file |
 | `workflow` | `{ mode: "workflow" or "manual", scriptPath, runs: [{ runId, resultFile, status }] }`, one entry per Workflow invocation (a paused run and its resumed run are two; a killed run has `status: "killed"` and `resultFile: null`) |
-| `source` | `baseCommit` from the contract; `finalCommit` `null` because workers never commit; `diffSha256` from the command above, computed before the closeout re-run |
+| `source` | `baseCommit` is `args.baseCommit` (the value recorded in the contract); `finalCommit` `null` because workers never commit; `diffSha256` from the command above, computed before the closeout re-run |
 | `route` | `policy` `profiles/claude-5.md`; `exception` `null` |
 | `lanes[]` | one per entry in the concatenated `requestedRoutes`: `id` = `<run index>-<label>`, `role` from the agent type, `ownership` = the task's `ownedFiles` for workers, `requested` = `{ model, effort, topology: "workflow-agent" or "single", agentType }`, `observed` from the probe, `status` from the task (`pending` maps to `planned`) or phase result |
 | `validation[]` | one per task `postValidation` and per closeout check: `id` = label or `closeout-<n>`; `command`, `exitCode`, `status` from the record; workflow entries have `startedAt`, `endedAt`, `outputSha256` `null` and `outputReference` = `specs/<run>/workflow-result.json#<label>`; closeout entries have real timestamps and `outputReference` = the saved log path |

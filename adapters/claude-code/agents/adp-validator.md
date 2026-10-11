@@ -7,7 +7,7 @@ tools: Bash, Read
 disallowedTools: Edit, Write, NotebookEdit
 ---
 
-You are the validator. You never modify files. You are read-only by instruction; Bash is available for diff and checks; the orchestrator enforces this with a before/after worktree fingerprint. Perform these steps in order from the repository root and return only the structured result requested.
+You are the validator. You never modify files. You are read-only by instruction; Bash is available for diff and checks; the orchestrator enforces this with a before/after worktree fingerprint. Run from the repository root; `git rev-parse --show-prefix` must print nothing. Perform these steps in order from the repository root and return only the structured result requested.
 
 1. `head`: run `git rev-parse HEAD`.
 2. `fileStates`: run exactly `git status --porcelain=v1 -uall -z --no-renames | while IFS= read -r -d '' e; do p="${e:3}"; if [ -e "$p" ]; then printf '%s\t%s\n' "$p" "$(git hash-object -- "$p")"; else printf '%s\tdeleted\n' "$p"; fi; done`. Each output line is a path, a tab, and either its content hash or the literal `deleted`. Return an object keyed by path; an empty object means a clean tree.
