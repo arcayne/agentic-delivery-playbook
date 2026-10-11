@@ -23,7 +23,8 @@
 
 | File | Responsibility |
 | --- | --- |
-| `lib/deliver-plan-rules.js` (new) | Pure helpers: path matcher, topological order, `validatePlan` (R1 to R8), `changedPaths`. Source of truth for the block copied into the script. |
+| `lib/deliver-plan-rules.js` (new) | Pure helpers: path matcher, concrete-path check, topological order, `validatePlan` (R1 to R8), `changedPaths`. Source of truth for the block copied into the script. |
+| `lib/workflow-syntax-check.js` (new) | Wraps a Workflow script body in an async function and runs `node --check`; shared by the workflow test and the active-policy validator. |
 | `adapters/claude-code/workflows/deliver-controlled.js` (new) | The Workflow script: `meta`, agent table, schemas, prompts, four phases, return record. |
 | `adapters/claude-code/agents/adp-lead.md`, `adp-validator.md`, `adp-goal-reviewer.md` (new) | Agent definitions. Lead plans; validator fingerprints and runs one command; goal reviewer judges fitness. |
 | `adapters/claude-code/agents/adp-worker*.md`, `adp-reviewer*.md` (modify) | Add structured-return and no-commit lines. |
@@ -53,9 +54,7 @@
 ```bash
 cd /path/to/agentic-delivery-playbook
 git fetch origin
-git checkout design/three-tier-delivery
-git pull --ff-only
-git checkout -b feat/three-tier-pr1
+git checkout -b feat/three-tier-pr1 origin/design/three-tier-delivery
 ```
 
 - [ ] **Step 2: Confirm the baseline is green**
@@ -148,8 +147,18 @@ test('R1: empty tasks and duplicate ids are rejected', () => {
   assert.equal(validatePlan(plan([task({ id: 'a' }), task({ id: 'a', ownedFiles: ['src/b.js'] })]), lanes, nonGoalFiles).reason, 'plan-rule-R1');
 });
 
-test('R2: empty ownedFiles, missing command, non-integer expectedExit are rejected', () => {
+test('R1 and R2 guard malformed input instead of throwing', () => {
+  assert.equal(validatePlan(plan([null]), lanes, nonGoalFiles).reason, 'plan-rule-R1');
+  assert.equal(validatePlan(plan([task({ ownedFiles: 'src/a.js' })]), lanes, nonGoalFiles).reason, 'plan-rule-R2');
+  assert.equal(validatePlan(plan([task({ ownedFiles: [42] })]), lanes, nonGoalFiles).reason, 'plan-rule-R2');
+  assert.equal(validatePlan(plan([task({ dependsOn: 'a' })]), lanes, nonGoalFiles).reason, 'plan-rule-R2');
+});
+
+test('R2: empty ownedFiles, glob or unsafe paths, missing command, non-integer expectedExit are rejected', () => {
   assert.equal(validatePlan(plan([task({ ownedFiles: [] })]), lanes, nonGoalFiles).reason, 'plan-rule-R2');
+  assert.equal(validatePlan(plan([task({ ownedFiles: ['src/**'] })]), lanes, nonGoalFiles).reason, 'plan-rule-R2', 'task paths are concrete');
+  assert.equal(validatePlan(plan([task({ ownedFiles: ['/src/a.js'] })]), lanes, nonGoalFiles).reason, 'plan-rule-R2', 'no absolute paths');
+  assert.equal(validatePlan(plan([task({ ownedFiles: ['src/../lib/a.js'] })]), lanes, nonGoalFiles).reason, 'plan-rule-R2', 'no dot segments');
   assert.equal(validatePlan(plan([task({ check: { command: '', expectedExit: 0 } })]), lanes, nonGoalFiles).reason, 'plan-rule-R2');
   assert.equal(validatePlan(plan([task({ check: { command: 'x', expectedExit: '0' } })]), lanes, nonGoalFiles).reason, 'plan-rule-R2');
 });
@@ -252,18 +261,30 @@ function topologicalOrder(tasks) {
   return { order, unknown: null, cycle: false };
 }
 
+// A concrete repository-relative path: a non-empty string with no glob, not absolute, no '.' or '..' segment.
+function isConcretePath(value) {
+  if (typeof value !== 'string' || value === '' || value.includes('*') || value.startsWith('/')) return false;
+  return value.split('/').every((segment) => segment !== '' && segment !== '.' && segment !== '..');
+}
+
 // Rules R1 to R8 from the spec, checked in order. Returns {ok:true, order} or {ok:false, reason, detail}.
+// Guards types instead of throwing, because resumePlan may be hand-edited.
 function validatePlan(plan, lanes, nonGoalFiles) {
   const fail = (rule, detail) => ({ ok: false, reason: `plan-rule-${rule}`, detail });
   const tasks = plan && Array.isArray(plan.tasks) ? plan.tasks : [];
   if (tasks.length === 0) return fail('R1', 'plan has no tasks');
   const seen = new Set();
   for (const task of tasks) {
+    if (!task || typeof task !== 'object') return fail('R1', 'task is not an object');
     if (typeof task.id !== 'string' || task.id === '' || seen.has(task.id)) return fail('R1', `duplicate or missing task id: ${task.id}`);
     seen.add(task.id);
   }
   for (const task of tasks) {
     if (!Array.isArray(task.ownedFiles) || task.ownedFiles.length === 0) return fail('R2', `${task.id}: ownedFiles is empty`);
+    for (const file of task.ownedFiles) {
+      if (!isConcretePath(file)) return fail('R2', `${task.id}: ${String(file)} is not a concrete repository-relative path`);
+    }
+    if (!Array.isArray(task.dependsOn)) return fail('R2', `${task.id}: dependsOn is not an array`);
     if (!task.check || typeof task.check.command !== 'string' || task.check.command === '') return fail('R2', `${task.id}: check.command is missing`);
     if (!Number.isInteger(task.check.expectedExit)) return fail('R2', `${task.id}: check.expectedExit is not an integer`);
   }
@@ -307,6 +328,7 @@ module.exports = {
   segmentMatches,
   matchPattern,
   matchesAny,
+  isConcretePath,
   topologicalOrder,
   validatePlan,
   changedPaths,
@@ -316,7 +338,7 @@ module.exports = {
 - [ ] **Step 4: Run the tests to verify they pass**
 
 Run: `node --test test/deliver-plan-rules.test.js`
-Expected: `# pass 9`, `# fail 0`.
+Expected: `# pass 10`, `# fail 0`.
 
 - [ ] **Step 5: Commit**
 
@@ -415,11 +437,11 @@ disallowedTools: Edit, Write, NotebookEdit
 You are the validator. You never modify files. You are read-only by instruction; Bash is available for diff and checks; the orchestrator enforces this with a before/after worktree fingerprint. Perform these steps in order from the repository root and return only the structured result requested.
 
 1. `head`: run `git rev-parse HEAD`.
-2. `fileStates`: run `git status --porcelain=v1 -uall -z --no-renames`. For every listed path record the output of `git hash-object <path>`, or the literal string `deleted` when the path no longer exists. Return an object keyed by path; an empty object means a clean tree.
+2. `fileStates`: run exactly `git status --porcelain=v1 -uall -z --no-renames | while IFS= read -r -d '' e; do p="${e:3}"; if [ -e "$p" ]; then printf '%s\t%s\n' "$p" "$(git hash-object -- "$p")"; else printf '%s\tdeleted\n' "$p"; fi; done`. Each output line is a path, a tab, and either its content hash or the literal `deleted`. Return an object keyed by path; an empty object means a clean tree.
 3. `fingerprint`: run exactly `T=$(mktemp) && cp "$(git rev-parse --git-path index)" "$T" && GIT_INDEX_FILE="$T" git add -A && GIT_INDEX_FILE="$T" git write-tree; rm -f "$T"` and record the tree hash it prints. Gitignored files are not covered by this fingerprint.
 4. If you were given a command, run exactly that command after steps 1 to 3 and record `command`, `exitCode`, and the last 40 lines of combined stdout and stderr as `outputExcerpt`. If you were given no command, set `command` and `exitCode` to `null` and `outputExcerpt` to an empty string.
 
-Never run anything other than the git commands above and the one given command. Never claim a command ran unless it did.
+Never run anything other than the commands above and the one given command. Never claim a command ran unless it did.
 ```
 
 - [ ] **Step 5: Create `adapters/claude-code/agents/adp-goal-reviewer.md`**
@@ -455,7 +477,7 @@ In `adapters/claude-code/agents/adp-worker.md` and `adp-worker-high.md`, replace
 In `adapters/claude-code/agents/adp-reviewer.md` and `adp-reviewer-high.md`, replace the line `Review the approved contract, the actual diff, and the validation evidence you are given. Read the diff yourself; do not rely on the implementer's narration.` with:
 
 ```markdown
-Review the approved contract, the actual diff, and the validation evidence you are given. Compute the diff yourself against the base commit you are given, including untracked files; do not rely on the implementer's narration. When asked for a structured result, return `decision` (`accept`, `accept-with-fixes`, or `reject`), `findings` (each with `severity`, `acceptanceCriterion`, `file`, `line`, `summary`), `unprovenCriteria`, and `diffSha256`: the SHA-256 of the output of `git diff <base>` followed by, for each path from `git ls-files --others --exclude-standard -z` in that order, the path, a NUL byte, and the file content. Compute it with `{ git diff <base>; git ls-files --others --exclude-standard -z | while IFS= read -r -d '' f; do printf '%s\0' "$f"; cat "$f"; done; } | shasum -a 256`.
+Review the approved contract, the actual diff, and the validation evidence you are given. Compute the diff yourself against the base commit you are given, including untracked files; do not rely on the implementer's narration. When asked for a structured result, return `decision` (`accept`, `accept-with-fixes`, or `reject`), `findings` (each with `severity`, `acceptanceCriterion`, `file`, `line`, `summary`), `unprovenCriteria`, and `diffSha256`: the SHA-256 of the output of `git diff --no-color --no-ext-diff <base>` followed by, for each path from `git ls-files --others --exclude-standard -z` in that order, the path, a NUL byte, and the file content. Compute it with `{ git diff --no-color --no-ext-diff <base>; git ls-files --others --exclude-standard -z | while IFS= read -r -d '' f; do printf '%s\0' "$f"; cat "$f"; done; } | shasum -a 256` (use `sha256sum` where `shasum` is absent).
 ```
 
 - [ ] **Step 7: Register the agents in `.claude-plugin/plugin.json`**
@@ -532,9 +554,43 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 **Files:**
 - Test: `test/deliver-workflow.test.js`
 
-The script cannot be executed under Node (it uses ESM `export` and Workflow globals), so the tests are static: syntax check, `meta` shape, forbidden tokens, marker-block equality with the library, and agent table equality with the frontmatter.
+The script cannot be executed under Node (it uses ESM `export`, Workflow globals, and top-level `return`), so the tests are static: a syntax check that wraps the body in an async function the way the Workflow runtime does, `meta` shape, forbidden tokens, marker-block equality with the library, and agent table equality with the frontmatter. Tasks 5 and 6 are committed together at the end of Task 6; `npm run check` is red in between, which is the intended TDD state.
 
-- [ ] **Step 1: Write the failing tests**
+- [ ] **Step 1: Write the shared syntax-check helper**
+
+Create `lib/workflow-syntax-check.js` (used by the test here and by `scripts/validate-active-policy.js` in Task 6):
+
+```js
+'use strict';
+
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { spawnSync } = require('node:child_process');
+
+// A Workflow script is an ES module whose body (after `export const meta`) runs inside an async
+// function, so top-level await and return are valid there. Wrap it the same way before `node --check`.
+function checkWorkflowSyntax(scriptText) {
+  const metaStart = scriptText.indexOf('export const meta');
+  const metaEnd = scriptText.indexOf('\n}\n', metaStart);
+  if (metaStart < 0 || metaEnd < 0) return { ok: false, stderr: 'export const meta block not found' };
+  const cut = metaEnd + 3;
+  const wrapped = `${scriptText.slice(0, cut)}\nexport default async function run() {\n${scriptText.slice(cut)}\n}\n`;
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'adp-workflow-check-'));
+  try {
+    const file = path.join(dir, 'deliver-controlled.mjs');
+    fs.writeFileSync(file, wrapped);
+    const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
+    return { ok: result.status === 0, stderr: result.stderr.trim() };
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+module.exports = { checkWorkflowSyntax };
+```
+
+- [ ] **Step 2: Write the failing tests**
 
 Create `test/deliver-workflow.test.js`:
 
@@ -543,12 +599,12 @@ Create `test/deliver-workflow.test.js`:
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
+
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
 
 const { readUtf8 } = require('../lib/policy-helpers');
 const { parseFrontmatter } = require('../lib/claude-route-probe');
+const { checkWorkflowSyntax } = require('../lib/workflow-syntax-check');
 
 const root = path.resolve(__dirname, '..');
 const scriptPath = 'adapters/claude-code/workflows/deliver-controlled.js';
@@ -561,11 +617,11 @@ const markedBlock = (text, file) => {
   return text.slice(start, end);
 };
 
-test('the workflow script parses as an ES module', () => {
-  const tmp = path.join(fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'adp-wf-')), 'deliver-controlled.mjs');
-  fs.copyFileSync(path.join(root, scriptPath), tmp);
-  const result = spawnSync(process.execPath, ['--check', tmp], { encoding: 'utf8' });
-  assert.equal(result.status, 0, result.stderr);
+test('the workflow script parses as the Workflow sandbox would run it', () => {
+  const result = checkWorkflowSyntax(script());
+  assert.equal(result.ok, true, result.stderr);
+  const broken = checkWorkflowSyntax(script().replace('phase(\'Plan\')', 'phase(\'Plan\'')) ;
+  assert.equal(broken.ok, false, 'a syntax error is detected');
 });
 
 test('meta is a pure literal with the four phase titles', () => {
@@ -636,11 +692,12 @@ test('the script carries every reason string and label pattern from the spec', (
   }
   assert.ok(text.includes('GIT_INDEX_FILE'), 'fingerprint command is in the validator prompt');
   assert.ok(text.includes('--porcelain=v1 -uall -z --no-renames'));
+  assert.ok(text.includes('git diff --no-color --no-ext-diff'));
   assert.ok(text.includes('git ls-files --others --exclude-standard -z'));
 });
 ```
 
-- [ ] **Step 2: Run it to verify it fails**
+- [ ] **Step 3: Run it to verify it fails**
 
 Run: `node --test test/deliver-workflow.test.js`
 Expected: FAIL with `ENOENT` on the script path.
@@ -649,10 +706,12 @@ Expected: FAIL with `ENOENT` on the script path.
 
 **Files:**
 - Create: `adapters/claude-code/workflows/deliver-controlled.js`
+- Modify: `scripts/validate-active-policy.js`
+- Test: `test/deliver-workflow.test.js` (from Task 5), `lib/workflow-syntax-check.js` (from Task 5)
 
 - [ ] **Step 1: Create the script**
 
-Create `adapters/claude-code/workflows/deliver-controlled.js`. Copy the plan-rules block from `lib/deliver-plan-rules.js` byte for byte between the markers (do not retype it; use `sed -n '/\/\/ BEGIN plan-rules/,/\/\/ END plan-rules/p' lib/deliver-plan-rules.js` and paste).
+Create `adapters/claude-code/workflows/deliver-controlled.js` with the content below. Leave the three placeholder lines for the plan-rules block as written; Step 2 replaces them deterministically.
 
 ```js
 export const meta = {
@@ -682,7 +741,8 @@ const WORKER_LADDER = ['worker', 'workerHigh', 'workerOpus']
 const MAX_ATTEMPTS = 3
 const MAX_REVIEW_CYCLES = 3
 const FINGERPRINT_COMMAND = 'T=$(mktemp) && cp "$(git rev-parse --git-path index)" "$T" && GIT_INDEX_FILE="$T" git add -A && GIT_INDEX_FILE="$T" git write-tree; rm -f "$T"'
-const DIFF_HASH_COMMAND = '{ git diff BASE; git ls-files --others --exclude-standard -z | while IFS= read -r -d \'\' f; do printf \'%s\\0\' "$f"; cat "$f"; done; } | shasum -a 256'
+const DIFF_HASH_COMMAND = '{ git diff --no-color --no-ext-diff BASE; git ls-files --others --exclude-standard -z | while IFS= read -r -d \'\' f; do printf \'%s\\0\' "$f"; cat "$f"; done; } | shasum -a 256'
+const FILE_STATES_COMMAND = 'git status --porcelain=v1 -uall -z --no-renames | while IFS= read -r -d \'\' e; do p="${e:3}"; if [ -e "$p" ]; then printf \'%s\\t%s\\n\' "$p" "$(git hash-object -- "$p")"; else printf \'%s\\tdeleted\\n\' "$p"; fi; done'
 
 // BEGIN plan-rules
 // (paste the block from lib/deliver-plan-rules.js here, byte for byte, including this line and the END line)
@@ -801,7 +861,7 @@ const validatorPrompt = (command) => [
   context(),
   'You are the validator. Never modify any file. Perform these steps in order and record each result:',
   '1. head: run `git rev-parse HEAD`.',
-  '2. fileStates: run `git status --porcelain=v1 -uall -z --no-renames`; for every listed path record `git hash-object <path>`, or the literal string "deleted" when the path no longer exists. Return an object keyed by path; an empty object means a clean tree.',
+  `2. fileStates: run exactly: ${FILE_STATES_COMMAND} . Each output line is a path, a tab, and its content hash or the literal "deleted". Return an object keyed by path; an empty object means a clean tree.`,
   `3. fingerprint: run exactly: ${FINGERPRINT_COMMAND}`,
   command
     ? `4. Then run exactly this command and record command, exitCode, and the last 40 lines of combined output as outputExcerpt: ${command}`
@@ -836,9 +896,10 @@ const reviewerPrompt = (plan, taskRecords, cycle) => [
   'Lead with defects ordered by severity, each tied to an acceptance criterion and a file and line. Flag scope creep, files outside task ownership, unrun or contradictory checks, and unsupported claims. List criteria that lack evidence in unprovenCriteria. Decide accept, accept-with-fixes, or reject.',
 ].join('\n')
 
-const goalFitPrompt = (review) => [
+const goalFitPrompt = (taskRecords, review) => [
   context(),
   'You are the fresh-context goal-fit reviewer. Read the intent brief first. Judge whether the result is useful for the goal in the brief, for the person it serves, as success is described there. The acceptance criteria are context, not the question.',
+  `Validation records: ${JSON.stringify([...taskRecords.values()])}`,
   `Defect review result: ${JSON.stringify(review)}`,
   'You may run only commands listed in the contract\'s verification plan, commands named in the brief\'s "how success is observed" section, and read-only inspection. Report anything else as "would need to run X" instead of running it. Never write files.',
   'Return verdict (fit, partially-fit, not-fit), reasons tied to lines of the brief, usedDeliverable, and howUsed.',
@@ -900,7 +961,7 @@ async function attemptTask(task, attempt, extra) {
   const d = AGENTS[role]
   const labels = { pre: `t${task.id}-pre-${attempt}`, implement: `t${task.id}-implement-${attempt}`, validate: `t${task.id}-validate-${attempt}` }
   const pre = await call('validator', labels.pre, 'Implement', validatorPrompt(null), VALIDATOR_SCHEMA)
-  if (!pre) return { outcome: 'escalate', reason: `agent-null:${labels.pre}` }
+  if (!pre) { record.status = 'failed'; return { outcome: 'escalate', reason: `agent-null:${labels.pre}` } }
   const worker = await call(role, labels.implement, 'Implement', workerPrompt(task, extra), WORKER_SCHEMA)
   const entry = { label: labels.implement, agentType: d.agentType, model: d.model, effort: d.effort, worker, preValidation: pre, postValidation: null, changedPaths: null, passed: false }
   record.attempts.push(entry)
@@ -957,12 +1018,14 @@ for (let cycle = 1; cycle <= MAX_REVIEW_CYCLES; cycle += 1) {
   })
   if (pre.fingerprint !== post.fingerprint || post.head !== a.baseCommit) return escalate('review-gate-fingerprint')
   finalDecision = review.decision
-  if (review.decision === 'reject') return escalate('review-rejected')
-  if (review.decision === 'accept') break
+  if (review.decision === 'reject') return escalate('review-rejected', review.findings)
+  // accept-with-fixes with nothing to fix is an accept.
+  if (review.decision === 'accept' || review.findings.length === 0) { finalDecision = 'accept'; break }
   if (cycle === MAX_REVIEW_CYCLES) return escalate('review-cycles-exhausted')
   const byTask = new Map()
   for (const finding of review.findings) {
-    const owner = plan.tasks.find((task) => task.ownedFiles.includes(finding.file))
+    const file = String(finding.file).replace(/^\.\//, '')
+    const owner = plan.tasks.find((task) => task.ownedFiles.includes(file))
     if (!owner) return escalate('finding-outside-ownership', finding.file)
     if (!byTask.has(owner.id)) byTask.set(owner.id, [])
     byTask.get(owner.id).push(finding)
@@ -970,7 +1033,7 @@ for (let cycle = 1; cycle <= MAX_REVIEW_CYCLES; cycle += 1) {
   for (const [id, findings] of byTask) {
     const record = taskRecords.get(id)
     const nextAttempt = record.attempts.length + 1
-    if (nextAttempt > MAX_ATTEMPTS) { record.status = 'blocked'; return escalate('fix-cycles-exhausted', id) }
+    if (nextAttempt > MAX_ATTEMPTS) { record.status = 'blocked'; return escalate('review-fix-failed', id) }
     record.status = 'pending'
     const outcome = await runTask(taskById.get(id), nextAttempt, { findings })
     if (outcome.outcome === 'escalate') return escalate(outcome.reason === 'fix-cycles-exhausted' ? 'review-fix-failed' : outcome.reason, outcome.detail)
@@ -982,7 +1045,7 @@ for (let cycle = 1; cycle <= MAX_REVIEW_CYCLES; cycle += 1) {
 phase('Goal-fit')
 const fitPre = await call('validator', 'goal-fit-pre', 'Goal-fit', validatorPrompt(null), VALIDATOR_SCHEMA)
 if (!fitPre) return escalate('agent-null:goal-fit-pre')
-const fit = await call('goalReviewer', 'goal-fit', 'Goal-fit', goalFitPrompt(reviewCycles[reviewCycles.length - 1]), GOAL_FIT_SCHEMA, goalReviewerDef)
+const fit = await call('goalReviewer', 'goal-fit', 'Goal-fit', goalFitPrompt(taskRecords, reviewCycles[reviewCycles.length - 1]), GOAL_FIT_SCHEMA, goalReviewerDef)
 if (!fit) return escalate('agent-null:goal-fit')
 const fitPost = await call('validator', 'goal-fit-post', 'Goal-fit', validatorPrompt(null), VALIDATOR_SCHEMA)
 if (!fitPost) return escalate('agent-null:goal-fit-post')
@@ -1000,35 +1063,30 @@ return result({ status: 'completed', goalFit })
 ```
 
 Notes for the implementer:
-- Top-level `return` and top-level `await` are valid in the Workflow sandbox (the script body runs in an async function context). `node --check` on an `.mjs` copy accepts top-level `await`; it also accepts top-level `return`? No: Node rejects top-level `return` in modules. The syntax test in Task 5 copies the file to `.mjs`, so **wrap nothing**; instead, the test must check the file as the sandbox does. Replace the first test in `test/deliver-workflow.test.js` with the version below before running, which wraps the body in an async function the same way the runtime does:
-
-```js
-test('the workflow script parses as the Workflow sandbox would run it', () => {
-  const text = script();
-  const metaEnd = text.indexOf('\n}\n', text.indexOf('export const meta')) + 3;
-  const body = text.slice(metaEnd);
-  const wrapped = `${text.slice(0, metaEnd)}\nexport default async function run() {\n${body}\n}\n`;
-  const tmp = path.join(fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'adp-wf-')), 'deliver-controlled.mjs');
-  fs.writeFileSync(tmp, wrapped);
-  const result = spawnSync(process.execPath, ['--check', tmp], { encoding: 'utf8' });
-  assert.equal(result.status, 0, result.stderr);
-});
-```
-
-- The spec's review-fix rule says a failed fix attempt climbs the ladder until the attempt-3 ceiling; `runTask` does that. If it exhausts, the reason is `review-fix-failed` rather than `fix-cycles-exhausted`, so the record shows the failure happened in Review.
+- Top-level `return` and top-level `await` are valid in the Workflow sandbox because the script body runs inside an async function. The syntax check in `lib/workflow-syntax-check.js` wraps the body the same way before `node --check`.
+- Both Review exits that hit the attempt ceiling use `review-fix-failed`, so the record shows the failure happened during a review fix. `fix-cycles-exhausted` is only produced by the Implement phase.
 - Do not add `isolation`, `pipeline`, or `parallel`. Writers are serialized by design.
+- Missing or malformed `args` throw, which surfaces as a Workflow tool error rather than an `escalated` record. The README says so.
 
-- [ ] **Step 2: Paste the plan-rules block and verify byte equality**
+- [ ] **Step 2: Paste the plan-rules block deterministically and verify byte equality**
 
-Run:
+Run from the repository root:
 ```bash
-sed -n '/\/\/ BEGIN plan-rules/,/\/\/ END plan-rules/p' lib/deliver-plan-rules.js > /tmp/adp-block.txt
-```
-Then replace the placeholder marker lines in the script with the contents of `/tmp/adp-block.txt`. Verify:
-```bash
+node -e '
+const fs = require("node:fs");
+const lib = fs.readFileSync("lib/deliver-plan-rules.js", "utf8");
+const block = lib.slice(lib.indexOf("// BEGIN plan-rules"), lib.indexOf("// END plan-rules") + "// END plan-rules".length);
+const file = "adapters/claude-code/workflows/deliver-controlled.js";
+const text = fs.readFileSync(file, "utf8");
+const start = text.indexOf("// BEGIN plan-rules");
+const end = text.indexOf("// END plan-rules") + "// END plan-rules".length;
+if (start < 0 || end < start) throw new Error("placeholder markers not found");
+fs.writeFileSync(file, text.slice(0, start) + block + text.slice(end));
+console.log("plan-rules block pasted");
+'
 diff <(sed -n '/\/\/ BEGIN plan-rules/,/\/\/ END plan-rules/p' lib/deliver-plan-rules.js) <(sed -n '/\/\/ BEGIN plan-rules/,/\/\/ END plan-rules/p' adapters/claude-code/workflows/deliver-controlled.js) && echo identical
 ```
-Expected: `identical`.
+Expected: `plan-rules block pasted` then `identical`. The three placeholder lines (BEGIN, the "(paste ...)" comment, END) are replaced by the library block.
 
 - [ ] **Step 3: Run the workflow tests**
 
@@ -1037,20 +1095,13 @@ Expected: `# pass 6`, `# fail 0`. If the `agent(` count test fails, search for s
 
 - [ ] **Step 4: Add the script to the active-policy validator with a syntax check**
 
-In `scripts/validate-active-policy.js`, add `'adapters/claude-code/workflows/deliver-controlled.js',` to the `active` list after the agent entries, and add before the final `if (errors.length > 0)`:
+In `scripts/validate-active-policy.js`, add `'adapters/claude-code/workflows/deliver-controlled.js',` to the `active` list after the agent entries, add `const { checkWorkflowSyntax } = require('../lib/workflow-syntax-check');` after the existing `require('../lib/policy-helpers')` block, and add before the final `if (errors.length > 0)`:
 
 ```js
 {
-  const { spawnSync } = require('node:child_process');
-  const os = require('node:os');
   const scriptFile = 'adapters/claude-code/workflows/deliver-controlled.js';
-  const text = readUtf8(root, scriptFile);
-  const metaEnd = text.indexOf('\n}\n', text.indexOf('export const meta')) + 3;
-  const wrapped = `${text.slice(0, metaEnd)}\nexport default async function run() {\n${text.slice(metaEnd)}\n}\n`;
-  const tmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'adp-policy-')), 'deliver-controlled.mjs');
-  fs.writeFileSync(tmp, wrapped);
-  const check = spawnSync(process.execPath, ['--check', tmp], { encoding: 'utf8' });
-  if (check.status !== 0) errors.push(`${scriptFile}: syntax check failed: ${check.stderr.trim()}`);
+  const check = checkWorkflowSyntax(readUtf8(root, scriptFile));
+  if (!check.ok) errors.push(`${scriptFile}: syntax check failed: ${check.stderr}`);
 }
 ```
 
@@ -1062,7 +1113,7 @@ Expected: all tests pass; `active policy validation passed`.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add adapters/claude-code/workflows/deliver-controlled.js test/deliver-workflow.test.js scripts/validate-active-policy.js
+git add adapters/claude-code/workflows/deliver-controlled.js lib/workflow-syntax-check.js test/deliver-workflow.test.js scripts/validate-active-policy.js
 git commit -m "feat: add deliver-controlled workflow script with Plan, Implement, Review, Goal-fit phases
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
@@ -1106,6 +1157,8 @@ Under `test/fixtures/claude-code/session-2/subagents/workflows/wf_fixture-1/`, c
 | `agent-w06` | `{"agentType":"agentic-delivery-playbook:adp-reviewer","description":"review-1","workflowPhase":"Review","spawnDepth":1,"model":"claude-opus-5-5"}` | `claude-opus-5-5` | `medium` |
 | `agent-w07` | `{"agentType":"agentic-delivery-playbook:adp-goal-reviewer","description":"goal-fit","workflowPhase":"Goal-fit","spawnDepth":1,"model":"claude-fable-5-1"}` | `claude-fable-5-1` | `high` |
 | `agent-w08` | `{"agentType":"workflow-subagent","description":"scratch","workflowPhase":"Plan","spawnDepth":1}` | `claude-opus-5-5` | (omit) |
+
+The fixture deliberately omits the per-task pre/validate validators, the review and goal-fit fingerprint validators, and the attempt-2 worker; `workflow-result.json` matches what is present. AC-9 replaces it with real data.
 
 `test/fixtures/claude-code/session-2/workflow-result.json` (only the fields the probe uses):
 ```json
@@ -1178,6 +1231,19 @@ test('compareRoutes reports missing, unexpected, and unknown-effort entries', ()
   assert.deepEqual(tolerant.unknownEffort, [{ label: 'review-1', agentType: 'agentic-delivery-playbook:adp-reviewer', model: 'claude-opus-5-5', requestedEffort: 'medium' }]);
 });
 
+test('compareRoutes resolves exact matches before unknown-effort fallbacks, regardless of order', () => {
+  const type = 'agentic-delivery-playbook:adp-goal-reviewer';
+  const observed = (label, effort) => ({ agentId: label, agentType: type, label, observed: [{ model: 'claude-fable-5-1', effort, entrypoint: 'cli', count: 1 }] });
+  const report = { subagents: [observed('g1', 'unknown'), observed('g2', 'medium')] };
+  const requested = [
+    { label: 'g2', agentType: type, model: 'claude-fable-5-1', effort: 'medium' },
+    { label: 'g1', agentType: type, model: 'claude-fable-5-1', effort: 'high' },
+  ];
+  const outcome = compareRoutes(report, requested);
+  assert.equal(outcome.matched, true, JSON.stringify(outcome));
+  assert.deepEqual(outcome.unknownEffort, [{ label: 'g1', agentType: type, model: 'claude-fable-5-1', requestedEffort: 'high' }]);
+});
+
 test('CLI probe accepts repeated --requested and prints the comparison', () => {
   const probe = cli('probe', 'claude', session2, '--requested', result2);
   assert.equal(probe.status, 0, probe.stderr);
@@ -1195,7 +1261,7 @@ Add `const fs = require('node:fs');` to the top of the test file if it is not al
 - [ ] **Step 3: Run the probe tests to verify the new ones fail**
 
 Run: `node --test test/claude-code-route-probe.test.js`
-Expected: the four new tests FAIL (`compareRoutes is not a function`, length mismatch). Existing tests pass.
+Expected: the five new tests FAIL (`compareRoutes is not a function`, length mismatch). The existing nine tests pass.
 
 - [ ] **Step 4: Rewrite `lib/claude-route-probe.js`**
 
@@ -1289,6 +1355,8 @@ function observedRoutes(file) {
 
 // Requested model: per-invocation meta, else definition, else unknown.
 // Requested effort: per-invocation meta (if a future Claude Code records it), else definition, else unknown.
+// Source: 'invocation' whenever the meta carries model or effort (including a workflow-subagent with a
+// passed model), else 'definition', else 'workflow' for a bare workflow-subagent, else 'unmatched'.
 function requestedRoute(meta, definition) {
   const route = {
     model: meta.model ?? definition?.model ?? 'unknown',
@@ -1393,9 +1461,15 @@ function compareRoutes(report, requestedRoutes) {
     else remaining.set(k, count - 1);
     return true;
   };
+  // Pass 1: exact matches, so an unknown-effort candidate cannot steal a slot an exact candidate needs.
+  const leftover = [];
   for (const candidate of candidates) {
     const { model, effort } = candidate.route;
-    if (consume(key(candidate.agentType, model, effort))) continue;
+    if (!consume(key(candidate.agentType, model, effort))) leftover.push(candidate);
+  }
+  // Pass 2: unknown-effort fallback on whatever remains, recorded as a gap.
+  for (const candidate of leftover) {
+    const { model, effort } = candidate.route;
     if (effort === 'unknown') {
       const match = [...remaining.keys()].map(parse).find((r) => r.agentType === candidate.agentType && r.model === model);
       if (match) {
@@ -1443,8 +1517,9 @@ if (args[0] === 'probe') {
     const report = probeClaude(sessionFile, { agentsDir });
     if (requestedFiles.length > 0) {
       const requested = requestedFiles.flatMap((file) => {
+        if (!fs.existsSync(file)) throw new Error(`requested file not found: ${path.basename(file)}`);
         const parsed = JSON.parse(fs.readFileSync(file, 'utf8'));
-        if (!Array.isArray(parsed.requestedRoutes)) throw new Error(`${file}: no requestedRoutes array`);
+        if (!Array.isArray(parsed.requestedRoutes)) throw new Error(`${path.basename(file)}: no requestedRoutes array`);
         return parsed.requestedRoutes;
       });
       report.comparison = compareRoutes(report, requested);
@@ -1462,7 +1537,7 @@ Update the usage text line to `agentic-delivery-playbook probe claude <session.j
 - [ ] **Step 6: Run the probe tests**
 
 Run: `node --test test/claude-code-route-probe.test.js`
-Expected: all pass, including the original eight. The existing `CLI probe rejects bad input` test still passes because `--agents-dir` without a value and `--bogus` hit `usage(1)`.
+Expected: all 14 pass, including the original nine. The existing `CLI probe rejects bad input` test still passes because `--agents-dir` without a value and `--bogus` hit `usage(1)`. Labels repeat across workflow runs (`plan`, `goal-fit`), so `labelPairs` is informational when several `--requested` files are passed; the multiset result is the acceptance signal.
 
 - [ ] **Step 7: Run the full check and commit**
 
@@ -1529,16 +1604,16 @@ Change `"schemaVersion": "1.0"` to `"1.1"`. After the `"contract": {...}` object
   },
 ```
 
-In the lane's `requested` object add `"agentType": null` after `"topology": "single"`. In `closeout` add `"goalFit": null` after `"escalation": null`.
+In the lane's `requested` object add `"agentType": null` after `"topology": "single"` (add the trailing comma to the `topology` line, which is currently last). In `closeout` add `"goalFit": null` after `"escalation": null` (same comma note).
 
 - [ ] **Step 4: Update `examples/controlled-run/run.json` the same way**
 
-Same four edits: `schemaVersion` `"1.1"`, `brief` and `workflow` blocks after `contract`, `"agentType": null` in both lanes' `requested`, `"goalFit": null` in `closeout`.
+Same four edits: `schemaVersion` `"1.1"`, `brief` and `workflow` blocks after `contract`, `"agentType": null` in both lanes' `requested`, `"goalFit": null` in `closeout`. Mind the commas as in Step 3.
 
 - [ ] **Step 5: Run tests and the validator**
 
 Run: `node --test test/run-record.test.js test/active-surface.test.js && node scripts/validate-active-policy.js`
-Expected: pass; the template stays under 120 lines (check with `wc -l templates/run.json`, expected about 95).
+Expected: pass; the template stays under 120 lines (check with `wc -l templates/run.json`, expected about 84).
 
 - [ ] **Step 6: Commit**
 
@@ -1665,7 +1740,7 @@ Expected: the profile test FAILS on `claude-fable-5-1`.
 
 Status: maintained
 Profile version: 2
-Verified: 2026-10-11 (desktop plugin install and the custom `agentType` recording in workflow metadata are confirmed by the dogfood run recorded under `specs/`)
+Verified: 2026-10-11 against Claude Code docs and local transcripts; desktop plugin install and the custom `agentType` recording in workflow metadata are to be confirmed by the dogfood run recorded under `specs/` (this line is updated from that run)
 Surfaces: Claude Code desktop app (Code tab) and terminal CLI, plugin `agentic-delivery-playbook`
 Recheck trigger: any Claude 5 model, alias, effort, Workflow tool, or Claude Code subagent/plugin change
 
@@ -1782,7 +1857,9 @@ Expected: the settings/README test FAILS.
 
 - [ ] **Step 4: Rewrite `adapters/claude-code/README.md`**
 
-```markdown
+The outer fence below uses four backticks because the README contains fenced blocks of its own.
+
+````markdown
 # Claude Code adapter
 
 A Claude Code plugin that applies the Direct and Controlled kernel in the desktop app (Code tab) and the terminal CLI. Routes are defined in [`profiles/claude-5.md`](../../profiles/claude-5.md). Controlled work runs as a shipped Workflow script: an Opus lead plans bounded tasks, Sonnet workers implement them one at a time, a low-effort validator gates each task, an Opus reviewer checks defects in fresh context, and a Fable goal-fit reviewer judges the result against the intent brief.
@@ -1830,7 +1907,7 @@ The skill passes these to the Workflow tool with `scriptPath` set to the plugin'
 }
 ```
 
-Set `pauseAfterPlan` to `true` when the grill was skipped or `risk` is `high`; the run returns `plan-ready`, you approve the plan, then start a second run with `resumePlan` set to the approved plan and `pauseAfterPlan` `false`. A `blocked` run with `openQuestions` means: answer them, append the answers to the brief under "Answers", and start a new run. Other plan failures may be retried once the same way; a second failure goes to the user. Lane `ownedFiles` and `nonGoalFiles` are patterns where `*` matches within one path segment and `**` matches any depth. `goalReviewer` is optional and defaults to the values shown.
+Set `pauseAfterPlan` to `true` when the grill was skipped or `risk` is `high`; the run returns `plan-ready`, you approve the plan, then start a second run with `resumePlan` set to the approved plan and `pauseAfterPlan` `false`. A `blocked` run with `openQuestions` means: answer them, append the answers to the brief under "Answers", and start a new run. Other plan failures may be retried once the same way; a second failure goes to the user. Lane `ownedFiles` and `nonGoalFiles` are patterns where `*` matches within one path segment and `**` matches any depth; task paths in the plan are concrete. `goalReviewer` is optional and defaults to the values shown. Missing or malformed `args` surface as a Workflow tool error, not as an `escalated` record.
 
 ### Fingerprint and diff hash
 
@@ -1840,35 +1917,37 @@ Worktree fingerprint (temp-index tree including untracked files; Gitignored file
 T=$(mktemp) && cp "$(git rev-parse --git-path index)" "$T" && GIT_INDEX_FILE="$T" git add -A && GIT_INDEX_FILE="$T" git write-tree; rm -f "$T"
 ```
 
-Diff hash, computed by the reviewer and again by the orchestrator at closeout before re-running the verification plan (replace `BASE`):
+Diff hash, computed by the reviewer and again by the orchestrator at closeout before re-running the verification plan (replace `BASE`; use `sha256sum` where `shasum` is absent):
 
 ```bash
-{ git diff BASE; git ls-files --others --exclude-standard -z | while IFS= read -r -d '' f; do printf '%s\0' "$f"; cat "$f"; done; } | shasum -a 256
+{ git diff --no-color --no-ext-diff BASE; git ls-files --others --exclude-standard -z | while IFS= read -r -d '' f; do printf '%s\0' "$f"; cat "$f"; done; } | shasum -a 256
 ```
 
 ### Closeout
 
 | Workflow `status` | Goal-fit `verdict` | Outcome |
 | --- | --- | --- |
-| `completed` | `fit` | accepted, if the orchestrator's own verification re-run also passes |
+| `completed` | `fit` | accepted, if the orchestrator's own verification re-run passes and the route comparison matches |
 | `completed` | `partially-fit` | partially accepted; reasons become known gaps |
 | `completed` | `not-fit` | escalated to the user |
-| `escalated` | any | escalated with `reason` |
+| `escalated` | any, or `invalid` after a goal-fit fingerprint mismatch | escalated with `reason` |
 | `blocked` | none | blocked with `reason` |
+| `plan-ready` | none | not a closeout; approve the plan and start the second run |
 
 Mapping from the workflow result to `run.json` (schema 1.1):
 
 | `run.json` field | Source |
 | --- | --- |
+| `schemaVersion`, `mode`, `status` | `"1.1"`, `"controlled"`, the outcome above |
 | `brief` | `{ path, inception: "completed" or "skipped" }` from the brief file |
-| `workflow` | `{ mode: "workflow" or "manual", scriptPath, runs: [{ runId, resultFile, status }] }`, one entry per Workflow invocation (a paused run and its resumed run are two) |
-| `source.finalCommit` | `null`; workers never commit. `diffSha256` from the command above |
-| `route.policy` | `profiles/claude-5.md` |
-| `lanes[]` | one per entry in the concatenated `requestedRoutes`: `id` = `<run index>-<label>`, `role` from the agent type, `ownership` = the task's `ownedFiles` for workers, `requested` = `{ model, effort, topology: "workflow-agent" or "single", agentType }`, `observed` from the probe |
-| `validation[]` | one per task `postValidation` and per closeout check: `id` = label or `closeout-<n>`; workflow entries have `startedAt`, `endedAt`, `outputSha256` `null` and `outputReference` = `specs/<run>/workflow-result.json#<label>` |
-| `acceptance[]` | `passed` when a task or closeout check covers the criterion, every covering task passed, it is absent from the final review's `unprovenCriteria`, and every closeout check covering it passed; `unproven` when nothing covers it; else `failed` |
-| `review` | `reviewerLaneId` = final cycle lane; `diffReviewed` true only when the reviewer's `diffSha256` equals the orchestrator's; `evidenceReviewed` true; `decision` = `finalDecision`; plus `cycles`, `unprovenCriteria`, fingerprints |
-| `closeout.goalFit` | `{ verdict, reviewerModel, reviewerEffort, usedDeliverable, howUsed, reasons }` |
+| `workflow` | `{ mode: "workflow" or "manual", scriptPath, runs: [{ runId, resultFile, status }] }`, one entry per Workflow invocation (a paused run and its resumed run are two; a killed run has `status: "killed"` and `resultFile: null`) |
+| `source` | `baseCommit` from the contract; `finalCommit` `null` because workers never commit; `diffSha256` from the command above, computed before the closeout re-run |
+| `route` | `policy` `profiles/claude-5.md`; `exception` `null` |
+| `lanes[]` | one per entry in the concatenated `requestedRoutes`: `id` = `<run index>-<label>`, `role` from the agent type, `ownership` = the task's `ownedFiles` for workers, `requested` = `{ model, effort, topology: "workflow-agent" or "single", agentType }`, `observed` from the probe, `status` from the task (`pending` maps to `planned`) or phase result |
+| `validation[]` | one per task `postValidation` and per closeout check: `id` = label or `closeout-<n>`; `command`, `exitCode`, `status` from the record; workflow entries have `startedAt`, `endedAt`, `outputSha256` `null` and `outputReference` = `specs/<run>/workflow-result.json#<label>`; closeout entries have real timestamps and `outputReference` = the saved log path |
+| `acceptance[]` | one per contract criterion: `passed` when a task or closeout check covers it, every covering task passed, it is absent from the final review's `unprovenCriteria`, and every closeout check covering it passed; `unproven` when nothing covers it; else `failed`; `evidence` uses `validation:<id>` |
+| `review` | `reviewerLaneId` = final cycle lane; `diffReviewed` true only when the reviewer's `diffSha256` equals the orchestrator's; `evidenceReviewed` true; `decision` = `finalDecision`; `findings` from the final cycle; plus `cycles`, `unprovenCriteria`, fingerprints |
+| `closeout` | `outcome` from the table; `goalFit` = `{ verdict, reviewerModel, reviewerEffort, usedDeliverable, howUsed, reasons }`; `knownGaps` includes `unknownEffort` entries, crash-resume orphans, and goal-fit reasons for `partially-fit`; `escalation` carries the `reason` and `detail` |
 
 Save each workflow return verbatim as `specs/<run>/workflow-result.json` (suffix `-2`, `-3` for later runs).
 
@@ -1878,12 +1957,12 @@ Save each workflow return verbatim as `specs/<run>/workflow-result.json` (suffix
 npx agentic-delivery-playbook probe claude <session.jsonl> [--agents-dir <dir>] [--requested <workflow-result.json>]...
 ```
 
-The transcript is `~/.claude/projects/<cwd with / replaced by ->/<session-id>.jsonl`; workflow agents are under `<session-id>/subagents/workflows/<runId>/`. Pass one `--requested` per workflow run. The report's `comparison` lists `missing`, `unexpected`, `unknownEffort` (a recorded gap), `excluded` (explorer and non-plugin agents), and `labelPairs`. Until an npm release includes this version, run `node <installed plugin path>/bin/agentic-delivery-playbook.js probe claude ...` instead.
+The transcript is `~/.claude/projects/<cwd with / replaced by ->/<session-id>.jsonl`; workflow agents are under `<session-id>/subagents/workflows/<runId>/`. Pass one `--requested` per workflow run. The report's `comparison` lists `missing`, `unexpected`, `unknownEffort` (a recorded gap), `excluded` (explorer and non-plugin agents), and `labelPairs` (informational; labels repeat across runs). Only agent types with the `agentic-delivery-playbook:` prefix are compared; if a transcript records a plugin agent under its bare name, every requested entry shows as missing, which fails closed. Until an npm release includes this version, run `node <installed plugin path>/bin/agentic-delivery-playbook.js probe claude ...` instead.
 
 ## Known gaps
 
 See the Known gaps section of the profile. Output paths are shown cwd-relative or with `~`, never as raw home-directory paths.
-```
+````
 
 - [ ] **Step 5: Run the adapter tests**
 
@@ -1932,7 +2011,7 @@ test('the deliver skill is explicit-invoke and translates the three-tier Control
 });
 ```
 
-In the test `'the reviewer read-only disclosure and fingerprint rule are stated plainly'`, delete these five lines (they moved to the validator and README tests):
+In the test `'the reviewer read-only disclosure and fingerprint rule are stated plainly'`, delete these four lines (they moved to the validator and README tests); only the `GIT_INDEX_FILE` deletion is mandatory, the other three are no longer asserted on the skill:
 
 ```js
   assert.match(skill, /GIT_INDEX_FILE/);
@@ -1985,7 +2064,7 @@ Preflight: your model ID (system prompt) must be `claude-fable-5-1` or `claude-o
 
 ## 5. Controlled: run the workflow
 
-Call the Workflow tool with `scriptPath` = `${CLAUDE_PLUGIN_ROOT}/adapters/claude-code/workflows/deliver-controlled.js` and the `args` from the README reference. Set `pauseAfterPlan` true when the grill was skipped or risk is high. This instruction is the opt-in; no keyword is needed. One orchestration plane, depth one: the workflow schedules the agents; you spawn nothing else from the plugin during the run. The workflow serializes writers: `adp-worker` is the sole writer for each task, the lead and both reviewers are read-only by instruction; Bash is available for diff and checks; the validator's fingerprints enforce it.
+Call the Workflow tool with `scriptPath` = `${CLAUDE_PLUGIN_ROOT}/adapters/claude-code/workflows/deliver-controlled.js` and the `args` from the README reference. Set `pauseAfterPlan` true when the grill was skipped or risk is high. This instruction is the opt-in; no keyword is needed. One orchestration plane, depth one: the workflow schedules the agents; you spawn nothing else from the plugin during the run. Writers are serialized: `adp-worker` is the sole writer for each task, the lead and both reviewers are read-only by instruction; Bash is available for diff and checks; the validator's fingerprints enforce it.
 
 - `plan-ready`: show the task list, get approval, then start a second run with `resumePlan` = the approved plan and `pauseAfterPlan` false.
 - `blocked` with `openQuestions`: ask the user, append the answers to the brief under "Answers", start a new run. Other plan failures: fix the cause, retry once, then stop and ask.
@@ -1994,7 +2073,7 @@ Call the Workflow tool with `scriptPath` = `${CLAUDE_PLUGIN_ROOT}/adapters/claud
 
 ## 6. Controlled: closeout
 
-Compute the diff hash (README) before anything else, then re-run every command in the contract's verification plan yourself and record command, exit status, and result; the validator's records gate tasks inside the run, your own re-run is the closeout evidence. Fill `run.json` with the README mapping. Run `node "${CLAUDE_PLUGIN_ROOT}/bin/agentic-delivery-playbook.js" probe claude <session.jsonl> --requested <workflow-result.json>...` where the transcript is `~/.claude/projects/<cwd with / replaced by ->/<session-id>.jsonl`; `comparison.matched` must be true, with `unknownEffort` entries recorded as gaps. Close by the README table: accepted needs defect review `accept`, goal-fit `fit`, a passing re-run, and a matched comparison. Report changed files, acceptance results, validation evidence, the actual diff hash, assumptions, known gaps, and escalation state. Never claim a check ran, a route was observed, or a reviewer was independent without evidence.
+Compute the diff hash (README) before anything else, then re-run every command in the contract's verification plan yourself and record command, exit status, and result; the validator's records gate tasks inside the run, your own re-run is the closeout evidence. Fill `run.json` with the README mapping and write `notes.md` with the lanes table, the comparison summary, and the gaps. Run `node "${CLAUDE_PLUGIN_ROOT}/bin/agentic-delivery-playbook.js" probe claude <session.jsonl> --requested <workflow-result.json>...` where the transcript is `~/.claude/projects/<cwd with / replaced by ->/<session-id>.jsonl`; `comparison.matched` must be true, with `unknownEffort` entries recorded as gaps. Close by the README table: accepted needs defect review `accept`, goal-fit `fit`, a passing re-run, and a matched comparison. Report changed files, acceptance results, validation evidence, the actual diff hash, assumptions, known gaps, and escalation state. Never claim a check ran, a route was observed, or a reviewer was independent without evidence.
 
 ## 7. Manual fallback
 
@@ -2036,9 +2115,9 @@ Expected: `Validation passed`.
 
 Run a headless session that lists the plugin's agents (the exact flag set used in the October 1 spike):
 ```bash
-claude -p --plugin-dir "$PWD" --output-format stream-json --verbose "Reply with the single word ok." 2>/dev/null | head -1 | grep -o '"agents":\[[^]]*\]'
+claude -p --plugin-dir "$PWD" --output-format stream-json --verbose "Reply with the single word ok." | grep -m1 '"subtype":"init"' | grep -o '"agents":\[[^]]*\]'
 ```
-Expected: the printed array includes `agentic-delivery-playbook:adp-lead`, `adp-validator`, and `adp-goal-reviewer`. If the init line has no `agents` field in this Claude Code version, instead run `claude --plugin-dir "$PWD"` interactively and type `/agents`; confirm the eight plugin agents are listed.
+Expected: the printed array includes `agentic-delivery-playbook:adp-lead`, `adp-validator`, and `adp-goal-reviewer`. Empty output means the init event has no `agents` field in this Claude Code version: then run `claude --plugin-dir "$PWD"` interactively and type `/agents`; confirm the eight plugin agents are listed. Keep stderr visible so plugin-load errors are not hidden.
 
 - [ ] **Step 2: Record**
 
@@ -2054,7 +2133,7 @@ This task is run by a person with the plugin loaded, not by a subagent. It needs
 
 - [ ] **Step 1: Load the plugin in a desktop Code-tab session on the target repository**
 
-Either install from the marketplace at the PR branch, or start the session with `--plugin-dir` pointing at this checkout. Confirm the main session model is Fable 5.1 (or Opus 5.5) and note the configured effort.
+The branch is not pushed yet and the desktop app takes no `--plugin-dir` flag, so register this checkout as a local marketplace from inside the desktop session: `/plugin marketplace add <absolute path to this checkout>` then `/plugin install agentic-delivery-playbook@agentic-delivery-playbook`. Confirm with `/agents` that the eight plugin agents are listed. If the desktop app cannot load a local marketplace, run the dogfood in the terminal CLI with `claude --plugin-dir <checkout>` instead and change the profile's `Verified:` line to say desktop install is unverified. Confirm the main session model is Fable 5.1 (or Opus 5.5) and note the configured effort.
 
 - [ ] **Step 2: Run the skill end to end**
 
@@ -2062,11 +2141,11 @@ Type `/agentic-delivery-playbook:deliver <task>`. Answer the grill. Approve the 
 
 - [ ] **Step 3: Copy the sanitized evidence into this repository**
 
-Into `specs/<date>-three-tier-dogfood/`: `brief.md`, `contract.md`, `run.json`, `workflow-result.json`, `workflow-result-2.json`, `probe.json`, and `notes.md` with the lanes table (requested = observed per label), the comparison summary, the orchestrator assistant-turn count for the run (count `"type":"assistant"` lines in the session transcript), and any difference between the real workflow metadata and the synthetic fixture. Replace repository names or paths from the target repo that are private with neutral placeholders. Run `grep -rn '/Users/\|/home/' specs/<date>-three-tier-dogfood/` and expect no output.
+Into `specs/<date>-three-tier-dogfood/`: `brief.md`, `contract.md`, `run.json`, `workflow-result.json`, `workflow-result-2.json`, `probe.json`, and `notes.md` with the lanes table (requested = observed per label), the comparison summary, the orchestrator turn count for the run (count distinct `message.id` values among `"type":"assistant"` lines in the main session transcript, because one message can span several lines), and any difference between the real workflow metadata and the synthetic fixture. Replace repository names or paths from the target repo that are private with neutral placeholders. Run `grep -rn '/Users/\|/home/' specs/<date>-three-tier-dogfood/` and expect no output.
 
-- [ ] **Step 4: Correct the fixture if the real layout differs**
+- [ ] **Step 4: Correct the fixture and the profile from the real run**
 
-If the real `meta.json` for a workflow agent with a custom `agentType` records a different `agentType` string, or records `effort`, update `test/fixtures/claude-code/session-2/` and, if needed, `lib/claude-route-probe.js` so the probe and `compareRoutes` match reality, then run `npm run check`. Record what changed in `notes.md`.
+If the real `meta.json` for a workflow agent with a custom `agentType` records a different `agentType` string, or records `effort`, update `test/fixtures/claude-code/session-2/` and, if needed, `lib/claude-route-probe.js` so the probe and `compareRoutes` match reality, then run `npm run check`. Update the `Verified:` line and the metadata statements in `profiles/claude-5.md` ("Requested, configured, observed" section) to what the run showed. Record what changed in `notes.md`.
 
 - [ ] **Step 5: Self goal-fit review (AC-10) in a separate session**
 
@@ -2074,12 +2153,12 @@ Create `specs/<date>-three-tier-dogfood/design-brief.md` by copying the appendix
 
 - [ ] **Step 6: Merge gate**
 
-AC-9 and AC-10 both need verdict `fit` and `comparison.matched` true (gaps only of the `unknownEffort` kind). If either is `partially-fit` or `not-fit`, address the reasons, repeat the affected run, and record both attempts.
+AC-9 and AC-10 both need verdict `fit` and `comparison.matched` true, with gaps only of the `unknownEffort` kind or crash-resume orphans recorded in `knownGaps`. If either verdict is `partially-fit` or `not-fit`, address the reasons, repeat the affected run, and record both attempts.
 
 - [ ] **Step 7: Commit the evidence**
 
 ```bash
-git add specs/<date>-three-tier-dogfood test/fixtures/claude-code lib/claude-route-probe.js
+git add specs/<date>-three-tier-dogfood test/fixtures/claude-code lib/claude-route-probe.js profiles/claude-5.md
 git commit -m "docs: record three-tier dogfood run and plugin goal-fit review
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
@@ -2090,13 +2169,15 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - [ ] **Step 1: Full check and package listing**
 
 Run: `npm run check && npm pack --dry-run 2>&1 | grep -c 'adapters/claude-code'`
-Expected: pass; the count is at least 12 (eight agents, the skill, the workflow, the README, plus any fixtures excluded).
+Expected: pass; the count is 11 (eight agents, the skill, the workflow script, the README).
 
 - [ ] **Step 2: Review the diff against the acceptance criteria**
 
 Walk AC-1 to AC-10 in the spec and tick each against a file or an evidence artifact. Anything unmet is listed in the PR body as an accepted gap or blocks the PR.
 
 - [ ] **Step 3: Push and open the PR**
+
+Pushing and opening the PR need the user's go-ahead in the executing session. Stop here and ask if it was not given.
 
 ```bash
 git push -u origin feat/three-tier-pr1
@@ -2117,4 +2198,3 @@ Known gaps: see profiles/claude-5.md.
 EOF
 ```
 
-Pushing and opening the PR need the user's go-ahead in the executing session; stop before this step if it was not given.

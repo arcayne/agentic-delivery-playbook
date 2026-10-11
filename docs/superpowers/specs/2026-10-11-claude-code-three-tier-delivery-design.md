@@ -127,10 +127,10 @@ plan = {
 }
 ```
 
-Plan rules. The script returns `{ status: "blocked", reason: "plan-rule-<n>", plan }` without any edit when any rule fails:
+Plan rules. The script returns `{ status: "blocked", reason: "plan-rule-R<n>", plan }` without any edit when any rule fails. Rules are checked in order and the first failure is reported. Non-object tasks, non-array `ownedFiles` or `dependsOn`, and non-string entries fail R1 or R2 rather than throwing, because `resumePlan` may be hand-edited:
 
-- R1: `tasks` is non-empty and task ids are unique.
-- R2: every task has non-empty `ownedFiles`, a non-empty `check.command`, and an integer `check.expectedExit`.
+- R1: `tasks` is a non-empty array of objects and task ids are unique non-empty strings.
+- R2: every task has non-empty `ownedFiles` whose entries are concrete repository-relative paths (strings containing no `*`, not starting with `/`, with no `.` or `..` segment), a non-empty `check.command`, and an integer `check.expectedExit`.
 - R3: every `lane` names an `args.lanes[].id`.
 - R4: every task path matches its lane's `ownedFiles` patterns.
 - R5: no task path matches `nonGoalFiles`.
@@ -138,17 +138,17 @@ Plan rules. The script returns `{ status: "blocked", reason: "plan-rule-<n>", pl
 - R7: every `dependsOn` entry names an existing task id, and the dependency graph has no cycle.
 - R8: `openQuestions` is empty. Open questions are the lead's channel back to the user, because workflow agents cannot ask the user directly.
 
-The Plan phase is fingerprinted like every other read-only phase: `adp-validator` (label `plan-pre`) runs before the lead and `adp-validator` (label `plan-post`) after it. A mismatch returns `{ status: "blocked", reason: "plan-gate-fingerprint" }`. Both calls appear in `requestedRoutes`. When `resumePlan` is supplied the lead does not run and these two calls are skipped.
+The Plan phase is fingerprinted like every other read-only phase: `adp-validator` (label `plan-pre`) runs before the lead and `adp-validator` (label `plan-post`) after it. A fingerprint mismatch, or either `head` differing from `baseCommit`, returns `{ status: "blocked", reason: "plan-gate-fingerprint" }`. Both calls appear in `requestedRoutes`. When `resumePlan` is supplied the lead does not run and these two calls are skipped.
 
 If `args.pauseAfterPlan` is true, the script returns `{ status: "plan-ready", plan }` after validation.
 
 ### Validator file states
 
-Every `adp-validator` call returns `fileStates`: a map from path to content hash for every path listed by `git status --porcelain=v1 -uall -z --no-renames` against the index and working tree, with the hash from `git hash-object <path>` and the literal `deleted` for a deleted path. `-uall` lists files inside new directories individually and `--no-renames` keeps every entry a single path. Two validator results differ at a path when the path is present in only one map or the hashes differ. "Changed paths between pre and post" below always means this comparison.
+Every `adp-validator` call returns `fileStates`: a map from path to content hash for every path listed by `git status --porcelain=v1 -uall -z --no-renames` against the index and working tree, with the hash from `git hash-object <path>` and the literal `deleted` for a deleted path. `-uall` lists files inside new directories individually and `--no-renames` keeps every entry a single path. The validator runs one exact command to produce it: `git status --porcelain=v1 -uall -z --no-renames | while IFS= read -r -d '' e; do p="${e:3}"; if [ -e "$p" ]; then printf '%s\t%s\n' "$p" "$(git hash-object -- "$p")"; else printf '%s\tdeleted\n' "$p"; fi; done`. Two validator results differ at a path when the path is present in only one map or the hashes differ. "Changed paths between pre and post" below always means this comparison.
 
 The validator has two modes. In fingerprint-only mode (no command given) it returns `{ fileStates, fingerprint, head }`. In check mode it captures `fileStates`, `fingerprint`, and `head` first, then runs the one command it is given, and returns them with `{ command, exitCode, outputExcerpt }`. Capturing before the check means files a check writes (coverage, snapshots, caches) do not trip the ownership gate. Check commands and goal-fit commands must not modify tracked files or create untracked files that `git status` reports; if they do, the following fingerprint catches it and the run escalates.
 
-The reviewer's and the orchestrator's `diffSha256` is the SHA-256 of: the output of `git diff <baseCommit>`, followed by, for each path from `git ls-files --others --exclude-standard -z` in that order, the path, a NUL byte, and the file content. The orchestrator computes its copy before re-running the verification plan at closeout.
+The reviewer's and the orchestrator's `diffSha256` is the SHA-256 of: the output of `git diff --no-color --no-ext-diff <baseCommit>`, followed by, for each path from `git ls-files --others --exclude-standard -z` in that order, the path, a NUL byte, and the file content. The exact command is `{ git diff --no-color --no-ext-diff BASE; git ls-files --others --exclude-standard -z | while IFS= read -r -d '' f; do printf '%s\0' "$f"; cat "$f"; done; } | shasum -a 256` (use `sha256sum` where `shasum` is absent). The orchestrator computes its copy before re-running the verification plan at closeout.
 
 ### Phase Implement
 
@@ -173,8 +173,8 @@ For review cycle `c` (1 to 3):
 1. `adp-validator` (label `review-pre-<c>`) returns the fingerprint, `head`, and `fileStates`.
 2. The defect reviewer (label `review-<c>`; `adp-reviewer`, or `adp-reviewer-high` when `risk` is `high`) receives the contract path, the brief path, the base commit, and all validation records so far, computes the diff against the base commit including untracked files itself, and returns `{ decision, findings: [{ severity, acceptanceCriterion, file, line, summary }], unprovenCriteria, diffSha256 }` with `decision` one of `accept`, `accept-with-fixes`, `reject`, and `diffSha256` computed as defined under "Validator file states". The orchestrator recomputes the same hash at closeout before re-running the verification plan; `review.diffReviewed` is `true` only when they match.
 3. `adp-validator` (label `review-post-<c>`) returns the fingerprint and `head`. A mismatch with `review-pre-<c>` returns `escalated` with `reason: "review-gate-fingerprint"`.
-4. `reject` returns `escalated` with the findings.
-5. `accept-with-fixes` on cycle 3 returns `escalated` with `reason: "review-cycles-exhausted"`. Otherwise each finding is grouped by the task owning its file; a finding on a file no task owns returns `escalated` with `reason: "finding-outside-ownership"`. Each affected task is re-run through steps 1 to 5 of Implement with the findings included, starting at the rung after that task's last attempt and never going down, with the same gates and the same attempt-3 ceiling; a task already at attempt 3 returns `escalated` with `reason: "fix-cycles-exhausted"`. Then the next review cycle starts.
+4. `reject` returns `escalated` with `reason: "review-rejected"` and the findings.
+5. `accept-with-fixes` with an empty `findings` list is treated as `accept`. Otherwise, on cycle 3 it returns `escalated` with `reason: "review-cycles-exhausted"`. Each finding's `file` is normalised (a leading `./` is stripped) and grouped by the task owning it; a finding on a file no task owns returns `escalated` with `reason: "finding-outside-ownership"`. Each affected task is re-run through steps 1 to 5 of Implement with the findings included, starting at the rung after that task's last attempt and never going down, with the same gates and the same attempt-3 ceiling; when the ceiling is hit during a review fix, either because the task is already at attempt 3 or because the fix attempts fail up to attempt 3, the run returns `escalated` with `reason: "review-fix-failed"`. Then the next review cycle starts.
 6. `accept` proceeds to Goal-fit.
 
 Known gap: a review fix to one task is validated only by that task's check. A dependent task's check is not re-run inside the workflow; the next review cycle and the orchestrator's closeout re-run of the verification plan cover it. This is recorded in the profile as a known gap.
@@ -195,14 +195,17 @@ Runs only after `decision === "accept"`.
   reason: string | null,
   plan,
   tasks: [{
-    id, status: "passed" | "blocked" | "failed",
-    attempts: [{ label, agentType, model, effort, worker, preValidation, postValidation, passed }]
+    id, status: "pending" | "passed" | "blocked" | "failed",
+    attempts: [{ label, agentType, model, effort, worker, preValidation, postValidation, changedPaths, passed }]
   }],
-  review: { cycles: [{ label, agentType, model, effort, decision, findings, unprovenCriteria, fingerprintBefore, fingerprintAfter }], finalDecision },
+  review: { cycles: [{ label, agentType, model, effort, decision, findings, unprovenCriteria, diffSha256, fingerprintBefore, fingerprintAfter }], finalDecision },
+  detail: any | null,
   goalFit: { label, agentType, model, effort, verdict: "fit" | "partially-fit" | "not-fit" | "invalid", reasons, usedDeliverable, howUsed, fingerprintBefore, fingerprintAfter } | null,
   requestedRoutes: [{ label, agentType, model, effort }]
 }
 ```
+
+Tasks that never started keep status `pending`; a `pending` task maps to lane status `planned`. `detail` carries the rule detail, the offending paths, or the stop reason for the recorded `reason`. Missing or malformed `args` make the script throw, which surfaces as a Workflow tool error rather than an `escalated` record.
 
 `requestedRoutes` lists every `agent()` call in order with the model and effort the script passed. The script passes `model` and `effort` explicitly on every call, taken from a constant table of agent definitions inside the script; a test keeps that table equal to the agent frontmatter. In manual mode the orchestrator builds the same list by hand from the agents it invoked.
 
