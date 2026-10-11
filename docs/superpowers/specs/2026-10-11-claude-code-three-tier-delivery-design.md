@@ -140,7 +140,7 @@ Plan rules. The script returns `{ status: "blocked", reason: "plan-rule-R<n>", p
 
 The Plan phase is fingerprinted like every other read-only phase: `adp-validator` (label `plan-pre`) runs before the lead and `adp-validator` (label `plan-post`) after it. A fingerprint mismatch, or either `head` differing from `baseCommit`, returns `{ status: "blocked", reason: "plan-gate-fingerprint" }`. Both calls appear in `requestedRoutes`. When `resumePlan` is supplied the lead does not run and these two calls are skipped.
 
-If `args.pauseAfterPlan` is true, the script returns `{ status: "plan-ready", plan }` after validation.
+If `args.pauseAfterPlan` is true and no `resumePlan` was supplied, the script returns the full record with `status: "plan-ready"` after validation; a resumed run never pauses again.
 
 ### Validator file states
 
