@@ -114,14 +114,22 @@ test('the Claude 5 profile holds the three-tier routes, escalation, delegation l
 
 test('the settings template sets the orchestrator route and the README documents install', () => {
   assert.deepEqual(json('templates/claude-settings.template.json'), {
-    model: 'claude-opus-5-5',
-    effortLevel: 'medium',
+    model: 'claude-fable-5-1',
+    effortLevel: 'high',
   });
   const readme = readUtf8(root, 'adapters/claude-code/README.md');
   assert.match(readme, /\/plugin marketplace add arcayne\/agentic-delivery-playbook/);
   assert.match(readme, /\/plugin install/);
   assert.match(readme, /never auto-applied/);
   assert.match(readme, /Known gaps/);
+  assert.match(readme, /## Reference/);
+  assert.match(readme, /"contractPath"/);
+  assert.match(readme, /GIT_INDEX_FILE/);
+  assert.match(readme, /git rev-parse --git-path index/);
+  assert.match(readme, /Gitignored files are not covered/);
+  assert.match(readme, /shasum -a 256/);
+  assert.match(readme, /--requested/);
+  assert.match(readme, /\| `closeout\.goalFit` \|/);
 });
 
 test('the reviewer read-only disclosure and fingerprint rule are stated plainly', () => {
