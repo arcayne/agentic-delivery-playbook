@@ -204,7 +204,7 @@ Runs only after `decision === "accept"`.
 }
 ```
 
-`requestedRoutes` lists every `agent()` call in order with the model and effort the script requested. For agents whose `model` or `effort` the script did not override, the script records the values from a constant table of agent definitions inside the script; a test keeps that table equal to the agent frontmatter. In manual mode the orchestrator builds the same list by hand from the agents it invoked.
+`requestedRoutes` lists every `agent()` call in order with the model and effort the script passed. The script passes `model` and `effort` explicitly on every call, taken from a constant table of agent definitions inside the script; a test keeps that table equal to the agent frontmatter. In manual mode the orchestrator builds the same list by hand from the agents it invoked.
 
 ### Closeout table
 
@@ -242,7 +242,7 @@ The workflow return value is saved verbatim as `specs/<run>/workflow-result.json
 
 ### Requested versus observed
 
-The workflow return is authoritative for requested routes. The probe is authoritative for observed routes. The match rule for closeout and for AC-9: take the multiset of `(agentType, model, effort)` over the concatenated `requestedRoutes` of every workflow run in the session, and the multiset of `(agentType, observed model, observed effort)` over the probe's subagents whose `agentType` is one of the plugin's agents other than `adp-explorer`; the two multisets must be equal. Probe subagents of other types (`Explore`, `general-purpose`, `adp-explorer`, foreign plugins) are reported but excluded. During a Controlled run the orchestrator must not invoke the plugin's worker, validator, reviewer, lead, or goal-reviewer agents outside the workflow; if it does, in manual mode or by exception, it adds them to the requested list by hand. If the dogfood run shows that subagent metadata carries the workflow `label`, the probe joins on label instead and the rule becomes per-label equality.
+The workflow return is authoritative for requested routes. The probe is authoritative for observed routes. The match rule for closeout and for AC-9: take the multiset of `(agentType, model, effort)` over the concatenated `requestedRoutes` of every workflow run in the session, and the multiset of `(agentType, observed model, observed effort)` over the probe's subagents whose `agentType` is one of the plugin's agents other than `adp-explorer`; the two multisets must be equal. Probe subagents of other types (`Explore`, `general-purpose`, `adp-explorer`, foreign plugins) are reported but excluded. During a Controlled run the orchestrator must not invoke the plugin's worker, validator, reviewer, lead, or goal-reviewer agents outside the workflow; if it does, in manual mode or by exception, it adds them to the requested list by hand. Metadata carries the label as `description`, so when every requested entry has a label the probe also reports per-label pairs; the multiset rule stays the acceptance test because the custom `agentType` recording is unconfirmed until AC-9.
 
 Two recorded exceptions do not fail the rule but must appear in `closeout.knownGaps`: an observed subagent with effort `unknown` (no `perTurnEffort` in its transcript) whose agent type and model match, and an orphaned observed subagent re-spawned by a crash resume. A killed Workflow invocation gets a `workflow.runs[]` entry with `status: "killed"` and `resultFile` `null`. Any other difference between the multisets is contradictory evidence and closes the run as escalated.
 
@@ -281,13 +281,17 @@ The path matcher, the topological sort, and rules R1 to R8 live in `lib/deliver-
 
 ## Probe changes
 
+Observed layout (local transcripts, 2026-10-11): workflow agents are stored under `<session>/subagents/workflows/<runId>/agent-*.{jsonl,meta.json}`. Their `meta.json` carries `agentType`, `description` (the workflow `label`), `workflowPhase`, `spawnDepth`, and `model` when one was passed per invocation. No metadata file carries `effort`. Whether a custom `agentType` passed to a workflow `agent()` call is recorded as that custom name is confirmed by the dogfood run.
+
 `lib/claude-route-probe.js` learns:
 
-- Requested effort follows the same precedence as model: a per-invocation value in `meta.json` when present, else the agent definition, else `unknown`. The spike showed `meta.model` is recorded only when passed per invocation; whether `effort` and `label` are recorded is confirmed by the dogfood run and documented in the profile.
+- Walk `subagents/*.jsonl` and `subagents/workflows/*/agent-*.jsonl`. Each subagent entry gains `label` (`meta.description`), `workflowRunId`, and `workflowPhase`, all `null` when absent.
+- Requested model follows the existing precedence: per-invocation `meta.model`, else the agent definition, else `unknown`. Requested effort comes from `meta.effort` if a future version records it, else the agent definition, else `unknown`.
 - An `agentType` of `workflow-subagent` records `requested.source: "workflow"` with model and effort `unknown` unless the meta carries them. The script always passes a custom `agentType`, so this is a fallback only.
-- No nested directory walk. Depth is one.
+- No nested directory walk beyond the workflows folder. Depth is one.
+- A `compareRoutes(report, requestedRoutes)` function and a `--requested <workflow-result.json>` CLI option (repeatable, one per run) apply the match rule below and print `matched`, `missing`, `unexpected`, and `unknownEffort` lists, so closeout and AC-9 are checked by code rather than by hand. Because every workflow call passes `model` and `effort` explicitly, `requestedRoutes` records exactly what was passed; the script's agent table is kept equal to the agent frontmatter by a test.
 
-Fixtures: one synthetic workflow transcript with Plan, Implement, Review, and Goal-fit agents, including one retry-2 worker with a per-invocation model and one `workflow-subagent`. AC-9 replaces the synthetic fixture with a sanitized copy of the dogfood transcript's metadata and transcripts, or records the differences and corrects the fixture.
+Fixtures: one synthetic workflow transcript using the observed layout with Plan, Implement, Review, and Goal-fit agents, including one retry-2 worker with a per-invocation model, one `workflow-subagent`, and one top-level `adp-explorer`, plus a matching `workflow-result.json`. AC-9 replaces the synthetic fixture with a sanitized copy of the dogfood transcript's metadata and transcripts, or records the differences and corrects the fixture.
 
 ## Test changes
 
@@ -320,7 +324,7 @@ PR 1 (mechanism):
 - AC-3: The `deliver` skill is at most 80 lines, explicit-invoke, references the brief, the workflow script path, the pause rule, the two review gates, the orchestrator's closeout re-run, and the manual fallback, and all `${CLAUDE_PLUGIN_ROOT}` references resolve. The adapter README holds the `args` example, the mapping table, and the fingerprint command.
 - AC-4: `profiles/claude-5.md` version 2 holds the route table above, permits the Workflow tool, excludes agent teams with the CLI-only reason, states depth one, and removes the alias escalation. At most 120 lines.
 - AC-5: The settings template is `{"model": "claude-fable-5-1", "effortLevel": "high"}` and the README documents it as a manual merge.
-- AC-6: The probe handles the effort precedence and `workflow-subagent` with the new fixture; existing fixtures still pass.
+- AC-6: The probe walks the workflows folder, reports `label`, `workflowRunId`, and `workflowPhase`, handles the effort precedence and `workflow-subagent`, and `compareRoutes` plus `--requested` apply the match rule on the new fixture; existing fixtures still pass.
 - AC-7: `templates/run.json` and the example run carry the new fields at `schemaVersion` `"1.1"` and parse.
 - AC-8: `npm run check` passes; `package.json` and `plugin.json` are `0.4.0`; `npm pack --dry-run` lists the workflow script and agents.
 - AC-9 (dogfood): one Controlled run on a real task in a non-playbook repository through the new skill, with `pauseAfterPlan` exercised once, recorded under `specs/<date>-three-tier-dogfood/` with `brief.md`, `contract.md`, `run.json`, `workflow-result.json`, and the probe output. The requested-versus-observed match rule holds for every `requestedRoutes` entry. The recorded artifacts contain no personal absolute paths and nothing private from the other repository. The goal-fit verdict must be `fit`; `partially-fit` or `not-fit` blocks merge until the reasons are addressed and the run repeated.
