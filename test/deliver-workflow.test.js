@@ -23,7 +23,7 @@ const markedBlock = (text, file) => {
 test('the workflow script parses as the Workflow sandbox would run it', () => {
   const result = checkWorkflowSyntax(script());
   assert.equal(result.ok, true, result.stderr);
-  const broken = checkWorkflowSyntax(script().replace('phase(\'Plan\')', 'phase(\'Plan\'')) ;
+  const broken = checkWorkflowSyntax(script().replace('phase(\'Plan\')', 'phase(\'Plan\''));
   assert.equal(broken.ok, false, 'a syntax error is detected');
 });
 
@@ -45,9 +45,10 @@ test('meta is a pure literal with the four phase titles', () => {
 
 test('the script uses no runtime features the Workflow sandbox forbids', () => {
   const text = script();
-  for (const token of ['Date.now', 'Math.random', 'new Date(', 'require(', 'import ', 'process.', 'fs.']) {
+  for (const token of ['Date.now', 'Math.random', 'new Date(', 'require(', 'import ', 'process.']) {
     assert.equal(text.includes(token), false, `script must not contain ${token}`);
   }
+  assert.doesNotMatch(text, /\bfs\./, 'script must not use fs.');
   assert.doesNotMatch(text, /\bpipeline\(|\bparallel\(/, 'writers are serialized; no pipeline or parallel');
   assert.doesNotMatch(text, /isolation:/, 'no worktree isolation in v1');
 });
@@ -84,7 +85,7 @@ test('the agent table matches the agent frontmatter and every call passes agentT
 test('the script carries every reason string and label pattern from the spec', () => {
   const text = script();
   for (const reason of [
-    'plan-gate-fingerprint', 'worker-stopped', 'head-moved', 'ownership', 'fix-cycles-exhausted',
+    'plan-gate-fingerprint', 'worker-stopped', 'head-moved', "reason: 'ownership'", 'fix-cycles-exhausted',
     'review-gate-fingerprint', 'review-rejected', 'review-cycles-exhausted', 'finding-outside-ownership',
     'review-fix-failed', 'goal-fit-gate-fingerprint', 'agent-null:',
   ]) {

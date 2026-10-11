@@ -240,14 +240,24 @@ const GOAL_FIT_SCHEMA = {
 
 // ---- args ------------------------------------------------------------------
 
+// Malformed args throw, which surfaces as a Workflow tool error rather than an escalated record.
 const a = args || {}
-const requireArg = (name, ok) => { if (!ok) throw new Error(`deliver-controlled: args.${name} is required`) }
-requireArg('contractPath', typeof a.contractPath === 'string' && a.contractPath !== '')
-requireArg('briefPath', typeof a.briefPath === 'string' && a.briefPath !== '')
-requireArg('baseCommit', typeof a.baseCommit === 'string' && a.baseCommit !== '')
+const requireArg = (name, ok, problem) => { if (!ok) throw new Error(`deliver-controlled: args.${name} ${problem || 'is required'}`) }
+const isText = (value) => typeof value === 'string' && value !== ''
+const isTextArray = (value) => Array.isArray(value) && value.every((item) => typeof item === 'string')
+const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value)
+requireArg('contractPath', isText(a.contractPath))
+requireArg('briefPath', isText(a.briefPath))
+requireArg('baseCommit', isText(a.baseCommit))
 requireArg('lanes', Array.isArray(a.lanes) && a.lanes.length > 0)
-const risk = a.risk === 'high' ? 'high' : 'normal'
-const nonGoalFiles = Array.isArray(a.nonGoalFiles) ? a.nonGoalFiles : []
+a.lanes.forEach((lane, i) => requireArg(`lanes[${i}]`, isObject(lane) && isText(lane.id) && isTextArray(lane.ownedFiles), 'must be an object with a non-empty string id and an array of strings ownedFiles'))
+requireArg('nonGoalFiles', a.nonGoalFiles === undefined || isTextArray(a.nonGoalFiles), 'must be an array of strings')
+requireArg('risk', a.risk === undefined || a.risk === 'normal' || a.risk === 'high', "must be 'normal' or 'high'")
+requireArg('goalReviewer', a.goalReviewer === undefined || (isObject(a.goalReviewer) && ['agentType', 'model', 'effort'].every((key) => a.goalReviewer[key] === undefined || isText(a.goalReviewer[key]))), 'must be an object whose agentType, model, and effort are non-empty strings when present')
+requireArg('pauseAfterPlan', a.pauseAfterPlan === undefined || typeof a.pauseAfterPlan === 'boolean', 'must be a boolean')
+requireArg('resumePlan', a.resumePlan === undefined || a.resumePlan === null || isObject(a.resumePlan), 'must be null or an object')
+const risk = a.risk || 'normal'
+const nonGoalFiles = a.nonGoalFiles || []
 const goalReviewerDef = Object.assign({}, AGENTS.goalReviewer, a.goalReviewer || {})
 
 // ---- prompts ---------------------------------------------------------------
@@ -263,9 +273,9 @@ const validatorPrompt = (command) => [
   'You are the validator. Never modify any file. Perform these steps in order and record each result:',
   '1. head: run `git rev-parse HEAD`.',
   `2. fileStates: run exactly the command between the backticks: \`${FILE_STATES_COMMAND}\` Each output line is a path, a tab, and its content hash or the literal "deleted". Return an object keyed by path; an empty object means a clean tree.`,
-  `3. fingerprint: run exactly: ${FINGERPRINT_COMMAND}`,
+  `3. fingerprint: run exactly the command between the backticks: \`${FINGERPRINT_COMMAND}\``,
   command
-    ? `4. Then run exactly this command and record command, exitCode, and the last 40 lines of combined output as outputExcerpt: ${command}`
+    ? `4. Then run exactly the command between the backticks and record command, exitCode, and the last 40 lines of combined output as outputExcerpt: \`${command}\``
     : '4. No command this time: set command to null, exitCode to null, and outputExcerpt to "".',
   'Steps 1 to 3 happen before step 4. Run nothing else.',
 ].join('\n')
@@ -293,8 +303,8 @@ const reviewerPrompt = (plan, taskRecords, cycle) => [
   `You are the fresh-context defect reviewer (cycle ${cycle}). Compute the diff against the base commit yourself, including untracked files.`,
   `Plan: ${JSON.stringify(plan)}`,
   `Validation records: ${JSON.stringify([...taskRecords.values()])}`,
-  `Compute diffSha256 with exactly this command, replacing BASE with the base commit: ${DIFF_HASH_COMMAND}`,
-  'Lead with defects ordered by severity, each tied to an acceptance criterion and a file and line. Flag scope creep, files outside task ownership, unrun or contradictory checks, and unsupported claims. List criteria that lack evidence in unprovenCriteria. Decide accept, accept-with-fixes, or reject.',
+  `Compute diffSha256 with exactly this command: \`${DIFF_HASH_COMMAND.replace('BASE', () => a.baseCommit)}\``,
+  'Lead with defects ordered by severity, each tied to an acceptance criterion and a file and line. For each finding, file must be the repository-relative path exactly as it appears in a task\'s ownedFiles; put the line number only in line. Flag scope creep, files outside task ownership, unrun or contradictory checks, and unsupported claims. List criteria that lack evidence in unprovenCriteria. Decide accept, accept-with-fixes, or reject.',
 ].join('\n')
 
 const goalFitPrompt = (taskRecords, review) => [
@@ -417,7 +427,7 @@ for (let cycle = 1; cycle <= MAX_REVIEW_CYCLES; cycle += 1) {
     decision: review.decision, findings: review.findings, unprovenCriteria: review.unprovenCriteria, diffSha256: review.diffSha256,
     fingerprintBefore: pre.fingerprint, fingerprintAfter: post.fingerprint,
   })
-  if (pre.fingerprint !== post.fingerprint || post.head !== a.baseCommit) return escalate('review-gate-fingerprint')
+  if (pre.fingerprint !== post.fingerprint || pre.head !== a.baseCommit || post.head !== a.baseCommit) return escalate('review-gate-fingerprint')
   finalDecision = review.decision
   if (review.decision === 'reject') return escalate('review-rejected', review.findings)
   // accept-with-fixes with nothing to fix is an accept.
@@ -431,7 +441,9 @@ for (let cycle = 1; cycle <= MAX_REVIEW_CYCLES; cycle += 1) {
     if (!byTask.has(owner.id)) byTask.set(owner.id, [])
     byTask.get(owner.id).push(finding)
   }
-  for (const [id, findings] of byTask) {
+  // Fix in dependency order so a dependency is repaired before its dependents.
+  for (const id of planCheck.order.filter((taskId) => byTask.has(taskId))) {
+    const findings = byTask.get(id)
     const record = taskRecords.get(id)
     const nextAttempt = record.attempts.length + 1
     if (nextAttempt > MAX_ATTEMPTS) { record.status = 'blocked'; return escalate('review-fix-failed', id) }
@@ -455,7 +467,7 @@ const goalFit = {
   verdict: fit.verdict, reasons: fit.reasons, usedDeliverable: fit.usedDeliverable, howUsed: fit.howUsed,
   fingerprintBefore: fitPre.fingerprint, fingerprintAfter: fitPost.fingerprint,
 }
-if (fitPre.fingerprint !== fitPost.fingerprint || fitPost.head !== a.baseCommit) {
+if (fitPre.fingerprint !== fitPost.fingerprint || fitPre.head !== a.baseCommit || fitPost.head !== a.baseCommit) {
   goalFit.verdict = 'invalid'
   return result({ status: 'escalated', reason: 'goal-fit-gate-fingerprint', goalFit })
 }
