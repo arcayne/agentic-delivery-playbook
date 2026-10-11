@@ -9,6 +9,7 @@ const {
   readUtf8,
   findForbiddenTerms,
 } = require('../lib/policy-helpers');
+const { checkWorkflowSyntax } = require('../lib/workflow-syntax-check');
 
 const root = path.resolve(__dirname, '..');
 const active = [
@@ -28,6 +29,7 @@ const active = [
   'adapters/claude-code/agents/adp-lead.md',
   'adapters/claude-code/agents/adp-validator.md',
   'adapters/claude-code/agents/adp-goal-reviewer.md',
+  'adapters/claude-code/workflows/deliver-controlled.js',
   'templates/claude-settings.template.json',
   '.claude-plugin/plugin.json',
   '.claude-plugin/marketplace.json',
@@ -101,6 +103,12 @@ for (const file of [
 
 for (const retired of ['adapters/claude']) {
   if (fs.existsSync(path.join(root, retired))) errors.push(`${retired}: must be under legacy/`);
+}
+
+{
+  const scriptFile = 'adapters/claude-code/workflows/deliver-controlled.js';
+  const check = checkWorkflowSyntax(readUtf8(root, scriptFile));
+  if (!check.ok) errors.push(`${scriptFile}: syntax check failed: ${check.stderr}`);
 }
 
 if (errors.length > 0) {
