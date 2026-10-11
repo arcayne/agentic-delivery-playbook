@@ -2,6 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
@@ -139,4 +140,78 @@ test('probe output never contains raw absolute home-directory paths', () => {
     }
   }
   assert.ok(strings.some((value) => value.includes('~/')), 'home paths are shown with ~');
+});
+
+const session2 = path.join(fixtures, 'session-2.jsonl');
+const result2 = path.join(fixtures, 'session-2', 'workflow-result.json');
+const { compareRoutes } = require('../lib/claude-route-probe');
+
+test('probe walks subagents/workflows/<runId> and reports label, run id, and phase', () => {
+  const report = probeClaude(session2);
+  const byLabel = Object.fromEntries(report.subagents.map((agent) => [agent.label, agent]));
+  assert.equal(report.subagents.length, 9);
+  assert.equal(byLabel['find test runner'].workflowRunId, null);
+  assert.equal(byLabel['plan'].workflowRunId, 'wf_fixture-1');
+  assert.equal(byLabel['plan'].workflowPhase, 'Plan');
+  assert.deepEqual(byLabel['plan'].requested, {
+    model: 'claude-opus-5-5', effort: 'xhigh', source: 'invocation', definitionPath: 'adp-lead.md',
+  });
+  assert.deepEqual(byLabel['t1-implement-3'].requested, {
+    model: 'claude-opus-5-5', effort: 'medium', source: 'invocation', definitionPath: 'adp-worker.md',
+  }, 'per-invocation model wins; effort falls back to the definition because meta has none');
+  assert.equal(byLabel['t1-implement-3'].observed[0].effort, 'high');
+  assert.deepEqual(byLabel['scratch'].requested, { model: 'unknown', effort: 'unknown', source: 'workflow', definitionPath: null });
+  assert.equal(byLabel['scratch'].observed[0].effort, 'unknown');
+});
+
+test('compareRoutes applies the multiset rule over plugin agents, excluding the explorer', () => {
+  const report = probeClaude(session2);
+  const requested = JSON.parse(fs.readFileSync(result2, 'utf8')).requestedRoutes;
+  const outcome = compareRoutes(report, requested);
+  assert.equal(outcome.matched, true, JSON.stringify(outcome));
+  assert.deepEqual(outcome.missing, []);
+  assert.deepEqual(outcome.unexpected, []);
+  assert.deepEqual(outcome.unknownEffort, []);
+  assert.deepEqual(outcome.excluded.map((entry) => entry.agentType).sort(), ['agentic-delivery-playbook:adp-explorer', 'workflow-subagent']);
+  assert.deepEqual(outcome.labelPairs.find((pair) => pair.label === 'goal-fit'), {
+    label: 'goal-fit', requested: { agentType: 'agentic-delivery-playbook:adp-goal-reviewer', model: 'claude-fable-5-1', effort: 'high' }, observed: { model: 'claude-fable-5-1', effort: 'high' },
+  });
+});
+
+test('compareRoutes reports missing, unexpected, and unknown-effort entries', () => {
+  const report = probeClaude(session2);
+  const requested = JSON.parse(fs.readFileSync(result2, 'utf8')).requestedRoutes;
+  const wrong = requested.map((route) => (route.label === 'review-1' ? { ...route, effort: 'high' } : route));
+  const outcome = compareRoutes(report, wrong);
+  assert.equal(outcome.matched, false);
+  assert.deepEqual(outcome.missing, [{ agentType: 'agentic-delivery-playbook:adp-reviewer', model: 'claude-opus-5-5', effort: 'high' }]);
+  assert.deepEqual(outcome.unexpected, [{ agentType: 'agentic-delivery-playbook:adp-reviewer', model: 'claude-opus-5-5', effort: 'medium' }]);
+  const unknown = { ...report, subagents: report.subagents.map((s) => (s.label === 'review-1' ? { ...s, observed: [{ ...s.observed[0], effort: 'unknown' }] } : s)) };
+  const tolerant = compareRoutes(unknown, requested);
+  assert.equal(tolerant.matched, true);
+  assert.deepEqual(tolerant.unknownEffort, [{ label: 'review-1', agentType: 'agentic-delivery-playbook:adp-reviewer', model: 'claude-opus-5-5', requestedEffort: 'medium' }]);
+});
+
+test('compareRoutes resolves exact matches before unknown-effort fallbacks, regardless of order', () => {
+  const type = 'agentic-delivery-playbook:adp-goal-reviewer';
+  const observed = (label, effort) => ({ agentId: label, agentType: type, label, observed: [{ model: 'claude-fable-5-1', effort, entrypoint: 'cli', count: 1 }] });
+  const report = { subagents: [observed('g1', 'unknown'), observed('g2', 'medium')] };
+  const requested = [
+    { label: 'g2', agentType: type, model: 'claude-fable-5-1', effort: 'medium' },
+    { label: 'g1', agentType: type, model: 'claude-fable-5-1', effort: 'high' },
+  ];
+  const outcome = compareRoutes(report, requested);
+  assert.equal(outcome.matched, true, JSON.stringify(outcome));
+  assert.deepEqual(outcome.unknownEffort, [{ label: 'g1', agentType: type, model: 'claude-fable-5-1', requestedEffort: 'high' }]);
+});
+
+test('CLI probe accepts repeated --requested and prints the comparison', () => {
+  const probe = cli('probe', 'claude', session2, '--requested', result2);
+  assert.equal(probe.status, 0, probe.stderr);
+  const report = JSON.parse(probe.stdout);
+  assert.equal(report.comparison.matched, true);
+  const twice = cli('probe', 'claude', session2, '--requested', result2, '--requested', result2);
+  assert.equal(JSON.parse(twice.stdout).comparison.matched, false, 'doubling requested routes produces missing entries');
+  assert.notEqual(cli('probe', 'claude', session2, '--requested').status, 0);
+  assert.notEqual(cli('probe', 'claude', session2, '--requested', path.join(fixtures, 'nope.json')).status, 0);
 });

@@ -19,10 +19,10 @@ function usage(exitCode = 0) {
 
 Usage:
   agentic-delivery-playbook show <codex|chatgpt|profile|contract|run>
-  agentic-delivery-playbook probe claude <session.jsonl> [--agents-dir <dir>]
+  agentic-delivery-playbook probe claude <session.jsonl> [--agents-dir <dir>] [--requested <workflow-result.json>]...
   agentic-delivery-playbook --help
 
-The show command prints a maintained artifact to stdout. The probe command reads a Claude Code session transcript and prints requested and observed routes as JSON. Neither changes local or global configuration.`);
+The show command prints a maintained artifact to stdout. The probe command reads a Claude Code session transcript and prints requested and observed routes as JSON. With --requested (repeatable, one per workflow run), the report includes a comparison of requested and observed routes. Neither changes local or global configuration.`);
   process.exit(exitCode);
 }
 
@@ -31,13 +31,27 @@ if (args[0] === '-h' || args[0] === '--help') usage(0);
 
 if (args[0] === 'probe') {
   const [, kind, sessionFile, ...rest] = args;
-  let agentsDir;
-  if (rest.length === 2 && rest[0] === '--agents-dir') agentsDir = rest[1];
-  else if (rest.length !== 0) usage(1);
   if (kind !== 'claude' || !sessionFile) usage(1);
+  let agentsDir;
+  const requestedFiles = [];
+  for (let i = 0; i < rest.length; i += 1) {
+    if (rest[i] === '--agents-dir' && rest[i + 1] && agentsDir === undefined) agentsDir = rest[++i];
+    else if (rest[i] === '--requested' && rest[i + 1]) requestedFiles.push(rest[++i]);
+    else usage(1);
+  }
   try {
-    const { probeClaude } = require('../lib/claude-route-probe');
-    console.log(JSON.stringify(probeClaude(sessionFile, { agentsDir }), null, 2));
+    const { probeClaude, compareRoutes } = require('../lib/claude-route-probe');
+    const report = probeClaude(sessionFile, { agentsDir });
+    if (requestedFiles.length > 0) {
+      const requested = requestedFiles.flatMap((file) => {
+        if (!fs.existsSync(file)) throw new Error(`requested file not found: ${path.basename(file)}`);
+        const parsed = JSON.parse(fs.readFileSync(file, 'utf8'));
+        if (!Array.isArray(parsed.requestedRoutes)) throw new Error(`${path.basename(file)}: no requestedRoutes array`);
+        return parsed.requestedRoutes;
+      });
+      report.comparison = compareRoutes(report, requested);
+    }
+    console.log(JSON.stringify(report, null, 2));
   } catch (error) {
     console.error(`error: ${error.message}`);
     usage(1);

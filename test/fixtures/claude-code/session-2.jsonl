@@ -1,0 +1,2 @@
+{"type":"user","message":{"role":"user","content":"deliver"}}
+{"type":"assistant","message":{"model":"claude-fable-5-1"},"perTurnEffort":"high","entrypoint":"claude-desktop"}
