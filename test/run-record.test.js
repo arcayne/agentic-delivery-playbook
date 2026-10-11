@@ -13,6 +13,11 @@ test('the run template is compact and normalized around lanes', () => {
   const run = JSON.parse(text);
 
   assert.equal(run.mode, 'controlled');
+  assert.equal(run.schemaVersion, '1.1');
+  assert.deepEqual(run.brief, { path: null, inception: null });
+  assert.deepEqual(run.workflow, { mode: null, scriptPath: null, runs: [] });
+  assert.equal(run.lanes[0].requested.agentType, null);
+  assert.equal(run.closeout.goalFit, null);
   assert.ok(Array.isArray(run.lanes));
   assert.ok(Array.isArray(run.validation));
   assert.ok(Array.isArray(run.acceptance));
@@ -33,4 +38,14 @@ test('the run template is compact and normalized around lanes', () => {
   for (const duplicate of ['modelLedger', 'roles', 'routeEvaluations', 'parallelization']) {
     assert.equal(Object.hasOwn(run, duplicate), false, `${duplicate} must not return`);
   }
+});
+
+test('the controlled example carries the 1.1 fields as null and keeps its GPT-6 lanes', () => {
+  const run = JSON.parse(readUtf8(root, 'examples/controlled-run/run.json'));
+  assert.equal(run.schemaVersion, '1.1');
+  assert.deepEqual(run.brief, { path: null, inception: null });
+  assert.deepEqual(run.workflow, { mode: null, scriptPath: null, runs: [] });
+  for (const lane of run.lanes) assert.equal(lane.requested.agentType, null);
+  assert.equal(run.closeout.goalFit, null);
+  assert.equal(run.lanes[0].requested.model, 'gpt-6-luna');
 });

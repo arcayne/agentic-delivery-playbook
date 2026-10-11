@@ -1,11 +1,20 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.1",
   "mode": "controlled",
   "status": "planned",
   "contract": {
     "path": "specs/example/contract.md",
     "sha256": "sha256:contract-content-hash",
     "approvalEvidence": "task-or-review-reference"
+  },
+  "brief": {
+    "path": null,
+    "inception": null
+  },
+  "workflow": {
+    "mode": null,
+    "scriptPath": null,
+    "runs": []
   },
   "source": {
     "baseCommit": "git-commit-sha",
@@ -25,7 +34,8 @@
       "requested": {
         "model": "gpt-6-luna",
         "effort": "high",
-        "topology": "single"
+        "topology": "single",
+        "agentType": null
       },
       "observed": {
         "model": "runtime-default",
@@ -67,6 +77,7 @@
   "closeout": {
     "outcome": "pending",
     "knownGaps": [],
-    "escalation": null
+    "escalation": null,
+    "goalFit": null
   }
 }

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.1",
   "mode": "controlled",
   "status": "accepted",
   "fictionalExample": true,
@@ -7,6 +7,15 @@
     "path": "examples/controlled-run/contract.md",
     "sha256": "sha256:0ce67c222857b95e75d6c6d47da3abc15c5404e49b90447c180de8bf52030eda",
     "approvalEvidence": "Fictional Acme Catalog API product review on 2026-07-10"
+  },
+  "brief": {
+    "path": null,
+    "inception": null
+  },
+  "workflow": {
+    "mode": null,
+    "scriptPath": null,
+    "runs": []
   },
   "source": {
     "baseCommit": "fictional:catalog-api-before-v2-version-marker",
@@ -31,7 +40,8 @@
       "requested": {
         "model": "gpt-6-luna",
         "effort": "high",
-        "topology": "single"
+        "topology": "single",
+        "agentType": null
       },
       "observed": {
         "model": "gpt-6-luna",
@@ -57,7 +67,8 @@
       "requested": {
         "model": "gpt-6-sol",
         "effort": "high",
-        "topology": "single"
+        "topology": "single",
+        "agentType": null
       },
       "observed": {
         "model": "gpt-6-sol",
@@ -137,6 +148,7 @@
   "closeout": {
     "outcome": "accepted",
     "knownGaps": [],
-    "escalation": null
+    "escalation": null,
+    "goalFit": null
   }
 }
