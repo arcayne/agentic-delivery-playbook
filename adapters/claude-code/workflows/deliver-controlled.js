@@ -22,7 +22,6 @@ const AGENTS = {
 }
 
 const WORKER_LADDER = ['worker', 'workerHigh', 'workerOpus']
-const MAX_ATTEMPTS = 3
 const MAX_REVIEW_CYCLES = 3
 const FINGERPRINT_COMMAND = 'T=$(mktemp) && cp "$(git rev-parse --git-path index)" "$T" && GIT_INDEX_FILE="$T" git add -A && GIT_INDEX_FILE="$T" git write-tree; rm -f "$T"'
 const DIFF_HASH_COMMAND = '{ git diff --no-color --no-ext-diff BASE; git ls-files --others --exclude-standard -z | while IFS= read -r -d \'\' f; do printf \'%s\\0\' "$f"; cat "$f"; done; } | shasum -a 256'
@@ -256,8 +255,11 @@ a.lanes.forEach((lane, i) => requireArg('lanes', a.lanes.findIndex((other) => ot
 requireArg('nonGoalFiles', a.nonGoalFiles === undefined || isTextArray(a.nonGoalFiles), 'must be an array of strings')
 requireArg('risk', a.risk === undefined || a.risk === 'normal' || a.risk === 'high', "must be 'normal' or 'high'")
 requireArg('goalReviewer', a.goalReviewer === undefined || (isObject(a.goalReviewer) && ['agentType', 'model', 'effort'].every((key) => a.goalReviewer[key] === undefined || isText(a.goalReviewer[key]))), 'must be an object whose agentType, model, and effort are non-empty strings when present')
+requireArg('workerLadder', a.workerLadder === undefined || (Array.isArray(a.workerLadder) && a.workerLadder.length >= 1 && a.workerLadder.length <= 3 && a.workerLadder.every((role) => WORKER_LADDER.includes(role))), 'must list 1 to 3 worker roles (worker, workerHigh, workerOpus)')
 requireArg('pauseAfterPlan', a.pauseAfterPlan === undefined || typeof a.pauseAfterPlan === 'boolean', 'must be a boolean')
 requireArg('resumePlan', a.resumePlan === undefined || a.resumePlan === null || isObject(a.resumePlan), 'must be null or an object')
+const ladder = Array.isArray(a.workerLadder) ? a.workerLadder : WORKER_LADDER
+const MAX_ATTEMPTS = ladder.length
 const risk = a.risk || 'normal'
 const nonGoalFiles = a.nonGoalFiles || []
 const goalReviewerDef = Object.assign({}, AGENTS.goalReviewer, a.goalReviewer || {})
@@ -374,7 +376,7 @@ for (const task of plan.tasks) taskRecords.set(task.id, { id: task.id, status: '
 // One attempt of one task. Returns {outcome:'passed'} | {outcome:'failed', validator} | {outcome:'escalate', reason, detail}.
 async function attemptTask(task, attempt, extra) {
   const record = taskRecords.get(task.id)
-  const role = WORKER_LADDER[attempt - 1]
+  const role = ladder[attempt - 1]
   const d = AGENTS[role]
   const labels = { pre: `t${task.id}-pre-${attempt}`, implement: `t${task.id}-implement-${attempt}`, validate: `t${task.id}-validate-${attempt}` }
   const pre = await call('validator', labels.pre, 'Implement', validatorPrompt(null), VALIDATOR_SCHEMA)

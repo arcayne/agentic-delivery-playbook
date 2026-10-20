@@ -214,10 +214,34 @@ test('malformed args reject with an error naming the argument', async () => {
     [{ goalReviewer: { model: null } }, 'args.goalReviewer'],
     [{ pauseAfterPlan: 'yes' }, 'args.pauseAfterPlan'],
     [{ resumePlan: [] }, 'args.resumePlan'],
+    [{ workerLadder: 'workerHigh' }, 'args.workerLadder'],
+    [{ workerLadder: ['nope'] }, 'args.workerLadder'],
+    [{ workerLadder: ['worker', 'workerHigh', 'workerOpus', 'workerOpus'] }, 'args.workerLadder'],
     [{ baseCommit: '0123456' }, 'args.baseCommit must be a full commit hash'],
     [{ lanes: [{ id: 'src', ownedFiles: ['src/**'] }, { id: 'src', ownedFiles: ['test/**'] }] }, 'args.lanes has duplicate id src'],
   ];
   for (const [patch, name] of malformed) {
     await assert.rejects(simulate({ ...ARGS, ...patch }), (err) => err.message.includes(name), name);
   }
+});
+
+test('workerLadder overrides the attempt rungs and is recorded in requestedRoutes', async () => {
+  const { result, calls } = await simulate(
+    { ...ARGS, workerLadder: ['workerHigh', 'workerHigh', 'workerOpus'] },
+    { exits: { 't1-validate-1': 1 } },
+  );
+  assert.equal(result.status, 'completed');
+  const attempts = taskRecord(result, '1').attempts;
+  assert.deepEqual(attempts.map((x) => x.agentType), [WORKER_HIGH, WORKER_HIGH]);
+  assert.deepEqual(attempts.map((x) => x.effort), ['high', 'high']);
+  assert.deepEqual(attempts.map((x) => x.model), [SONNET, SONNET]);
+  assert.deepEqual(result.requestedRoutes, calls);
+});
+
+test('a one-rung workerLadder escalates after exactly one worker attempt', async () => {
+  const { result, labels } = await simulate({ ...ARGS, workerLadder: ['worker'] }, { exits: { 't1-validate-1': 1 } });
+  assert.equal(result.status, 'escalated');
+  assert.equal(result.reason, 'fix-cycles-exhausted');
+  assert.equal(taskRecord(result, '1').attempts.length, 1);
+  assert.equal(labels.filter((l) => l.startsWith('t1-implement')).length, 1);
 });

@@ -41,11 +41,12 @@ The skill passes these to the Workflow tool with `scriptPath` set to the plugin'
   "nonGoalFiles": ["README.md", "legacy/**"],
   "lanes": [{ "id": "worker", "ownedFiles": ["src/**", "test/x.test.js"] }],
   "goalReviewer": { "agentType": "agentic-delivery-playbook:adp-goal-reviewer", "model": "claude-fable-5-1", "effort": "high" },
+  "workerLadder": ["worker", "workerHigh", "workerOpus"],
   "resumePlan": null
 }
 ```
 
-Set `pauseAfterPlan` to `true` when the grill was skipped or `risk` is `high`; the run returns `plan-ready`, you approve the plan, then start a second run with `resumePlan` set to the approved plan and `pauseAfterPlan` `false`. For a `blocked` run: if the returned `plan.openQuestions` is non-empty, whatever the `reason`, ask the user, append the answers to the brief under "Answers", and start a new run. For any other plan failure, append the failure detail to the brief under "Answers", fix the cause, retry once, then stop and ask. Lane `ownedFiles` and `nonGoalFiles` are patterns where `*` matches within one path segment and `**` matches any depth; task paths in the plan are concrete. `goalReviewer` is optional and defaults to the values shown. Missing or malformed `args` surface as a Workflow tool error, not as an `escalated` record.
+Set `pauseAfterPlan` to `true` when the grill was skipped or `risk` is `high`; the run returns `plan-ready`, you approve the plan, then start a second run with `resumePlan` set to the approved plan and `pauseAfterPlan` `false`. For a `blocked` run: if the returned `plan.openQuestions` is non-empty, whatever the `reason`, ask the user, append the answers to the brief under "Answers", and start a new run. For any other plan failure, append the failure detail to the brief under "Answers", fix the cause, retry once, then stop and ask. Lane `ownedFiles` and `nonGoalFiles` are patterns where `*` matches within one path segment and `**` matches any depth; task paths in the plan are concrete. `goalReviewer` is optional and defaults to the values shown. `workerLadder` is optional and overrides the attempt rungs with worker roles from the script's agent table; any override is a route exception and must be recorded in `run.json` under `route.exception`. Missing or malformed `args` surface as a Workflow tool error, not as an `escalated` record.
 
 ### Fingerprint and diff hash
 

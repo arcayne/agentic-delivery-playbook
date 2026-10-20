@@ -96,11 +96,12 @@ Location: `adapters/claude-code/workflows/deliver-controlled.js`, shipped in the
   "nonGoalFiles": ["README.md", "legacy/**"],
   "lanes": [{ "id": "worker", "ownedFiles": ["src/**", "test/x.test.js"] }],
   "goalReviewer": { "agentType": "agentic-delivery-playbook:adp-goal-reviewer", "model": "claude-fable-5-1", "effort": "high" },
+  "workerLadder": ["worker", "workerHigh", "workerOpus"],
   "resumePlan": null
 }
 ```
 
-`goalReviewer` defaults to the values shown when omitted. `resumePlan` carries an approved plan object; when present, the Plan phase is skipped and the plan is re-validated by the same rules, because the user may have edited it. `resumeFromRunId` is reserved for crash recovery of an identical invocation and is not used for the pause.
+`goalReviewer` defaults to the values shown when omitted. `workerLadder` is optional; when present it lists one to three worker roles (`worker`, `workerHigh`, `workerOpus`) that replace the default ladder, and the orchestrator records the override as a route exception. `resumePlan` carries an approved plan object; when present, the Plan phase is skipped and the plan is re-validated by the same rules, because the user may have edited it. `resumeFromRunId` is reserved for crash recovery of an identical invocation and is not used for the pause.
 
 ### Path matching
 

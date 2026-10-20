@@ -26,7 +26,7 @@ Direct mode: the orchestrator edits directly. Controlled mode: the shipped Workf
 
 ## Escalation
 
-- Worker ladder inside the workflow: Sonnet medium, then Sonnet high, then Opus high. Three attempts per task, counting review fixes. A task that fails its check at attempt three stops the run as escalated.
+- Worker ladder inside the workflow: Sonnet medium, then Sonnet high, then Opus high. Three attempts per task, counting review fixes. A task that fails its check at attempt three stops the run as escalated. The workflow `workerLadder` argument may start higher for a bounded run; record it under `route.exception`.
 - Review: `adp-reviewer` at medium; `adp-reviewer-high` when the contract's risk line is `high`. At most two accept-with-fixes cycles before the run escalates.
 - Goal-fit: no automatic fix loop. `partially-fit` closes as partially accepted with the reasons as known gaps; `not-fit` escalates to the user.
 - Escalate only from evidence: a failed check, a reviewer finding, a fingerprint mismatch, or a stop condition. Higher effort is not an unlimited retry loop.
